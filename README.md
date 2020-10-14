@@ -61,5 +61,5 @@
 * Dashboard com informações dos doadores
 * Dashboard com informações dos enfermeiros
 
-###### **Datas críticas**
+##### **Datas críticas**
 * Alerta de datas consideradas críticas para o estoque de bolsas
