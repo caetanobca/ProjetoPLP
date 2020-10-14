@@ -1,1 +1,0 @@
-##Data de entrega paradigma lógico: 30/11 a 05/12

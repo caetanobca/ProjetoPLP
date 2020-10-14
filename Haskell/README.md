@@ -1,1 +1,1 @@
-##Data de entrega paradigma funcional: 02/11 a 08/11
+## Data de entrega paradigma funcional: 02/11 a 08/11
