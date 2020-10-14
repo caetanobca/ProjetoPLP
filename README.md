@@ -7,7 +7,7 @@
 
 ## Funcionalidades
 ---
-##### **Cadastro de doadores**
+#### **Cadastro de doadores**
 * Ficha de Dados
 * Ficha Médica
 * Histórico de doações
@@ -19,13 +19,13 @@
 * Visualizar todos os doadores
 * Notificação de tempo desde última doação
 
-##### **Cadastro de Recebedores**
+#### **Cadastro de Recebedores**
 * Ficha de Dados
 * Ficha Médica
 * Hospital que será internado
 * Quantidade necessária
 
-##### **Cadastro de Enfermeiros** 
+#### **Cadastro de Enfermeiros** 
 * Ficha de Dados
 * Agendar coleta com enfermeiro
 * Solicitar retirada de bolsa
@@ -39,27 +39,27 @@
 * Visualizar horários disponíveis para doação
 * Visualizar fila no hemocentro
 
-##### **Controle de estoque de bolsas de sangue**
+#### **Controle de estoque de bolsas de sangue**
 * Registrar coleta e retirada de bolsas de tal tipo sanguíneo.
 * Emitir alertas ao atingir um limite mínimo de bolsas.
 * Visualizar como está o estoque
 * Emitir alertas ao atingir um limite máximo de bolsas, para que quando perto do limite, algumas bolsas sejam doadas para outra instituição.
 
 
-##### **Agendamento de coleta com enfermeiros**
+#### **Agendamento de coleta com enfermeiros**
 * Limite máximo de coletas semanais
 * Intervalo entre uma coleta e outra
 
-##### **Cadastro de impedimentos**
+#### **Cadastro de impedimentos**
 * Doenças que impedem um doador de doar
 * Medicamentos que impedem um doador de doar
 * Lista de remédios que impedem o doador de doar
 
-##### **Dashboards**
+#### **Dashboards**
 * Dashboard geral
 * Dashboard com informações dos recebedores
 * Dashboard com informações dos doadores
 * Dashboard com informações dos enfermeiros
 
-##### **Datas críticas**
+#### **Datas críticas**
 * Alerta de datas consideradas críticas para o estoque de bolsas
