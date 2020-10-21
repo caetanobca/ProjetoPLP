@@ -7,6 +7,5 @@ data Impedimento = Medicamento{
     ,tempoSuspencao :: String
 } deriving (Show)
 
-
 cadastraImpedimento :: [Impedimento] -> Impedimento -> [Impedimento]
 cadastraImpedimento lista impedimento = lista ++ [impedimento]
