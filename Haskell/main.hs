@@ -1,8 +1,11 @@
 import qualified Impedimento as Impedimento
 import qualified Auxiliar as Auxiliar
+import qualified Enfermeiro as Enfermeiro
+import Data.Map as Map
 
 main :: IO ()
 main = do
+    
     menuInicial Auxiliar.iniciaImpedimentos
 
 
@@ -26,9 +29,9 @@ menuInicial listaImpedimentos = do
     else if input == "3" then do
         putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")
     else if input == "4" then do
-        putStrLn ("IMPLEMENTAR CADASTRO DE ENFERMEIROS")
+        enfermeiros
     else if input == "5" then do
-        cadastroDeImpedimentos listaImpedimentos
+        cadastroDeImpedimentos listaImpedimentos        
         putStrLn ("Impedimento cadastrado")
     else if input == "6" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM DOADOR")
@@ -75,3 +78,49 @@ cadastroDeImpedimentos listaImpedimentos = do
     else do
         putStrLn("Entrada Invalida")
         menuInicial listaImpedimentos
+
+enfermeiros :: IO()
+enfermeiros = do
+    putStr ("1. Cadastro de Enfermeiros\n" ++
+            "2. Buscar Enfermeiro\n" ++
+            "3. Listagem de Enfermeiros\n" ++
+            "4. Listagem de Enfermeiros por nome\n" ++
+            "5. Adicionar escala de Enfermeiros\n" ++
+            "6. Visualizar escala de Enfermeiros\n")
+    tipo <- getLine
+    if(tipo == "2") then do
+        putStrLn("Insira o nome do(a) Enfermeiro(a) que você deseja")
+        nome <- getLine 
+        let enfermeiro = Enfermeiro.encontraEnfermeiroString nome carregaEnfermeiros
+        putStrLn enfermeiro
+    else if(tipo == "3") then do
+        let enfermeiros = Enfermeiro.todosOsEnfermeiros carregaEnfermeiros
+        putStrLn enfermeiros
+    else if(tipo == "4") then do
+       let enfermeiros = Enfermeiro.visualizaEnfermeiros carregaEnfermeiros 
+       putStrLn enfermeiros
+    else if(tipo == "5") then do
+        putStrLn("Insira a data")
+        diaMes <- getLine
+        putStrLn("Insira o nome do Enfermeio")
+        enfermeiro <- getLine
+        let escala = Enfermeiro.organizaEscala diaMes carregaEscala enfermeiro carregaEnfermeiros 
+        putStrLn (show escala)
+    else if(tipo == "6") then do
+        putStrLn("Insira a data")
+        diaMes <- getLine
+        let escala = Enfermeiro.visualizaEscala diaMes carregaEscala
+        if(escala == Nothing) then do 
+        putStrLn("Data não encontrada")
+        else do
+        putStrLn (show escala)    
+    else do
+        putStrLn ("Ainda não implementado")
+
+carregaEnfermeiros ::  [Enfermeiro.Enfermeiro]
+carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
+
+carregaEscala :: Map String String
+carregaEscala = Auxiliar.iniciaEscala 
+     
+      

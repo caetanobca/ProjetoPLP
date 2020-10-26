@@ -1,8 +1,8 @@
-
 module Enfermeiro where
     import Data.List
     import Data.Maybe()
     import Data.Map as Map
+    import Data.Char
 
 
     data Enfermeiro = Enfermeiro{nome :: String, endereco :: String, idade :: Int, telefone :: String
@@ -12,35 +12,42 @@ module Enfermeiro where
     adicionaEnfermeiro nome endereco idade telefone = (Enfermeiro {nome = nome, endereco = endereco,idade = idade, telefone = telefone})
 
     encontraEnfermeiroString :: String -> [Enfermeiro] -> String
-    encontraEnfermeiroString procurado [] = "Não encontrado(a)"
+    encontraEnfermeiroString procurado [] = "Resultados: \n"
     encontraEnfermeiroString procurado (h:t)
-        |isInfixOf procurado (nome h) == True = show h
+        |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = show h ++ encontraEnfermeiroString procurado t
         |otherwise = encontraEnfermeiroString procurado t
 
     encontraEnfermeiro :: String -> [Enfermeiro] -> Maybe Enfermeiro
     encontraEnfermeiro procurado [] = Nothing
     encontraEnfermeiro procurado (h:t)
-        |isInfixOf procurado (nome h) == True = Just h
+        |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = Just h
         |otherwise = encontraEnfermeiro procurado t
 
-    todosOsEnfermeiros:: String -> String
-    todosOsEnfermeiros [] = ""
-    todosOsEnfermeiros (h:t) =  [h] ++ todosOsEnfermeiros t
+    todosOsEnfermeiros:: [Enfermeiro] -> String
+    todosOsEnfermeiros [] = " "
+    todosOsEnfermeiros (h:t) = "Nome: " ++ nome h 
+        ++ " " ++ "Endereço: " ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
+        ++ "Telefone: " ++ telefone h ++ "\n"++ todosOsEnfermeiros t
     
     enfermeiroCadastrado :: String -> [Enfermeiro] -> Bool
     enfermeiroCadastrado procurado [] = False
     enfermeiroCadastrado procurado (h:t)
-        |isInfixOf procurado (nome h) == True = True
+        |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = True
         |otherwise = enfermeiroCadastrado procurado t
 
     organizaEscala :: String -> Map String String -> String -> [Enfermeiro] -> Map String String
     organizaEscala diaMes escala nome enfermeiros
-        |enfermeiroCadastrado nome enfermeiros == True = insertWith (++) diaMes novaEscala escala
+        |encontraEnfermeiroString nome enfermeiros /= "Resultados: \n" = insertWith (++) diaMes novaEscala escala
         where novaEscala = encontraEnfermeiroString nome enfermeiros
 
     visualizaEscala :: String -> Map String String -> Maybe String
-    visualizaEscala diaMes escala = Map.lookup diaMes escala
-    
+    visualizaEscala diaMes escala
+        |member diaMes escala == False = Nothing
+        |member diaMes escala == True = Map.lookup diaMes escala
+
     visualizaEnfermeiros :: [Enfermeiro] -> String
     visualizaEnfermeiros [] = ""
-    visualizaEnfermeiros (h:t) = nome h ++ visualizaEnfermeiros t 
+    visualizaEnfermeiros (h:t) = nome h ++ " " ++ visualizaEnfermeiros t
+
+    toUpperCase :: String -> String
+    toUpperCase entrada = [toUpper x | x <- entrada]
