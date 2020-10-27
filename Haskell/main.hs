@@ -1,6 +1,7 @@
 import qualified Impedimento as Impedimento
 import qualified Auxiliar as Auxiliar
 import qualified Enfermeiro as Enfermeiro
+import qualified Recebedor as Recebedor
 import Data.Map as Map
 
 main :: IO ()
@@ -23,7 +24,8 @@ menuInicial listaImpedimentos = do
     input <- getLine 
 
     if input == "1" then do
-        putStrLn ("IMPLEMENTAR CADASTRO DE RECEBEDORES")
+        cadastroDeRecebedor
+        putStrLn ("Recebedor cadastrado")
     else if input == "2" then do
         putStrLn ("IMPLEMENTAR CONTROLE DO ESTOQUE DE BOLSAS")
     else if input == "3" then do
@@ -44,9 +46,6 @@ menuInicial listaImpedimentos = do
     else do
        putStrLn("Entrada invalida")
         
-
-    
-
 
 cadastroDeImpedimentos :: [Impedimento.Impedimento] -> IO()
 cadastroDeImpedimentos listaImpedimentos = do 
@@ -122,5 +121,47 @@ carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
 
 carregaEscala :: Map String String
 carregaEscala = Auxiliar.iniciaEscala 
-     
-      
+
+cadastroDeRecebedor :: IO()
+cadastroDeRecebedor = do
+    putStr (
+        "1. Cadastro de Recebedor\n" ++
+        "2. Buscar Recebedor\n" ++
+        "3. Listar Recebedores\n" ++
+        "4. Visualizar Ficha de Dados do Recebedor\n" ++
+        )
+
+    input <- getLine
+
+    if (input == "1") then do
+        putStr("Digite o nome do(a) Recebedor(a)")
+        nome <- getLine
+        putStr("Digite o endereço do(a) Recebedor(a)")
+        endereco <- getLine
+        putStr("Digite a idade do(a) Recebedor(a)")
+        input <- getLine
+        idade = read input
+        putStr("Digite o telefone do(a) Recebedor(a)")
+        telefone <- getLine
+        putStr("Digite a quantidade de sangue em ml que o(a) Recebedor(a) precisa")
+        input <- getLine
+        quantidade = read input
+        let recebedor = Recebedor.adicionaRecebedor nome endereco idade telefone quantidade
+        putStr recebedor
+
+    else if (input == "2") then do
+        putStr("Digite o nome do recebedor: ")
+        nome <- getLine
+        let recebedor = Recebedor.recebedorCadastrado
+        -- se o recebdor já for cadastrado imprime os dados senao cadastra novo
+
+    else if (input == "3") then do
+        let listaRecebedores Recebedor.todosRecebedores recebedores
+        putStr listaRecebedores
+
+    else if (input == "4") then do
+        putStr("Digite o nome do recebedor: ")
+        nome <- getLine
+        let fichaRecebedor = Recebedor.fichaDeDadosRecebedor nome
+
+
