@@ -24,7 +24,7 @@ menuInicial listaImpedimentos = do
     input <- getLine 
 
     if input == "1" then do
-        cadastroDeRecebedor
+        --cadastroDeRecebedor
         putStrLn ("Recebedor cadastrado")
     else if input == "2" then do
         putStrLn ("IMPLEMENTAR CONTROLE DO ESTOQUE DE BOLSAS")
@@ -122,7 +122,7 @@ carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
 carregaEscala :: Map String String
 carregaEscala = Auxiliar.iniciaEscala 
 
-cadastroDeRecebedor :: IO()
+{--cadastroDeRecebedor :: IO()
 cadastroDeRecebedor = do
     putStr (
         "1. Cadastro de Recebedor\n" ++
@@ -163,5 +163,5 @@ cadastroDeRecebedor = do
         putStr("Digite o nome do recebedor: ")
         nome <- getLine
         let fichaRecebedor = Recebedor.fichaDeDadosRecebedor nome
-
+--}
 
