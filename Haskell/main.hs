@@ -6,8 +6,8 @@ import Data.Map as Map
 
 main :: IO ()
 main = do
-    
-    menuInicial Auxiliar.iniciaImpedimentos
+    Auxiliar.criaArquivos
+    menuInicial
 
 
 opcoes :: String
@@ -17,8 +17,8 @@ opcoes = ("BloodLife\n1. Cadastro de Recebedores\n2. Controle de estoque de bols
  "7. Agendamento de coleta com enfermeiros\n8. Dashboards\n9. sai\n")
 
 
-menuInicial :: [Impedimento.Impedimento] -> IO()
-menuInicial listaImpedimentos = do
+menuInicial :: IO()
+menuInicial  = do
     putStr(opcoes)
 
     input <- getLine 
@@ -33,8 +33,7 @@ menuInicial listaImpedimentos = do
     else if input == "4" then do
         enfermeiros
     else if input == "5" then do
-        cadastroDeImpedimentos listaImpedimentos        
-        putStrLn ("Impedimento cadastrado")
+        cadastroDeImpedimentos carregaImpedimentos       
     else if input == "6" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM DOADOR")
     else if input == "7" then do
@@ -49,35 +48,53 @@ menuInicial listaImpedimentos = do
 
 cadastroDeImpedimentos :: [Impedimento.Impedimento] -> IO()
 cadastroDeImpedimentos listaImpedimentos = do 
-    putStr ("Cadastro de impedimentos\n" ++
+    putStr ("1. Cadastro de Impedimento\n" ++ 
+            "2. Buscar Impedimento\n" ++
+            "3. Listar Impedimentos\n")
+    opcao <- getLine
+    if (opcao == "1") then do
+        putStr ("Cadastro de Impedimentos\n" ++
             "1. Cadastro de Medicamento\n" ++
             "2. Cadastro de Doenca\n")
-    tipo <- getLine
-    if (tipo == "1") then do
-        putStr("Cadastro de Medicamento\n" ++
-                "Funcao: ")
-        input <- getLine
-        let funcao = input
-        putStr("Composto: ")
-        input <- getLine
-        let composto = input
-        putStr("tempo de Suspencao: ")
-        input <- getLine
-        let tempoSuspencao = input
-        menuInicial (listaImpedimentos ++ [(Impedimento.Medicamento funcao composto tempoSuspencao)])
-    else if (tipo == "2") then do
-        putStr("Cadastro de Doenca\n" ++
-                "CID: ")
-        input <- getLine
-        let cid = input
-        putStr("tempo de Suspencao: ")
-        input <- getLine
-        let tempoSuspencao = input
-        menuInicial (listaImpedimentos ++ [(Impedimento.Doenca cid tempoSuspencao)])
+        tipo <- getLine
+        if (tipo == "1") then do
+            putStr("Cadastro de Medicamento\n" ++
+                    "Funcao: ")
+            input <- getLine
+            let funcao = input
+            putStr("Composto: ")
+            input <- getLine
+            let composto = input
+            putStr("tempo de Suspencao (em dias): ")
+            input <- getLine 
+            let tempoSuspencao = read input :: Integer
+            Auxiliar.escreverImpedimento (Impedimento.adicionaImpedimento funcao composto tempoSuspencao)
+            putStrLn ("Impedimento cadastrado")
+            menuInicial
+        else if (tipo == "2") then do
+            putStr("Cadastro de Doenca\n" ++
+                    "CID: ")
+            input <- getLine
+            let cid = input
+            putStr("tempo de Suspencao (em dias): ")
+            input <- getLine
+            let tempoSuspencao = read input :: Integer
+            Auxiliar.escreverImpedimento (Impedimento.adicionaImpedimento [] cid tempoSuspencao)
+            putStrLn ("Impedimento cadastrado")
+            menuInicial
+        else do
+            putStrLn("Entrada Invalida")
+            menuInicial
+    else if (opcao == "2") then do 
+        putStrLn("nao implementado")
+    else if (opcao == "3") then do
+        putStrLn ("Listar Impedimentos")
+        putStr(Impedimento.listarImpedimentos listaImpedimentos)
+        menuInicial
     else do
         putStrLn("Entrada Invalida")
-        menuInicial listaImpedimentos
-
+        menuInicial
+        
 enfermeiros :: IO()
 enfermeiros = do
     putStr ("1. Cadastro de Enfermeiros\n" ++
@@ -120,7 +137,10 @@ carregaEnfermeiros ::  [Enfermeiro.Enfermeiro]
 carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
 
 carregaEscala :: Map String String
-carregaEscala = Auxiliar.iniciaEscala 
+carregaEscala = Auxiliar.iniciaEscala
+
+carregaImpedimentos :: [Impedimento.Impedimento]
+carregaImpedimentos = Auxiliar.iniciaImpedimentos
 
 {--cadastroDeRecebedor :: IO()
 cadastroDeRecebedor = do
