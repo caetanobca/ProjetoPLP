@@ -50,7 +50,7 @@ iniciaEnfermeiros = [(Enfermeiro.Enfermeiro "Caio Davi" "Rua Marechal" 21 "33224
 iniciaEscala :: Map String String
 iniciaEscala = Map.fromList [("16/10", "José"), ("17/10","Pedro")]
 
-inciaRecebedores :: [Recebedor.Recebedor]
-inciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 1250), (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1000)]
+iniciaRecebedores :: [Recebedor.Recebedor]
+iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 1250), (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1000)]
 
 --Implementar metodo q vai salvar a lista de impedimentos

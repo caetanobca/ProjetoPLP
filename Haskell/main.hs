@@ -32,8 +32,8 @@ menuInicial  = do
         putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")
     else if input == "4" then do
         enfermeiros
-    else if input == "5" then do
-        cadastroDeImpedimentos carregaImpedimentos       
+   -- else if input == "5" then do
+        --cadastroDeImpedimentos carregaImpedimentos       
     else if input == "6" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM DOADOR")
     else if input == "7" then do
@@ -171,17 +171,21 @@ cadastroDeRecebedor = do
         input <- getLine
         let quantidade = read input
         let recebedor = Recebedor.adicionaRecebedor nome endereco idade telefone quantidade
-        putStr recebedor
+        putStr ("Recebedor cadastrado")
 
     else if (input == "2") then do
         putStr("Digite o nome do recebedor: ")
         nome <- getLine
-        let recebedor = Recebedor.recebedorCadastrado
-        putStr recebedor
+        let recebedor = Recebedor.recebedorCadastrado nome carregaRecebedores
+        if (recebedor == True) then do
+            putStr ("Recebedor já cadastrado")
+            else 
+                putStr ("Recebedor não cadastrado")
+
         -- se o recebedor já for cadastrado imprime os dados senao cadastra novo
 
     else if (input == "3") then do
-        let listaRecebedores = Recebedor.todosOsRecebedores recebedores
+        let listaRecebedores = Recebedor.todosOsRecebedores carregaRecebedores
         putStr ("\n" ++ listaRecebedores)
 
 
