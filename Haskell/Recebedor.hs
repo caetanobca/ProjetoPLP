@@ -36,5 +36,5 @@ module Recebedor where
 	toUpperCase :: String -> String
 	toUpperCase entrada = [toUpper x | x <- entrada]
 
-	-- Ainda falta implementar Ficha de Dados Medicos, estou pensando em fazer um outro objeto Ficha para usar aqui
+	-- Ainda falta implementar Ficha de Dados Medicos, estou pensando em fazer um outro objeto Ficha para usar aqui será que é uma boa
 	
