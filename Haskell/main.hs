@@ -24,7 +24,7 @@ menuInicial  = do
     input <- getLine 
 
     if input == "1" then do
-        --cadastroDeRecebedor
+        cadastroDeRecebedor
         putStrLn ("Recebedor cadastrado")
     else if input == "2" then do
         putStrLn ("IMPLEMENTAR CONTROLE DO ESTOQUE DE BOLSAS")
@@ -139,16 +139,20 @@ carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
 carregaEscala :: Map String String
 carregaEscala = Auxiliar.iniciaEscala
 
-carregaImpedimentos :: [Impedimento.Impedimento]
+{-carregaImpedimentos :: [Impedimento.Impedimento]
 carregaImpedimentos = Auxiliar.iniciaImpedimentos
+-}
 
-{--cadastroDeRecebedor :: IO()
+carregaRecebedores :: [Recebedor.Recebedor]
+carregaRecebedores = Auxiliar.iniciaRecebedores
+
+cadastroDeRecebedor :: IO()
 cadastroDeRecebedor = do
     putStr (
         "1. Cadastro de Recebedor\n" ++
         "2. Buscar Recebedor\n" ++
         "3. Listar Recebedores\n" ++
-        "4. Visualizar Ficha de Dados do Recebedor\n" ++
+        "4. Visualizar Ficha de Dados do Recebedor\n"
         )
 
     input <- getLine
@@ -160,12 +164,12 @@ cadastroDeRecebedor = do
         endereco <- getLine
         putStr("Digite a idade do(a) Recebedor(a)")
         input <- getLine
-        idade = read input
+        let idade = read input
         putStr("Digite o telefone do(a) Recebedor(a)")
         telefone <- getLine
         putStr("Digite a quantidade de sangue em ml que o(a) Recebedor(a) precisa")
         input <- getLine
-        quantidade = read input
+        let quantidade = read input
         let recebedor = Recebedor.adicionaRecebedor nome endereco idade telefone quantidade
         putStr recebedor
 
@@ -173,15 +177,18 @@ cadastroDeRecebedor = do
         putStr("Digite o nome do recebedor: ")
         nome <- getLine
         let recebedor = Recebedor.recebedorCadastrado
-        -- se o recebdor já for cadastrado imprime os dados senao cadastra novo
+        putStr recebedor
+        -- se o recebedor já for cadastrado imprime os dados senao cadastra novo
 
     else if (input == "3") then do
-        let listaRecebedores Recebedor.todosRecebedores recebedores
-        putStr listaRecebedores
+        let listaRecebedores = Recebedor.todosOsRecebedores recebedores
+        putStr ("\n" ++ listaRecebedores)
 
+
+    else putStr ("cadastroooooooou")
+    {-
     else if (input == "4") then do
         putStr("Digite o nome do recebedor: ")
         nome <- getLine
-        let fichaRecebedor = Recebedor.fichaDeDadosRecebedor nome
---}
-
+        fichaRecebedor = Recebedor.fichaDeDadosRecebedor nome
+    -}
