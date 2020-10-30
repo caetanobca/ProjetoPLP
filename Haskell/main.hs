@@ -24,7 +24,7 @@ menuInicial  = do
     input <- getLine 
 
     if input == "1" then do
-        --cadastroDeRecebedor
+        cadastroDeRecebedor
         putStrLn ("Recebedor cadastrado")
     else if input == "2" then do
         putStrLn ("IMPLEMENTAR CONTROLE DO ESTOQUE DE BOLSAS")
@@ -32,8 +32,8 @@ menuInicial  = do
         putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")
     else if input == "4" then do
         enfermeiros
-    else if input == "5" then do
-        cadastroDeImpedimentos carregaImpedimentos       
+   -- else if input == "5" then do
+        --cadastroDeImpedimentos carregaImpedimentos       
     else if input == "6" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM DOADOR")
     else if input == "7" then do
@@ -154,8 +154,9 @@ carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
 carregaEscala :: Map String String
 carregaEscala = Auxiliar.iniciaEscala
 
-carregaImpedimentos :: [Impedimento.Impedimento]
+{-carregaImpedimentos :: [Impedimento.Impedimento]
 carregaImpedimentos = Auxiliar.iniciaImpedimentos
+-}
 
 carregaRecebedores :: [Recebedor.Recebedor]
 carregaRecebedores = Auxiliar.iniciaRecebedores

@@ -1,12 +1,13 @@
 module Auxiliar where
 
+import qualified Recebedor as Recebedor
 import qualified Impedimento as Impedimento
 import qualified Enfermeiro as Enfermeiro
 import qualified Recebedor as Recebedor
 import Data.Map as Map
 import Data.List
-import Data.List.Split
 import System.IO.Unsafe(unsafeDupablePerformIO)
+{-import Data.List.Split
 
 --Esses metodos vai carregar os empedimentos que estavam salvos em um arquivo
 iniciaImpedimentos :: [Impedimento.Impedimento]
@@ -15,7 +16,7 @@ iniciaImpedimentos = do
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_impedimentos = ((Data.List.map constroiImpedimento lista))
     return lista_impedimentos !! 0
-
+-}
 constroiImpedimento ::[String] -> Impedimento.Impedimento
 constroiImpedimento lista = 
     if((lista!! 0) == "MEDICAMENTO") then Impedimento.Medicamento{
@@ -76,3 +77,7 @@ escreverEnfermeiros enfermeiro = do
 
 iniciaRecebedores :: [Recebedor.Recebedor]
 iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 1250), (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1000)]
+
+
+--Implementar metodo q vai salvar a lista de impedimentos
+
