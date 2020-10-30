@@ -2,6 +2,8 @@ module Auxiliar where
 
 import qualified Impedimento as Impedimento
 import qualified Enfermeiro as Enfermeiro
+import qualified Estoque as Estoque
+import qualified Bolsa as Bolsa
 import Data.Map as Map
 import Data.List
 import Data.List.Split
@@ -39,14 +41,25 @@ escreverImpedimento impedimento = do
         appendFile "impedimentos.txt" (impedimentoStr)
         return ()   
         
+escreverBolsa:: Bolsa.Bolsa -> IO()
+escreverBolsa bolsa = do
+    let bolsaStr = Bolsa.tipoSanguineo bolsa ++ ","++ show (Bolsa.qtdSangue bolsa) ++ "\n"
+    appendFile "estoque.txt" (bolsaStr)
+    return ()
+
+
 criaArquivos :: IO()
 criaArquivos = do
     appendFile "impedimentos.txt" ("")
+    appendFile "estoque.txt" ("")
 
 iniciaEnfermeiros :: [Enfermeiro.Enfermeiro]
 iniciaEnfermeiros = [(Enfermeiro.Enfermeiro "Caio Davi" "Rua Marechal" 21 "33224455"), (Enfermeiro.Enfermeiro "Mateus" "Rua General" 23 "33224455")]
 
 iniciaEscala :: Map String String
 iniciaEscala = Map.fromList [("16/10", "José"), ("17/10","Pedro")]
+
+iniciaEstoque :: [Bolsa.Bolsa]
+iniciaEstoque = [(Bolsa.Bolsa "A+" 450), (Bolsa.Bolsa "O-" 400)]
 
 --Implementar metodo q vai salvar a lista de impedimentos

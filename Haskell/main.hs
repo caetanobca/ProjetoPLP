@@ -2,6 +2,8 @@ import qualified Impedimento as Impedimento
 import qualified Auxiliar as Auxiliar
 import qualified Enfermeiro as Enfermeiro
 import qualified Recebedor as Recebedor
+import qualified Estoque as Estoque
+import qualified Bolsa as Bolsa
 import Data.Map as Map
 
 main :: IO ()
@@ -133,14 +135,60 @@ enfermeiros = do
     else do
         putStrLn ("Ainda não implementado")
 
-carregaEnfermeiros ::  [Enfermeiro.Enfermeiro]
-carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
+estoque :: IO()
+estoque = do
+    putStr ("1. Adicionar Bolsa de Sangue\n" ++
+            "2. Retirar Bolsa de Sangue\n" ++
+            "3. Listar Todas as Bolsas\n" ++
+            "4. Listar Bolsas por Tipo\n")
+    tipo <- getLine
+
+    if(tipo== "1") then do
+        putStr("Tipo Sanguineo(cadastrar): ")
+        input <- getLine
+        let tipoSanguineo = input
+        putStr("Quantidade de sangue (em ml): ")
+        input <- getLine 
+        let qtdSangue = read input :: Int
+        Auxiliar.escreverBolsa(Estoque.adicionaBolsa tipoSanguineo qtdSangue)    
+        putStrLn ("Bolsa cadastrada")
+        main
+
+    else if(tipo == "2") then do
+        putStrLn("Tipo Sanguineo(retirar): ")
+        input <- getLine
+        let tipo = input
+        putStr("Quantidade de sangue (em ml): ")
+        input <- getLine 
+        let qtdSangue = read input :: Int
+        let bolsa = Estoque.removeBolsa tipo qtdSangue carregaEstoque
+        if(bolsa /= Nothing) then 
+            putStrLn("Sangue retirado com sucesso! ")
+            putStrLn(Estoque.bolsaToString bolsa)
+            --Auxiliar.removeBolsa bolsa
+            --deve ter alguma logica pra remover a bolsa do .tx
+            main
+        else  
+            putStr ("Nao ha bolsas disponiveis :(") 
+            main
+    else 
+        putStrLn ("Opção inválida")
+        main
+
+
 
 carregaEscala :: Map String String
 carregaEscala = Auxiliar.iniciaEscala
 
+
+carregaEnfermeiros ::  [Enfermeiro.Enfermeiro]
+carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
+
 carregaImpedimentos :: [Impedimento.Impedimento]
 carregaImpedimentos = Auxiliar.iniciaImpedimentos
+
+carregaEstoque ::  [Bolsa.Bolsa]
+carregaEstoque = Auxiliar.iniciaEstoque
 
 {--cadastroDeRecebedor :: IO()
 cadastroDeRecebedor = do
