@@ -1,13 +1,16 @@
+
 module Auxiliar where
 
 import qualified Recebedor as Recebedor
 import qualified Impedimento as Impedimento
 import qualified Enfermeiro as Enfermeiro
 import qualified Recebedor as Recebedor
+import qualified Estoque as Estoque
+import qualified Bolsa as Bolsa
 import Data.Map as Map
 import Data.List
 import System.IO.Unsafe(unsafeDupablePerformIO)
-{-import Data.List.Split
+import Data.List.Split
 
 --Esses metodos vai carregar os empedimentos que estavam salvos em um arquivo
 iniciaImpedimentos :: [Impedimento.Impedimento]
@@ -16,7 +19,7 @@ iniciaImpedimentos = do
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_impedimentos = ((Data.List.map constroiImpedimento lista))
     return lista_impedimentos !! 0
--}
+
 constroiImpedimento ::[String] -> Impedimento.Impedimento
 constroiImpedimento lista = 
     if((lista!! 0) == "MEDICAMENTO") then Impedimento.Medicamento{
@@ -46,6 +49,15 @@ constroiEnfermeiro lista =
         Enfermeiro.telefone = lista !! 3
     }
 
+escreverBolsa:: Bolsa.Bolsa -> IO()
+escreverBolsa bolsa = do
+    let bolsaStr = Bolsa.tipoSanguineo bolsa ++ ","++ show (Bolsa.qtdSangue bolsa) ++ "\n"
+    appendFile "estoque.txt" (bolsaStr)
+    return ()
+
+iniciaEstoque :: [Bolsa.Bolsa]
+iniciaEstoque = [(Bolsa.Bolsa "A+" 450), (Bolsa.Bolsa "O-" 400)]
+    
 iniciaEscala :: Map String String
 iniciaEscala = Map.fromList [("16/10", "José"), ("17/10","Pedro")]
 
@@ -54,6 +66,7 @@ criaArquivos :: IO()
 criaArquivos = do
     appendFile "impedimentos.txt" ("")
     appendFile "enfermeiros.txt" ("")
+    appendFile "estoque.txt" ("")
 
 
 --metodos q vao salvar as listas 
@@ -80,4 +93,5 @@ iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabe
 
 
 --Implementar metodo q vai salvar a lista de impedimentos
+
 

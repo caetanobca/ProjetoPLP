@@ -2,6 +2,8 @@ import qualified Impedimento as Impedimento
 import qualified Auxiliar as Auxiliar
 import qualified Enfermeiro as Enfermeiro
 import qualified Recebedor as Recebedor
+import qualified Estoque as Estoque
+import qualified Bolsa as Bolsa
 import Data.Map as Map
 
 main :: IO ()
@@ -24,7 +26,7 @@ menuInicial  = do
     input <- getLine 
 
     if input == "1" then do
-        cadastroDeRecebedor
+        --cadastroDeRecebedor
         putStrLn ("Recebedor cadastrado")
     else if input == "2" then do
         putStrLn ("IMPLEMENTAR CONTROLE DO ESTOQUE DE BOLSAS")
@@ -32,8 +34,8 @@ menuInicial  = do
         putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")
     else if input == "4" then do
         enfermeiros
-   -- else if input == "5" then do
-        --cadastroDeImpedimentos carregaImpedimentos       
+    else if input == "5" then do
+        cadastroDeImpedimentos carregaImpedimentos       
     else if input == "6" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM DOADOR")
     else if input == "7" then do
@@ -154,9 +156,8 @@ carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
 carregaEscala :: Map String String
 carregaEscala = Auxiliar.iniciaEscala
 
-{-carregaImpedimentos :: [Impedimento.Impedimento]
+carregaImpedimentos :: [Impedimento.Impedimento]
 carregaImpedimentos = Auxiliar.iniciaImpedimentos
--}
 
 carregaRecebedores :: [Recebedor.Recebedor]
 carregaRecebedores = Auxiliar.iniciaRecebedores
@@ -211,3 +212,51 @@ cadastroDeRecebedor = do
         nome <- getLine
         fichaRecebedor = Recebedor.fichaDeDadosRecebedor nome
     -}
+
+estoque :: IO()
+estoque = do
+    putStr ("1. Adicionar Bolsa de Sangue\n" ++
+            "2. Retirar Bolsa de Sangue\n" ++
+            "3. Listar Todas as Bolsas\n" ++
+            "4. Listar Bolsas por Tipo\n")
+    tipo <- getLine
+    if(tipo== "1") then do
+        putStr("Tipo Sanguineo(cadastrar): ")
+        input <- getLine
+        let tipoSanguineo = input
+        putStr("Quantidade de sangue (em ml): ")
+        input <- getLine 
+        let qtdSangue = read input :: Int
+        Auxiliar.escreverBolsa(Estoque.adicionaBolsa tipoSanguineo qtdSangue)    
+        putStrLn ("Bolsa cadastrada")
+    else if(tipo == "2") then do
+        putStrLn("Tipo Sanguineo(retirar): ")
+        input <- getLine
+        let tipo = input
+        putStr("Quantidade de sangue (em ml): ")
+        input <- getLine 
+        let qtdSangue = read input :: Int
+        let bolsa = Estoque.removeBolsa tipo qtdSangue carregaEstoque
+        if(bolsa /= Nothing) then do
+            putStrLn("Sangue retirado com sucesso! ")
+            putStrLn(Estoque.bolsaToString bolsa)
+            --Auxiliar.removeBolsa bolsa
+        else do 
+            putStr ("Nao ha bolsas disponiveis :(")
+    -- deve ter alguma logica pra remover a bolsa do .txt
+
+    else if(tipo == "3") then do
+        let estoque = Estoque.listaTodasAsBolsas carregaEstoque
+        putStrLn estoque
+    else if(tipo == "4") then do
+        putStrLn("Tipo Sanguineo(listar): ")
+        input <- getLine
+        let tipoSanguineo = input
+        let estoque = Estoque.listaBolsasPorTipo tipoSanguineo carregaEstoque
+        putStrLn estoque
+    else do
+        putStrLn ("Ainda não implementado")
+
+
+carregaEstoque ::  [Bolsa.Bolsa]
+carregaEstoque = Auxiliar.iniciaEstoque
