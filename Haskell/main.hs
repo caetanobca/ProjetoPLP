@@ -104,17 +104,32 @@ enfermeiros = do
             "5. Adicionar escala de Enfermeiros\n" ++
             "6. Visualizar escala de Enfermeiros\n")
     tipo <- getLine
-    if(tipo == "2") then do
+    if(tipo == "1")then do
+        putStrLn ("Você irá cadastrar um Enfermeiro(a)")
+        putStrLn ("Insira o nome do Enfermeiro(a)")
+        nome <- getLine
+        putStrLn ("Insira o endereço do Enfermeiro(a)")
+        endereco <- getLine
+        putStrLn ("Insira a idade do Enfermeiro(a)")
+        idade <- getLine
+        putStrLn ("Insira o telefone do Enfermeiro(a)")
+        telefone <- getLine
+        Auxiliar.escreverEnfermeiros(Enfermeiro.adicionaEnfermeiro nome endereco (read(idade)) telefone)
+        menuInicial
+    else if(tipo == "2") then do
         putStrLn("Insira o nome do(a) Enfermeiro(a) que você deseja")
         nome <- getLine 
         let enfermeiro = Enfermeiro.encontraEnfermeiroString nome carregaEnfermeiros
         putStrLn enfermeiro
+        menuInicial
     else if(tipo == "3") then do
         let enfermeiros = Enfermeiro.todosOsEnfermeiros carregaEnfermeiros
         putStrLn enfermeiros
+        menuInicial
     else if(tipo == "4") then do
        let enfermeiros = Enfermeiro.visualizaEnfermeiros carregaEnfermeiros 
        putStrLn enfermeiros
+       menuInicial
     else if(tipo == "5") then do
         putStrLn("Insira a data")
         diaMes <- getLine

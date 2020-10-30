@@ -38,3 +38,4 @@ module Recebedor where
 
 	-- Ainda falta implementar Ficha de Dados Medicos, estou pensando em fazer um outro objeto Ficha para usar aqui será que é uma boa
 	
+
