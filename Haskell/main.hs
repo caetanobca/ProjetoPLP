@@ -104,17 +104,32 @@ enfermeiros = do
             "5. Adicionar escala de Enfermeiros\n" ++
             "6. Visualizar escala de Enfermeiros\n")
     tipo <- getLine
-    if(tipo == "2") then do
+    if(tipo == "1")then do
+        putStrLn ("Você irá cadastrar um Enfermeiro(a)")
+        putStrLn ("Insira o nome do Enfermeiro(a)")
+        nome <- getLine
+        putStrLn ("Insira o endereço do Enfermeiro(a)")
+        endereco <- getLine
+        putStrLn ("Insira a idade do Enfermeiro(a)")
+        idade <- getLine
+        putStrLn ("Insira o telefone do Enfermeiro(a)")
+        telefone <- getLine
+        Auxiliar.escreverEnfermeiros(Enfermeiro.adicionaEnfermeiro nome endereco (read(idade)) telefone)
+        menuInicial
+    else if(tipo == "2") then do
         putStrLn("Insira o nome do(a) Enfermeiro(a) que você deseja")
         nome <- getLine 
         let enfermeiro = Enfermeiro.encontraEnfermeiroString nome carregaEnfermeiros
         putStrLn enfermeiro
+        menuInicial
     else if(tipo == "3") then do
         let enfermeiros = Enfermeiro.todosOsEnfermeiros carregaEnfermeiros
         putStrLn enfermeiros
+        menuInicial
     else if(tipo == "4") then do
        let enfermeiros = Enfermeiro.visualizaEnfermeiros carregaEnfermeiros 
        putStrLn enfermeiros
+       menuInicial
     else if(tipo == "5") then do
         putStrLn("Insira a data")
         diaMes <- getLine
@@ -142,13 +157,16 @@ carregaEscala = Auxiliar.iniciaEscala
 carregaImpedimentos :: [Impedimento.Impedimento]
 carregaImpedimentos = Auxiliar.iniciaImpedimentos
 
-{--cadastroDeRecebedor :: IO()
+carregaRecebedores :: [Recebedor.Recebedor]
+carregaRecebedores = Auxiliar.iniciaRecebedores
+
+cadastroDeRecebedor :: IO()
 cadastroDeRecebedor = do
     putStr (
         "1. Cadastro de Recebedor\n" ++
         "2. Buscar Recebedor\n" ++
         "3. Listar Recebedores\n" ++
-        "4. Visualizar Ficha de Dados do Recebedor\n" ++
+        "4. Visualizar Ficha de Dados do Recebedor\n"
         )
 
     input <- getLine
@@ -160,28 +178,35 @@ cadastroDeRecebedor = do
         endereco <- getLine
         putStr("Digite a idade do(a) Recebedor(a)")
         input <- getLine
-        idade = read input
+        let idade = read input
         putStr("Digite o telefone do(a) Recebedor(a)")
         telefone <- getLine
         putStr("Digite a quantidade de sangue em ml que o(a) Recebedor(a) precisa")
         input <- getLine
-        quantidade = read input
+        let quantidade = read input
         let recebedor = Recebedor.adicionaRecebedor nome endereco idade telefone quantidade
-        putStr recebedor
+        putStr ("Recebedor cadastrado")
 
     else if (input == "2") then do
         putStr("Digite o nome do recebedor: ")
         nome <- getLine
-        let recebedor = Recebedor.recebedorCadastrado
-        -- se o recebdor já for cadastrado imprime os dados senao cadastra novo
+        let recebedor = Recebedor.recebedorCadastrado nome carregaRecebedores
+        if (recebedor == True) then do
+            putStr ("Recebedor já cadastrado")
+            else 
+                putStr ("Recebedor não cadastrado")
+
+        -- se o recebedor já for cadastrado imprime os dados senao cadastra novo
 
     else if (input == "3") then do
-        let listaRecebedores Recebedor.todosRecebedores recebedores
-        putStr listaRecebedores
+        let listaRecebedores = Recebedor.todosOsRecebedores carregaRecebedores
+        putStr ("\n" ++ listaRecebedores)
 
+
+    else putStr ("cadastroooooooou")
+    {-
     else if (input == "4") then do
         putStr("Digite o nome do recebedor: ")
         nome <- getLine
-        let fichaRecebedor = Recebedor.fichaDeDadosRecebedor nome
---}
-
+        fichaRecebedor = Recebedor.fichaDeDadosRecebedor nome
+    -}
