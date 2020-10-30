@@ -11,6 +11,7 @@ import Data.Map as Map
 import Data.List
 import System.IO.Unsafe(unsafeDupablePerformIO)
 import Data.List.Split
+import Data.Typeable
 
 --Esses metodos vai carregar os empedimentos que estavam salvos em um arquivo
 iniciaImpedimentos :: [Impedimento.Impedimento]
@@ -55,11 +56,23 @@ escreverBolsa bolsa = do
     appendFile "estoque.txt" (bolsaStr)
     return ()
 
+iniciaEscala :: Map String String
+iniciaEscala = do
+    let arquivo = unsafeDupablePerformIO(readFile "escala.txt")
+    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
+    let lista_enfermeiros = ((Data.List.map constroiEscala lista))
+    let mapa_escala = Map.fromList lista_enfermeiros
+    return mapa_escala !! 0
+
+constroiEscala:: [String] -> (String,String)
+constroiEscala  diaMesEnfermeiros = (diaMesEnfermeiros!!0,diaMesEnfermeiros!!1)
+    
+
 iniciaEstoque :: [Bolsa.Bolsa]
 iniciaEstoque = [(Bolsa.Bolsa "A+" 450), (Bolsa.Bolsa "O-" 400)]
     
-iniciaEscala :: Map String String
-iniciaEscala = Map.fromList [("16/10", "José"), ("17/10","Pedro")]
+--iniciaEscala :: Map String String
+--iniciaEscala = Map.fromList [("16/10", "José"), ("17/10","Pedro")]
 
 --esses metodos criam txts responsaveis por armazenar os dados do sistema       
 criaArquivos :: IO()
@@ -67,6 +80,7 @@ criaArquivos = do
     appendFile "impedimentos.txt" ("")
     appendFile "enfermeiros.txt" ("")
     appendFile "estoque.txt" ("")
+    appendFile "escala.txt" ("")
 
 
 --metodos q vao salvar as listas 
@@ -86,6 +100,12 @@ escreverEnfermeiros :: Enfermeiro.Enfermeiro -> IO()
 escreverEnfermeiros enfermeiro = do
     let enfermeiroStr = Enfermeiro.nome enfermeiro ++ "," ++ Enfermeiro.endereco enfermeiro ++ "," ++ show (Enfermeiro.idade enfermeiro) ++ "," ++ Enfermeiro.telefone enfermeiro ++ "\n"
     appendFile "enfermeiros.txt" (enfermeiroStr)
+    return ()
+
+escreverEscala :: (String,String) -> IO()
+escreverEscala (diaMes,enfermeiro) = do
+    let escalaStr = diaMes ++ "," ++ enfermeiro ++ "\n" 
+    appendFile "escala.txt" (escalaStr)
     return ()
 
 iniciaRecebedores :: [Recebedor.Recebedor]
