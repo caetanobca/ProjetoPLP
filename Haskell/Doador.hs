@@ -4,20 +4,27 @@ module Doador where
     import Data.Map as Map (Map, insertWith, lookup, member)
     import Data.Map as Map()
     import Data.Char
+    import Impedimento
 
 
-    data Doador = Doador{nome :: String, endereco :: String, idade :: Int, telefone :: String, doencas :: String, medicamentos :: String, doacoes :: String
+    data Doador = Doador{nome :: String, endereco :: String, idade :: Int, telefone :: String, impedimento :: [Impedimento], doacoes :: String
     } deriving (Show,Eq)
 
-    adicionaDoador :: String -> String -> Int -> String -> String -> String -> String -> Doador
-    adicionaDoador nome endereco idade telefone doencas medicamentos doacoes =
-     (Doador {nome = nome, endereco = endereco,idade = idade, telefone = telefone, doencas = doencas, medicamentos = medicamentos})
+    adicionaDoador :: String -> String -> Int -> String -> [Impedimento]  -> Doador
+    adicionaDoador nome endereco idade telefone impedimento  =
+     (Doador {nome = nome, endereco = endereco,idade = idade, telefone = telefone, impedimento = impedimento})
 
-    adicionaDoacao :: String -> [Doador] -> String -> Bool
-    adicionaDoacao doador [] doacao = True
+--nao sei se ta certo pq n sei se ta adicionando nas doacoes ou so ta salvando a ultima doacao 
+    adicionaDoacao :: String -> [Doador] -> String -> Maybe Doador
+    adicionaDoacao doador [] doacao = Nothing
     adicionaDoacao doador (h:t) doacao
-        |isInfixOf (toUpperCase doador) (toUpperCase (nome h)) == True = (Doador {doacoes = doacao}) 
+        |isInfixOf (toUpperCase doador) (toUpperCase (nome h)) == True = Just (Doador {doacoes = doacao}) 
         |otherwise = adicionaDoacao doador t doacao
+
+    
+    mostraFichaTecnica :: Doador -> String
+    mostraFichaTecnica  doador =  Impedimento.listarImpedimentos (impedimento doador)
+
 
 
 --metodos relacionados a achar e mostrar os doadores
@@ -38,7 +45,7 @@ module Doador where
     todosOsDoadores [] = " "
     todosOsDoadores (h:t) = "Nome: " ++ nome h 
         ++ " " ++ "Endereço: " ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
-        ++ "Telefone: " ++ telefone h ++ "Doencas: " ++ doencas h  ++ "Medicamnetos: " ++ medicamentos h  ++ "\n"++ todosOsDoadores t
+        ++ "Telefone: " ++ telefone h ++ "Impedimentos: " ++ mostraFichaTecnica h    ++ "\n"++ todosOsDoadores t
     
     doadorCadastrado :: String -> [Doador] -> Bool
     doadorCadastrado procurado [] = False
@@ -49,7 +56,7 @@ module Doador where
  
     visualizaDoadores :: [Doador] -> String
     visualizaDoadores [] = ""
-    visualizaDoadores (h:t) = nome h ++ " " ++ visualizaDoadors t
+    visualizaDoadores (h:t) = nome h ++ " " ++ visualizaDoadores t
 
     toUpperCase :: String -> String
     toUpperCase entrada = [toUpper x | x <- entrada]
