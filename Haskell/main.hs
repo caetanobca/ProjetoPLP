@@ -14,7 +14,8 @@ import Data.Char
 
 main :: IO ()
 main = do    
-    Auxiliar.criaArquivos        
+    Auxiliar.criaArquivos   
+    verificaDataCritica 
     menuInicial
 
 
@@ -26,7 +27,7 @@ opcoes = ("BloodLife\n1. Cadastro de Recebedores\n2. Controle de Estoque de Bols
 
 
 menuInicial :: IO()
-menuInicial  = do
+menuInicial  = do    
     putStr(opcoes)
 
     input <- getLine 
@@ -86,7 +87,7 @@ doador listaDoador = do
         if((elem (toUpperCase tipoSanguineo) tipos) == False) then do
             putStrLn("Tipo Inválido\n")
             else do             
-                Auxiliar.escreverDoador(Doador.adicionaDoador nome endereco (read(idade)) telefone tipoSanguineo [])                    
+                Auxiliar.escreverDoador(Doador.adicionaDoador nome endereco (read(idade)) telefone tipoSanguineo)                    
         menuInicial
     else if(tipo == "2") then do
         putStrLn("Insira o nome do(a) Doador(a) que você deseja")

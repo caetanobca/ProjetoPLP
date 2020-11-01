@@ -9,29 +9,21 @@ module Doador where
     import Impedimento
 
 
-    data Doador = Doador{nome :: String, endereco :: String, idade :: Int, telefone :: String, tipoSanguineo :: String ,impedimentoStr :: String, ultimoDiaImpedido :: Day ,doacoes :: String
+    data Doador = Doador{nome :: String, endereco :: String, idade :: Int, telefone :: String, tipSanguineo :: String, impedimentoStr :: String, ultimoDiaImpedido :: Day ,doacoes :: String
     } deriving (Show,Eq)
 
-    adicionaDoador :: String -> String -> Int -> String -> String -> [Impedimento] -> Doador
-    adicionaDoador nome endereco idade telefone tipoSanguineo impedimento = 
+    adicionaDoador :: String -> String -> Int -> String -> String  -> Doador
+    adicionaDoador nome endereco idade telefone tipoSanguineo = 
         (Doador {nome = nome, 
         endereco = endereco,
         idade = idade, 
         telefone = telefone, 
-        tipoSanguineo = tipoSanguineo,
-        impedimentoStr = Impedimento.listarImpedimentos (impedimento), 
+        tipSanguineo = tipoSanguineo, 
+        impedimentoStr = "",
         Doador.ultimoDiaImpedido =  getUltimoDia,
         doacoes = ""})
 
-        where getUltimoDia = unsafeDupablePerformIO(Impedimento.ultimoDiaImpedido impedimento)
-
---nao sei se ta certo pq n sei se ta adicionando nas doacoes ou so ta salvando a ultima doacao 
-    adicionaDoacao :: String -> [Doador] -> String -> Maybe Doador
-    adicionaDoacao doador [] doacao = Nothing
-    adicionaDoacao doador (h:t) doacao
-        |isInfixOf (toUpperCase doador) (toUpperCase (nome h)) == True = Just (Doador {doacoes = doacao}) 
-        |otherwise = adicionaDoacao doador t doacao
-
+        where getUltimoDia = unsafeDupablePerformIO(getHoje)
     
     mostraFichaTecnica :: String -> [Doador] -> String
     mostraFichaTecnica  nome doador = impedimentoStr (Doador.encontraDoador nome doador)
@@ -57,7 +49,7 @@ module Doador where
         |otherwise = encontraDoadorString procurado t
 
     encontraDoador :: String -> [Doador] ->  Doador
-    encontraDoador procurado [] = (Doador "" "" 5 ""  "" "" (fromGregorian 1888 12 25) "")
+    encontraDoador procurado [] = (Doador "" "" 5 "" "" "" (fromGregorian 1888 12 25) "")
     encontraDoador procurado (h:t)
         |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = h
         |otherwise = encontraDoador procurado t
@@ -66,7 +58,7 @@ module Doador where
     todosOsDoadores [] = " "
     todosOsDoadores (h:t) = "Nome: " ++ nome h 
         ++ " " ++ "Endereço: " ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
-        ++ "Telefone: " ++ telefone h ++ "Tipo Sanguíneo: " ++ tipoSanguineo h ++ "Impedimentos: " ++ impedimentoStr h ++ "\n"++ todosOsDoadores t
+        ++ "Telefone: " ++ telefone h ++ "Impedimentos: " ++ impedimentoStr h     ++ "\n"++ todosOsDoadores t
     
     doadorCadastrado :: String -> [Doador] -> Bool
     doadorCadastrado procurado [] = False
@@ -86,3 +78,17 @@ module Doador where
 
     toUpperCase :: String -> String
     toUpperCase entrada = [toUpper x | x <- entrada]
+
+    registraImpedimento :: String -> [Doador] -> Impedimento.Impedimento -> [Doador]
+    registraImpedimento doador [] impedimento = []
+    registraImpedimento doador (h:t) impedimento
+        |isInfixOf (toUpperCase doador) (toUpperCase (nome h)) == True = ((Doador(nome h) (endereco h) (idade h) (telefone h) (tipSanguineo h) (impedimentoStr h ++ "--" ++ impedimentoAsString) (Impedimento.ultimoDiaImpedido impedimento (Doador.ultimoDiaImpedido h) ) (doacoes h)) : t ) 
+        |otherwise = (h: registraImpedimento doador t impedimento)
+        where impedimentoAsString = Impedimento.impedimentoToString impedimento
+
+    adicionaDoacao :: String -> [Doador] -> String -> [Doador]
+    adicionaDoacao doador [] doacao = []
+    adicionaDoacao doador (h:t) doacao
+        |isInfixOf (toUpperCase doador) (toUpperCase (nome h)) == True = ((Doador(nome h) (endereco h) (idade h) (telefone h) (tipSanguineo h) (impedimentoStr h) (Doador.ultimoDiaImpedido h) (doacoes h ++ "--" ++doacao)) : t ) 
+        |otherwise = (h: adicionaDoacao doador t doacao)
+    

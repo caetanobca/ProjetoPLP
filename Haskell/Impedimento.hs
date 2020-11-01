@@ -3,6 +3,7 @@ module Impedimento where
     import Data.Typeable ()
     import Data.Char
     import Data.Time
+    import System.IO.Unsafe(unsafeDupablePerformIO)
 
 
         
@@ -59,7 +60,13 @@ module Impedimento where
         |impedimento == h = removeImpedimetno impedimento t
         |otherwise = (h : removeImpedimetno impedimento t)
 
-
+    
+    ultimoDiaImpedido :: Impedimento -> Day -> Day
+    ultimoDiaImpedido impedimentos diaAtual
+        |diaAtual > diaNovo = diaAtual
+        |diaAtual < diaNovo = diaNovo
+        where diaNovo =  unsafeDupablePerformIO(addDays (tempoSuspencao (impedimentos)) <$> getHoje)
+{-    
     ultimoDiaImpedido :: [Impedimento] -> IO(Day)
     ultimoDiaImpedido impedimentos = addDays (tempoSuspencao (impedimentoMaisLongo impedimentos)) <$> getHoje
 
@@ -71,6 +78,7 @@ module Impedimento where
         | (tempoSuspencao h) < (tempoSuspencao (impedimentoMaisLongo t)) = impedimentoMaisLongo t
         | otherwise = h
 
+  -}
     getHoje :: IO(Day)
     getHoje = do
         a <- utctDay <$> getCurrentTime
