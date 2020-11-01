@@ -10,11 +10,11 @@ import qualified Bolsa as Bolsa
 import Data.Map as Map
 import Data.List
 import System.IO.Unsafe(unsafeDupablePerformIO)
-import Data.List.Split
+--import Data.List.Split
 import Data.Typeable
 
 --Esses metodos vai carregar os empedimentos que estavam salvos em um arquivo
-iniciaImpedimentos :: [Impedimento.Impedimento]
+{-iniciaImpedimentos :: [Impedimento.Impedimento]
 iniciaImpedimentos = do
     let arquivo = unsafeDupablePerformIO(readFile "impedimentos.txt")
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
@@ -63,7 +63,7 @@ iniciaEscala = do
     let lista_enfermeiros = ((Data.List.map constroiEscala lista))
     let mapa_escala = Map.fromList lista_enfermeiros
     return mapa_escala !! 0
-
+-}
 constroiEscala:: [String] -> (String,String)
 constroiEscala  diaMesEnfermeiros = (diaMesEnfermeiros!!0,diaMesEnfermeiros!!1)
     
