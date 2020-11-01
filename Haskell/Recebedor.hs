@@ -20,11 +20,15 @@ module Recebedor where
 	encontraRecebedor procurado (h:t)
 		|isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = Just h
 		|otherwise = encontraRecebedor procurado t
-
+{-
+	imprimeRecebedor :: String -> [Recebedor] -> String
+	imprimeRecebedor procurado = "Nome " ++ nome procurado ++ " " ++ "Endereco" ++ endereco procurado ++ " " ++ "Idade: " ++ show (idade procurado) ++ " "
+		++ "Telefone: " ++ telefone procurado ++ " " ++ "Quantidade de Sangue Necessária em ml: " ++ show (quantidademl procurado ) ++ "\n"
+-}
 	todosOsRecebedores :: [Recebedor] -> String
 	todosOsRecebedores [] = " "
 	todosOsRecebedores (h:t) = "Nome " ++ nome h ++ " " ++ "Endereco" ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
-		++ "Telefone: " ++ telefone h ++ "Quantidade de Sangue Necessária em ml: " ++ show (quantidademl h) ++ "\n" ++ todosOsRecebedores t
+		++ "Telefone: " ++ telefone h ++ " " ++ "Quantidade de Sangue Necessária em ml: " ++ show (quantidademl h) ++ "\n" ++ todosOsRecebedores t
 
 	recebedorCadastrado :: String -> [Recebedor] -> Bool
 	recebedorCadastrado procurado [] = False

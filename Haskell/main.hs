@@ -5,6 +5,7 @@ import qualified Recebedor as Recebedor
 import qualified Estoque as Estoque
 import qualified Bolsa as Bolsa
 import Data.Map as Map
+import System.IO
 
 main :: IO ()
 main = do
@@ -26,16 +27,18 @@ menuInicial  = do
     input <- getLine 
 
     if input == "1" then do
-        --cadastroDeRecebedor
+        cadastroDeRecebedor
         putStrLn ("Recebedor cadastrado")
     else if input == "2" then do
         putStrLn ("IMPLEMENTAR CONTROLE DO ESTOQUE DE BOLSAS")
     else if input == "3" then do
         putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")
+    {-
     else if input == "4" then do
         enfermeiros
     else if input == "5" then do
         cadastroDeImpedimentos carregaImpedimentos       
+    -}
     else if input == "6" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM DOADOR")
     else if input == "7" then do
@@ -50,7 +53,7 @@ menuInicial  = do
 
 cadastroDeImpedimentos :: [Impedimento.Impedimento] -> IO()
 cadastroDeImpedimentos listaImpedimentos = do 
-    putStr ("1. Cadastro de Impedimento\n" ++ 
+    putStr ("\n1. Cadastro de Impedimento\n" ++ 
             "2. Buscar Impedimento\n" ++
             "3. Listar Impedimentos\n")
     opcao <- getLine
@@ -97,6 +100,7 @@ cadastroDeImpedimentos listaImpedimentos = do
         putStrLn("Entrada Invalida")
         menuInicial
         
+{-
 enfermeiros :: IO()
 enfermeiros = do
     putStr ("1. Cadastro de Enfermeiros\n" ++
@@ -158,7 +162,7 @@ carregaEscala = Auxiliar.iniciaEscala
 
 carregaImpedimentos :: [Impedimento.Impedimento]
 carregaImpedimentos = Auxiliar.iniciaImpedimentos
-
+-}
 carregaRecebedores :: [Recebedor.Recebedor]
 carregaRecebedores = Auxiliar.iniciaRecebedores
 
@@ -174,29 +178,29 @@ cadastroDeRecebedor = do
     input <- getLine
 
     if (input == "1") then do
-        putStr("Digite o nome do(a) Recebedor(a)")
-        nome <- getLine
-        putStr("Digite o endereço do(a) Recebedor(a)")
-        endereco <- getLine
-        putStr("Digite a idade do(a) Recebedor(a)")
-        input <- getLine
+        
+        nome <- prompt "Digite o nome do(a) Recebedor(a) "
+        endereco <- prompt "Digite o endereço do(a) Recebedor(a) "
+        input <- prompt "Digite a idade do(a) Recebedor(a) "
         let idade = read input
-        putStr("Digite o telefone do(a) Recebedor(a)")
-        telefone <- getLine
-        putStr("Digite a quantidade de sangue em ml que o(a) Recebedor(a) precisa")
-        input <- getLine
+        telefone <- prompt "Digite o telefone do(a) Recebedor(a) "
+        input <- prompt "Digite a quantidade de sangue em ml que o(a) Recebedor(a) precisa "
         let quantidade = read input
         let recebedor = Recebedor.adicionaRecebedor nome endereco idade telefone quantidade
-        putStr ("Recebedor cadastrado")
+        putStrLn "Recebedor cadastrado"
 
     else if (input == "2") then do
-        putStr("Digite o nome do recebedor: ")
-        nome <- getLine
+        nome <- prompt "Digite o nome do recebedor: "
         let recebedor = Recebedor.recebedorCadastrado nome carregaRecebedores
         if (recebedor == True) then do
-            putStr ("Recebedor já cadastrado")
-            else 
-                putStr ("Recebedor não cadastrado")
+            verFicha <- prompt "Visualizar:\n(1) Ficha Médica do recebedor\n(2) Ficha de Dados\n(3) Sair\n"
+            putStrLn "\n"
+            if (verFicha == "1") then do
+                putStrLn "IMPLEMENTAR FICHA MEDICA"
+            else --putStr Recebedor.imprimeRecebedor nome carregaRecebedores
+                putStr "IMPLEMENTAR RECEBEDOR TO STRING"
+            
+            else putStrLn "Recebedor não cadastrado"
 
         -- se o recebedor já for cadastrado imprime os dados senao cadastra novo
 
@@ -205,7 +209,7 @@ cadastroDeRecebedor = do
         putStr ("\n" ++ listaRecebedores)
 
 
-    else putStr ("cadastroooooooou")
+    else putStr ("Entrada Inválida xxxx")
     {-
     else if (input == "4") then do
         putStr("Digite o nome do recebedor: ")
@@ -213,6 +217,13 @@ cadastroDeRecebedor = do
         fichaRecebedor = Recebedor.fichaDeDadosRecebedor nome
     -}
 
+prompt :: String -> IO String
+prompt text = do
+    putStr text
+    hFlush stdout
+    getLine
+
+{-
 estoque :: IO()
 estoque = do
     putStr ("1. Adicionar Bolsa de Sangue\n" ++
@@ -256,7 +267,7 @@ estoque = do
         putStrLn estoque
     else do
         putStrLn ("Ainda não implementado")
-
+-}
 
 carregaEstoque ::  [Bolsa.Bolsa]
 carregaEstoque = Auxiliar.iniciaEstoque
