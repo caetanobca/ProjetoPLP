@@ -1,5 +1,5 @@
 module Enfermeiro where
-    import Data.List
+    import Data.List ( isInfixOf )
     import Data.Maybe()
     import Data.Map as Map
     import Data.Char
