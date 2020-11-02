@@ -3,6 +3,7 @@ module Recebedor where
 	import Data.Maybe()
 	import Data.Map as Map
 	import Data.Char
+	import System.IO
 
 	data Recebedor = Recebedor { nome :: String, endereco :: String, idade :: Int, telefone :: String, quantidademl :: Int} deriving (Show, Eq)
 
@@ -39,6 +40,26 @@ module Recebedor where
 
 	toUpperCase :: String -> String
 	toUpperCase entrada = [toUpper x | x <- entrada]
+
+
+	cadastrarRecebedor :: IO()
+	cadastrarRecebedor = do
+		nome <- prompt "Digite o nome do(a) Recebedor(a) "
+		endereco <- prompt "Digite o endereço do(a) Recebedor(a) "
+		input <- prompt "Digite a idade do(a) Recebedor(a) "
+		let idade = read input
+		telefone <- prompt "Digite o telefone do(a) Recebedor(a) "
+		input <- prompt "Digite a quantidade de sangue em ml que o(a) Recebedor(a) precisa "
+		let quantidade = read input
+		let recebedor = adicionaRecebedor nome endereco idade telefone quantidade
+		putStr "Recebedor Cadastrado"
+
+
+	prompt :: String -> IO String
+	prompt text = do
+		putStr text
+		hFlush stdout
+		getLine
 
 	-- Ainda falta implementar Ficha de Dados Medicos, estou pensando em fazer um outro objeto Ficha para usar aqui será que é uma boa
 	

@@ -29,16 +29,16 @@ menuInicial  = do
 
     if input == "1" then do
         cadastroDeRecebedor
-        putStrLn ("Recebedor cadastrado")
+        putStrLn (" ")
     else if input == "2" then do
         putStrLn ("IMPLEMENTAR CONTROLE DO ESTOQUE DE BOLSAS")
     else if input == "3" then do
         putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")    
-    else if input == "4" then do
+    {-else if input == "4" then do
         enfermeiros carregaEnfermeiros carregaEscala
     else if input == "5" then do
         cadastroDeImpedimentos carregaImpedimentos    
-    else if input == "6" then do
+    -}else if input == "6" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM DOADOR")
     else if input == "7" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM ENFERMEIRO")
@@ -99,7 +99,7 @@ cadastroDeImpedimentos listaImpedimentos = do
         putStrLn("Entrada Invalida")
         menuInicial
         
-
+{-
 enfermeiros :: [Enfermeiro.Enfermeiro] -> Map Day String -> IO()
 enfermeiros listaEnfermeiros mapaEscala = do      
     putStr ("1. Cadastro de Enfermeiros\n" ++
@@ -159,7 +159,7 @@ carregaEscala = Auxiliar.iniciaEscala
 
 carregaImpedimentos :: [Impedimento.Impedimento]
 carregaImpedimentos = Auxiliar.iniciaImpedimentos
-
+-}
 carregaRecebedores :: [Recebedor.Recebedor]
 carregaRecebedores = Auxiliar.iniciaRecebedores
 
@@ -175,29 +175,22 @@ cadastroDeRecebedor = do
     input <- getLine
 
     if (input == "1") then do
-        
-        nome <- prompt "Digite o nome do(a) Recebedor(a) "
-        endereco <- prompt "Digite o endereço do(a) Recebedor(a) "
-        input <- prompt "Digite a idade do(a) Recebedor(a) "
-        let idade = read input
-        telefone <- prompt "Digite o telefone do(a) Recebedor(a) "
-        input <- prompt "Digite a quantidade de sangue em ml que o(a) Recebedor(a) precisa "
-        let quantidade = read input
-        let recebedor = Recebedor.adicionaRecebedor nome endereco idade telefone quantidade
-        putStrLn "Recebedor cadastrado"
+        Recebedor.cadastrarRecebedor
 
     else if (input == "2") then do
         nome <- prompt "Digite o nome do recebedor: "
         let recebedor = Recebedor.recebedorCadastrado nome carregaRecebedores
         if (recebedor == True) then do
-            verFicha <- prompt "Visualizar:\n(1) Ficha Médica do recebedor\n(2) Ficha de Dados\n(3) Sair\n"
+            verFicha <- prompt "Visualizar:\n(1) Ficha Médica do recebedor\n(2) Ficha de Dados\n(3) Sair"
             putStrLn "\n"
             if (verFicha == "1") then do
                 putStrLn "IMPLEMENTAR FICHA MEDICA"
             else --putStr Recebedor.imprimeRecebedor nome carregaRecebedores
                 putStr "IMPLEMENTAR RECEBEDOR TO STRING"
             
-            else putStrLn "Recebedor não cadastrado"
+            else do 
+                cadastrarNovo <- prompt "Recebedor não cadastrado\nCadastrar um novo Recebedor(a)?\n(1) SIM\n(2) NÃO\n"
+                if (cadastrarNovo == "1") then do Recebedor.cadastrarRecebedor else putStr " "
 
         -- se o recebedor já for cadastrado imprime os dados senao cadastra novo
 
