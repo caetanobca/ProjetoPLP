@@ -25,7 +25,8 @@ module Doador where
     mostraFichaTecnica :: Doador -> String
     mostraFichaTecnica  doador =  Impedimento.listarImpedimentos (impedimento doador)
 
-
+    listarDoacoes :: Doador -> String
+    listarDoacoes doador = (doacoes doador)
 
 --metodos relacionados a achar e mostrar os doadores
 
