@@ -2,6 +2,7 @@
 module Auxiliar where
 
 import qualified Recebedor as Recebedor
+import qualified Doador as Doador
 import qualified Impedimento as Impedimento
 import qualified Enfermeiro as Enfermeiro
 import qualified Recebedor as Recebedor
@@ -82,6 +83,7 @@ criaArquivos = do
     appendFile "enfermeiros.txt" ("")
     appendFile "estoque.txt" ("")
     appendFile "escala.txt" ("")
+    appendFile "doador.txt" ("")
 
 
 --metodos q vao salvar as listas 
@@ -127,6 +129,43 @@ stringEmDataAmericana dados = fromGregorian (read (datas!!0)) (read (datas!!1)) 
     
 iniciaRecebedores :: [Recebedor.Recebedor]
 iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 1250), (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1000)]
+
+
+
+
+iniciaDoador :: [Doador.Doador]
+iniciaDoador = do
+    let arquivo = unsafeDupablePerformIO(readFile "doador.txt")
+    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
+    let lista_doador = ((Data.List.map constroiDoador lista))
+    return lista_doador !! 0
+
+constroiDoador :: [String] -> Doador.Doador
+constroiDoador lista = 
+    Doador.Doador{
+        Doador.nome = lista !! 0,
+        Doador.endereco = lista !! 1,
+        Doador.idade = read (lista !! 2),
+        Doador.telefone = lista !! 3,
+        Doador.impedimentoStr =  lista !! 4,
+        Doador.ultimoDiaImpedido =  lista !! 5,
+        Doador.doacoes = lista !! 6
+    }
+
+
+escreverDoador :: Doador.Doador -> IO()
+escreverDoador doador = do
+    let doadorStr = Doador.nome doador ++ "," ++ Doador.endereco doador ++ "," ++ show (Doador.idade doador) ++ "," ++ Doador.telefone doador ++ "," ++ Doador.impedimento doador ++ "," ++ Doador.ultimoDiaImpedido doador ++ "," ++ Doador.doacoes doador ++  "\n"
+    appendFile "doador.txt" (doadorStr)
+    return ()
+
+
+rescreverDoador :: [(Day,String)] ->IO()
+rescreverDoador doador = do
+    writeFile "doador.txt" ("")
+    escreverDoador doador
+    return()
+
 
 
 --Implementar metodo q vai salvar a lista de impedimentos

@@ -1,5 +1,6 @@
 module Doador where
     import Data.List
+    import Data.Time
     import Data.Maybe()
     import Data.Map as Map (Map, insertWith, lookup, member)
     import Data.Map as Map()
@@ -7,12 +8,12 @@ module Doador where
     import Impedimento
 
 
-    data Doador = Doador{nome :: String, endereco :: String, idade :: Int, telefone :: String, impedimento :: [Impedimento], doacoes :: String
+    data Doador = Doador{nome :: String, endereco :: String, idade :: Int, telefone :: String, impedimentoStr :: String, ultimoDiaImpedido :: Day ,doacoes :: String
     } deriving (Show,Eq)
 
-    adicionaDoador :: String -> String -> Int -> String -> [Impedimento]  -> Doador
+    adicionaDoador :: String -> String -> Int -> String -> [Impedimento] -> Doador
     adicionaDoador nome endereco idade telefone impedimento  =
-     (Doador {nome = nome, endereco = endereco,idade = idade, telefone = telefone, impedimento = impedimento})
+     (Doador {nome = nome, endereco = endereco,idade = idade, telefone = telefone, impedimentoStr = impedimento, Doador.ultimoDiaImpedido = todHour})
 
 --nao sei se ta certo pq n sei se ta adicionando nas doacoes ou so ta salvando a ultima doacao 
     adicionaDoacao :: String -> [Doador] -> String -> Maybe Doador
@@ -23,10 +24,18 @@ module Doador where
 
     
     mostraFichaTecnica :: Doador -> String
-    mostraFichaTecnica  doador =  Impedimento.listarImpedimentos (impedimento doador)
+    mostraFichaTecnica  doador =   (impedimentoStr doador)
 
     listarDoacoes :: Doador -> String
     listarDoacoes doador = (doacoes doador)
+
+
+    mensagemDeAgradecimentoIndividual :: Doador -> String
+    mensagemDeAgradecimentoIndividual doador = ("mensagem enviada para " ++ nome doador )
+
+    mensagemPedidoDoacao :: [Doador] -> String
+    mensagemPedidoDoacao [] = ""
+    mensagemPedidoDoacao (h:t) = ("mensagem enviada para todos os doadores ativos")
 
 --metodos relacionados a achar e mostrar os doadores
 
