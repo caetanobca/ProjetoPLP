@@ -6,6 +6,7 @@ import qualified Estoque as Estoque
 import qualified Bolsa as Bolsa
 import Data.Map as Map
 import System.IO
+import Data.Time.Calendar
 
 main :: IO ()
 main = do
@@ -28,18 +29,16 @@ menuInicial  = do
 
     if input == "1" then do
         cadastroDeRecebedor
-        putStrLn ("Recebedor cadastrado")
+        putStrLn (" ")
     else if input == "2" then do
         putStrLn ("IMPLEMENTAR CONTROLE DO ESTOQUE DE BOLSAS")
     else if input == "3" then do
-        putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")
-    {-
-    else if input == "4" then do
-        enfermeiros
+        putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")    
+    {-else if input == "4" then do
+        enfermeiros carregaEnfermeiros carregaEscala
     else if input == "5" then do
-        cadastroDeImpedimentos carregaImpedimentos       
-    -}
-    else if input == "6" then do
+        cadastroDeImpedimentos carregaImpedimentos    
+    -}else if input == "6" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM DOADOR")
     else if input == "7" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM ENFERMEIRO")
@@ -101,8 +100,8 @@ cadastroDeImpedimentos listaImpedimentos = do
         menuInicial
         
 {-
-enfermeiros :: IO()
-enfermeiros = do
+enfermeiros :: [Enfermeiro.Enfermeiro] -> Map Day String -> IO()
+enfermeiros listaEnfermeiros mapaEscala = do      
     putStr ("1. Cadastro de Enfermeiros\n" ++
             "2. Buscar Enfermeiro\n" ++
             "3. Listagem de Enfermeiros\n" ++
@@ -120,44 +119,42 @@ enfermeiros = do
         idade <- getLine
         putStrLn ("Insira o telefone do Enfermeiro(a)")
         telefone <- getLine
-        Auxiliar.escreverEnfermeiros(Enfermeiro.adicionaEnfermeiro nome endereco (read(idade)) telefone)
+        Auxiliar.escreverEnfermeiros(Enfermeiro.adicionaEnfermeiro nome endereco (read(idade)) telefone)                    
         menuInicial
     else if(tipo == "2") then do
         putStrLn("Insira o nome do(a) Enfermeiro(a) que você deseja")
-        nome <- getLine 
-        let enfermeiro = Enfermeiro.encontraEnfermeiroString nome carregaEnfermeiros
-        putStrLn enfermeiro
+        nome <- getLine          
+        putStrLn (Enfermeiro.encontraEnfermeiroString nome listaEnfermeiros)
         menuInicial
-    else if(tipo == "3") then do
-        let enfermeiros = Enfermeiro.todosOsEnfermeiros carregaEnfermeiros
-        putStrLn enfermeiros
+    else if(tipo == "3") then do        
+        putStrLn (Enfermeiro.todosOsEnfermeiros listaEnfermeiros)
         menuInicial
-    else if(tipo == "4") then do
-       let enfermeiros = Enfermeiro.visualizaEnfermeiros carregaEnfermeiros 
-       putStrLn enfermeiros
+    else if(tipo == "4") then do       
+       putStrLn (Enfermeiro.visualizaEnfermeiros listaEnfermeiros )
        menuInicial
     else if(tipo == "5") then do
         putStrLn("Insira a data")
-        diaMes <- getLine
-        putStrLn("Insira o nome do Enfermeio")
-        enfermeiro <- getLine
-        let escala = Enfermeiro.organizaEscala diaMes carregaEscala enfermeiro carregaEnfermeiros 
-        putStrLn (show escala)
+        diaMesAno <- getLine
+        putStrLn("Insira o nome do Enfermeiro")
+        enfermeiro <- getLine              
+        Auxiliar.rescreverEscala (Enfermeiro.organizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala enfermeiro listaEnfermeiros)
+        menuInicial
     else if(tipo == "6") then do
         putStrLn("Insira a data")
-        diaMes <- getLine
-        let escala = Enfermeiro.visualizaEscala diaMes carregaEscala
-        if(escala == Nothing) then do 
+        diaMesAno <- getLine                    
+        if((Enfermeiro.visualizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala) == Nothing) then do 
         putStrLn("Data não encontrada")
+        menuInicial
         else do
-        putStrLn (show escala)    
+        putStrLn (show (Enfermeiro.visualizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala))
+        menuInicial    
     else do
         putStrLn ("Ainda não implementado")
 
 carregaEnfermeiros ::  [Enfermeiro.Enfermeiro]
 carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
 
-carregaEscala :: Map String String
+carregaEscala :: Map Day String
 carregaEscala = Auxiliar.iniciaEscala
 
 carregaImpedimentos :: [Impedimento.Impedimento]
@@ -178,29 +175,22 @@ cadastroDeRecebedor = do
     input <- getLine
 
     if (input == "1") then do
-        
-        nome <- prompt "Digite o nome do(a) Recebedor(a) "
-        endereco <- prompt "Digite o endereço do(a) Recebedor(a) "
-        input <- prompt "Digite a idade do(a) Recebedor(a) "
-        let idade = read input
-        telefone <- prompt "Digite o telefone do(a) Recebedor(a) "
-        input <- prompt "Digite a quantidade de sangue em ml que o(a) Recebedor(a) precisa "
-        let quantidade = read input
-        let recebedor = Recebedor.adicionaRecebedor nome endereco idade telefone quantidade
-        putStrLn "Recebedor cadastrado"
+        Recebedor.cadastrarRecebedor
 
     else if (input == "2") then do
         nome <- prompt "Digite o nome do recebedor: "
         let recebedor = Recebedor.recebedorCadastrado nome carregaRecebedores
         if (recebedor == True) then do
-            verFicha <- prompt "Visualizar:\n(1) Ficha Médica do recebedor\n(2) Ficha de Dados\n(3) Sair\n"
+            verFicha <- prompt "Visualizar:\n(1) Ficha Médica do recebedor\n(2) Ficha de Dados\n(3) Sair"
             putStrLn "\n"
             if (verFicha == "1") then do
                 putStrLn "IMPLEMENTAR FICHA MEDICA"
             else --putStr Recebedor.imprimeRecebedor nome carregaRecebedores
                 putStr "IMPLEMENTAR RECEBEDOR TO STRING"
             
-            else putStrLn "Recebedor não cadastrado"
+            else do 
+                cadastrarNovo <- prompt "Recebedor não cadastrado\nCadastrar um novo Recebedor(a)?\n(1) SIM\n(2) NÃO\n"
+                if (cadastrarNovo == "1") then do Recebedor.cadastrarRecebedor else putStr " "
 
         -- se o recebedor já for cadastrado imprime os dados senao cadastra novo
 

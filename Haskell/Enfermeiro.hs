@@ -3,6 +3,7 @@ module Enfermeiro where
     import Data.Maybe()
     import Data.Map as Map
     import Data.Char
+    import Data.Time
 
 
     data Enfermeiro = Enfermeiro{nome :: String, endereco :: String, idade :: Int, telefone :: String
@@ -12,10 +13,16 @@ module Enfermeiro where
     adicionaEnfermeiro nome endereco idade telefone = (Enfermeiro {nome = nome, endereco = endereco,idade = idade, telefone = telefone})
 
     encontraEnfermeiroString :: String -> [Enfermeiro] -> String
-    encontraEnfermeiroString procurado [] = "Resultados: \n"
+    encontraEnfermeiroString procurado [] = ""
     encontraEnfermeiroString procurado (h:t)
         |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = show h ++ encontraEnfermeiroString procurado t
         |otherwise = encontraEnfermeiroString procurado t
+
+    encontraEnfermeiroStringNome :: String -> [Enfermeiro] -> String
+    encontraEnfermeiroStringNome procurado [] = ""
+    encontraEnfermeiroStringNome procurado (h:t)
+        |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = nome h ++ encontraEnfermeiroString procurado t
+        |otherwise = encontraEnfermeiroString procurado t    
 
     encontraEnfermeiro :: String -> [Enfermeiro] -> Maybe Enfermeiro
     encontraEnfermeiro procurado [] = Nothing
@@ -35,12 +42,12 @@ module Enfermeiro where
         |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = True
         |otherwise = enfermeiroCadastrado procurado t
 
-    organizaEscala :: String -> Map String String -> String -> [Enfermeiro] -> Map String String
+    organizaEscala :: Day -> Map Day String -> String -> [Enfermeiro] -> [(Day,String)]
     organizaEscala diaMes escala nome enfermeiros
-        |encontraEnfermeiroString nome enfermeiros /= "Resultados: \n" = insertWith (++) diaMes novaEscala escala
-        where novaEscala = encontraEnfermeiroString nome enfermeiros
+        |encontraEnfermeiroStringNome nome enfermeiros /= "" = Map.toList(insertWith (++) diaMes novaEscala escala)
+        where novaEscala = encontraEnfermeiroStringNome nome enfermeiros
 
-    visualizaEscala :: String -> Map String String -> Maybe String
+    visualizaEscala :: Day -> Map Day String -> Maybe String
     visualizaEscala diaMes escala
         |member diaMes escala == False = Nothing
         |member diaMes escala == True = Map.lookup diaMes escala

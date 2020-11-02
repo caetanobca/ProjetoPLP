@@ -10,11 +10,12 @@ import qualified Bolsa as Bolsa
 import Data.Map as Map
 import Data.List
 import System.IO.Unsafe(unsafeDupablePerformIO)
---import Data.List.Split
+import Data.List.Split ( splitOn )
 import Data.Typeable
+import Data.Time.Calendar
 
 --Esses metodos vai carregar os empedimentos que estavam salvos em um arquivo
-{-iniciaImpedimentos :: [Impedimento.Impedimento]
+iniciaImpedimentos :: [Impedimento.Impedimento]
 iniciaImpedimentos = do
     let arquivo = unsafeDupablePerformIO(readFile "impedimentos.txt")
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
@@ -56,17 +57,17 @@ escreverBolsa bolsa = do
     appendFile "estoque.txt" (bolsaStr)
     return ()
 
-iniciaEscala :: Map String String
+iniciaEscala :: Map Day String
 iniciaEscala = do
     let arquivo = unsafeDupablePerformIO(readFile "escala.txt")
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_enfermeiros = ((Data.List.map constroiEscala lista))
     let mapa_escala = Map.fromList lista_enfermeiros
-    return mapa_escala !! 0
--}
-constroiEscala:: [String] -> (String,String)
-constroiEscala  diaMesEnfermeiros = (diaMesEnfermeiros!!0,diaMesEnfermeiros!!1)
-    
+    return mapa_escala!!0
+
+constroiEscala:: [String] -> (Day,String)
+constroiEscala  diaMesEnfermeiros = ((stringEmDataAmericana (diaMesEnfermeiros!!0)),diaMesEnfermeiros!!1)
+
 
 iniciaEstoque :: [Bolsa.Bolsa]
 iniciaEstoque = [(Bolsa.Bolsa "A+" 450), (Bolsa.Bolsa "O-" 400)]
@@ -102,12 +103,28 @@ escreverEnfermeiros enfermeiro = do
     appendFile "enfermeiros.txt" (enfermeiroStr)
     return ()
 
-escreverEscala :: (String,String) -> IO()
-escreverEscala (diaMes,enfermeiro) = do
-    let escalaStr = diaMes ++ "," ++ enfermeiro ++ "\n" 
+escreverEscala :: [(Day,String)] -> IO()
+escreverEscala [] = return ()
+escreverEscala (h:t) = do
+    let escalaStr = (show (fst h)) ++ "," ++ snd h ++ "\n" 
     appendFile "escala.txt" (escalaStr)
+    escreverEscala t
     return ()
 
+rescreverEscala :: [(Day,String)] ->IO()
+rescreverEscala escala = do
+    writeFile "escala.txt" ("")
+    escreverEscala escala
+    return()
+
+stringEmData :: String -> Day
+stringEmData dados = fromGregorian (read (datas!!2)) (read (datas!!1)) (read (datas!!0))
+    where datas = splitOn ("/") dados
+
+stringEmDataAmericana :: String -> Day
+stringEmDataAmericana dados = fromGregorian (read (datas!!0)) (read (datas!!1)) (read (datas!!2))
+    where datas = splitOn ("-") dados
+    
 iniciaRecebedores :: [Recebedor.Recebedor]
 iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 1250), (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1000)]
 
