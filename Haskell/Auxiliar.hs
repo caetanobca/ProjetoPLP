@@ -2,7 +2,7 @@
 module Auxiliar where
 
 import qualified Recebedor as Recebedor
-import qualified Doador as Doador
+--import qualified Doador as Doador
 import qualified Impedimento as Impedimento
 import qualified Enfermeiro as Enfermeiro
 import qualified Recebedor as Recebedor
@@ -70,6 +70,17 @@ constroiEscala:: [String] -> (Day,String)
 constroiEscala  diaMesEnfermeiros = ((stringEmDataAmericana (diaMesEnfermeiros!!0)),diaMesEnfermeiros!!1)
 
 
+iniciaAgendaLocal :: Map Day String
+iniciaAgendaLocal = do
+    let arquivo = unsafeDupablePerformIO(readFile "agendaLocal.txt")
+    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
+    let lista_agenda = ((Data.List.map constroiAgendaLocal lista))
+    let mapa_escala = Map.fromList lista_agenda
+    return mapa_escala!!0
+    
+constroiAgendaLocal:: [String] -> (Day,String)
+constroiAgendaLocal  diaMesAgenda = ((stringEmDataAmericana (diaMesAgenda!!0)),diaMesAgenda!!1)
+
 iniciaEstoque :: [Bolsa.Bolsa]
 iniciaEstoque = [(Bolsa.Bolsa "A+" 450), (Bolsa.Bolsa "O-" 400)]
     
@@ -84,6 +95,8 @@ criaArquivos = do
     appendFile "estoque.txt" ("")
     appendFile "escala.txt" ("")
     appendFile "doador.txt" ("")
+    appendFile "agendaLocal.txt" ("")
+    appendFile "agendaDomicilio.txt" ("")
 
 
 --metodos q vao salvar as listas 
@@ -119,6 +132,20 @@ rescreverEscala escala = do
     escreverEscala escala
     return()
 
+escreverAgendaLocal :: [(Day,String)] -> IO()
+escreverAgendaLocal [] = return ()
+escreverAgendaLocal (h:t) = do
+    let agendaStr = (show (fst h)) ++ "," ++ snd h ++ "\n" 
+    appendFile "agendaLocal.txt" (agendaStr)
+    escreverAgendaLocal t
+    return ()
+
+rescreverAgendaLocal :: [(Day,String)] ->IO()
+rescreverAgendaLocal agendaLocal = do
+    writeFile "agendaLocal.txt" ("")
+    escreverAgendaLocal agendaLocal
+    return()
+
 stringEmData :: String -> Day
 stringEmData dados = fromGregorian (read (datas!!2)) (read (datas!!1)) (read (datas!!0))
     where datas = splitOn ("/") dados
@@ -132,7 +159,7 @@ iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabe
 
 
 
-
+{--
 iniciaDoador :: [Doador.Doador]
 iniciaDoador = do
     let arquivo = unsafeDupablePerformIO(readFile "doador.txt")
@@ -150,9 +177,9 @@ constroiDoador lista =
         Doador.impedimentoStr =  lista !! 4,
         Doador.ultimoDiaImpedido =  lista !! 5,
         Doador.doacoes = lista !! 6
-    }
+--}
 
-
+{--
 escreverDoador :: Doador.Doador -> IO()
 escreverDoador doador = do
     let doadorStr = Doador.nome doador ++ "," ++ Doador.endereco doador ++ "," ++ show (Doador.idade doador) ++ "," ++ Doador.telefone doador ++ "," ++ Doador.impedimento doador ++ "," ++ Doador.ultimoDiaImpedido doador ++ "," ++ Doador.doacoes doador ++  "\n"
@@ -166,7 +193,7 @@ rescreverDoador doador = do
     escreverDoador doador
     return()
 
-
+--}
 
 --Implementar metodo q vai salvar a lista de impedimentos
 
