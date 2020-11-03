@@ -116,16 +116,18 @@ escreverImpedimento impedimento = do
 escreverImpedimentos :: [Impedimento.Impedimento] -> IO()
 escreverImpedimentos [] = return ()
 escreverImpedimentos (h:t) = do
-    if(Impedimento.tipoImpedimento impedimento) == "MEDICAMENTO" then do
-        let impedimentoStr =  Impedimento.tipoImpedimento impedimento ++ "," ++ Impedimento.funcao impedimento ++ "," ++ Impedimento.composto impedimento ++ "," ++ show (Impedimento.tempoSuspencao impedimento) ++ "\n"
+    if(Impedimento.tipoImpedimento h) == "MEDICAMENTO" then do
+        let impedimentoStr =  Impedimento.tipoImpedimento h ++ "," ++ Impedimento.funcao h ++ "," ++ Impedimento.composto h ++ "," ++ show (Impedimento.tempoSuspencao h) ++ "\n"
         appendFile "impedimentos.txt" (impedimentoStr)
+        escreverImpedimentos t
         return ()  
     else do  
-        let impedimentoStr =  Impedimento.tipoImpedimento impedimento ++ "," ++ Impedimento.cid impedimento ++ "," ++ show (Impedimento.tempoSuspencao impedimento) ++ "\n"
+        let impedimentoStr =  Impedimento.tipoImpedimento h ++ "," ++ Impedimento.cid h ++ "," ++ show (Impedimento.tempoSuspencao h) ++ "\n"
         appendFile "impedimentos.txt" (impedimentoStr)
+        escreverImpedimentos t
         return ()  
 
-rescreverImpedimento :: [Doador.Doador] ->IO()
+rescreverImpedimento :: [Impedimento.Impedimento] ->IO()
 rescreverImpedimento impedimentos = do
     writeFile "impedimentos.txt" ("")
     escreverImpedimentos impedimentos
