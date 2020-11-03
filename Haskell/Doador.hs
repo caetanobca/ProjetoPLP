@@ -4,6 +4,7 @@ module Doador where
     import Data.Maybe()
     import Data.Map as Map (Map, insertWith, lookup, member)
     import Data.Map as Map()
+    import System.IO.Unsafe(unsafeDupablePerformIO)
     import Data.Char
     import Impedimento
 
@@ -12,8 +13,9 @@ module Doador where
     } deriving (Show,Eq)
 
     adicionaDoador :: String -> String -> Int -> String -> [Impedimento] -> Doador
-    adicionaDoador nome endereco idade telefone impedimento  =
-     (Doador {nome = nome, endereco = endereco,idade = idade, telefone = telefone, impedimentoStr = impedimento, Doador.ultimoDiaImpedido = todHour})
+    adicionaDoador nome endereco idade telefone impedimento = 
+        (Doador {nome = nome, endereco = endereco,idade = idade, telefone = telefone, impedimentoStr = Impedimento.listarImpedimentos (impedimento), Doador.ultimoDiaImpedido =  getUltimoDia})
+        where getUltimoDia = unsafeDupablePerformIO(Impedimento.ultimoDiaImpedido impedimento)
 
 --nao sei se ta certo pq n sei se ta adicionando nas doacoes ou so ta salvando a ultima doacao 
     adicionaDoacao :: String -> [Doador] -> String -> Maybe Doador
