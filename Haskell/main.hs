@@ -8,7 +8,7 @@ import qualified Doador as Doador
 import qualified Agenda as Agenda
 import Data.Map as Map
 import System.IO
-import Data.Time.Calendar
+import Data.Time
 import qualified DatasCriticas as DatasCriticas
 
 main :: IO ()
@@ -104,14 +104,14 @@ impedimentos listaImpedimentos = do
                 "Composto: ")
             input <- getLine
             let composto = input
-            putStrLn (Impedimento.buscaImpedimentoStr ("MEDICAMENTO" composto listaImpedimentos))
+            putStrLn (show (Impedimento.buscaImpedimentoStr "MEDICAMENTO" composto listaImpedimentos))
             menuInicial
         else if (tipo == "2") then do
             putStr("Buscar Doenca\n" ++
                     "CID: ")
             input <- getLine
             let cid = input
-            putStrLn (Impedimento.buscaImpedimentoStr ("DOENCA" cid listaImpedimentos))
+            putStrLn (Impedimento.buscaImpedimentoStr "DOENCA" cid listaImpedimentos)
             menuInicial
         else do
             putStrLn("Entrada Invalida")
@@ -130,7 +130,7 @@ impedimentos listaImpedimentos = do
                     "Composto: ")
             input <- getLine
             let composto = input
-            Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento("MEDICAMENTO" composto listaImpedimentos) listaImpedimentos))
+            Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento "MEDICAMENTO" composto listaImpedimentos) listaImpedimentos)
             putStrLn ("Impedimento deletado")
             menuInicial
         else if (tipo == "2") then do
@@ -138,7 +138,7 @@ impedimentos listaImpedimentos = do
                     "CID: ")
             input <- getLine
             let cid = input
-            Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento("DOENCA" cid listaImpedimentos) listaImpedimentos))
+            Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento "DOENCA" cid listaImpedimentos) listaImpedimentos)
             putStrLn ("Impedimento deletado")
             menuInicial
         else do
@@ -360,11 +360,18 @@ carregaEstoque = Auxiliar.iniciaEstoque
     Caso hoje seja dia primeiro, compara o estoque com o do ano passado 
 -}
 verificaDataCritica :: IO()
-verificaDataCritica
-    |dia == 1 = do
-        today <- toGregorian <$> (utctDay <$> getCurrentTime)
+verificaDataCritica = do
+    today <- hoje
+    if((today) == 1) then do
         DatasCriticas.verificaHoje carregaEstoque
-    where dia = (getDia today)
+    else do
+        return()       
+    
 
-getMes :: (a, b, c) -> a
-getMes (y, _, _) = y 
+getDia :: (a, b, c) -> c
+getDia (_, _, y) = y
+
+hoje :: IO(Int)
+hoje = do
+    today <- toGregorian <$> (utctDay <$> getCurrentTime)
+    return (getDia today)

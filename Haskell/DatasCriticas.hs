@@ -3,8 +3,10 @@ module DatasCriticas where
     import qualified Estoque as Estoque
     import qualified Bolsa as Bolsa
     import Data.Map as Map
+    import Data.List
     import System.IO.Unsafe(unsafeDupablePerformIO)
     import Data.List.Split ( splitOn )
+    import qualified Auxiliar as Auxiliar
 
 
     {-
@@ -17,29 +19,44 @@ module DatasCriticas where
         today <- toGregorian <$> (utctDay <$> getCurrentTime)
         let mes = (show (getMes today))
 
-        let mlAnterior = read (getEstoqueMes mes estoqueMes) :: Int
-        let mlHoje = Estoque.totalSangue estoqueHoje
-        
-        salvaEstoqueMes (estoqueHoje estoqueMes)
-
-        if(mlAnterior > mlHoje)then do 
+        let estoqueMes = getEstoqueMes mes iniciaEstoqueMes
+        if(estoqueMes /= Nothing) then do
+            let mlAnterior = (read (show estoqueMes)) :: Int
+            let mlHoje = Estoque.totalSangue estoqueHoje
+            salvaEstoqueMes
+            if(mlAnterior > mlHoje)then do 
             putStr ("ESTOQUE BAIXO -CHAMAR METODO QUE AVISA DOADORES-")
+            else do
+            putStr ("ESTOQUE OK -TALVEZ N FAZER NADA-") 
+
         else do
-            putStr ("ESTOQUE OK -TALVEZ N FAZER NADA-")
-            
+            let mlAnterior = 0
+            let mlHoje = Estoque.totalSangue estoqueHoje
+            salvaEstoqueMes
+            if(mlAnterior > mlHoje)then do 
+            putStr ("ESTOQUE BAIXO -CHAMAR METODO QUE AVISA DOADORES-")
+            else do
+            putStr ("ESTOQUE OK -TALVEZ N FAZER NADA-")                   
 
         
 
-    getEstoqueMes :: String -> Map String String -> String
+    getEstoqueMes :: String -> Map String String -> Maybe String
     getEstoqueMes mes estoqueMes
-        |member mes escala == False = "0"
-        |member mes escala == True = Map.lookup mes estoqueMes
+        |member mes estoqueMes == False = Nothing
+        |member mes estoqueMes == True = Map.lookup mes estoqueMes
 
-    salvaEstoqueMes :: [Bolsa.Bolsa] -> Map String String -> IO()
-    salvaEstoqueMes estoque mapa = do 
+    salvaEstoqueMes :: IO()
+    salvaEstoqueMes = do 
+        --today <- toGregorian <$> (utctDay <$> getCurrentTime)
+        mes <- passaData
+        rescreverEstoqueMes (Estoque.estoqueEmMapa Auxiliar.iniciaEstoque iniciaEstoqueMes mes)
+        
+        
+    
+    passaData :: IO(String)
+    passaData = do
         today <- toGregorian <$> (utctDay <$> getCurrentTime)
-        let mes = (show (getMes today))
-        rescreverEstoqueMes (Estoque.estoqueEmMapa estoque mapa mes)
+        return (show (getMes today))
 
     getMes :: (a, b, c) -> b  
     getMes (_, y, _) = y  
@@ -58,7 +75,7 @@ module DatasCriticas where
         escreverEstoqueMes estoqueMes
         return()
 
-    iniciaEstoqueMes :: Map Day String
+    iniciaEstoqueMes :: Map String String
     iniciaEstoqueMes = do
         let arquivo = unsafeDupablePerformIO(readFile "estoqueMes.txt")
         let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))

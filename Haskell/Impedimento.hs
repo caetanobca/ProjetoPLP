@@ -22,7 +22,7 @@ module Impedimento where
     adicionaImpedimento  [] cid  tempoSuspencao  = (Doenca "DOENCA" cid tempoSuspencao)
     adicionaImpedimento  funcao composto tempoSuspencao = (Medicamento "MEDICAMENTO" funcao composto tempoSuspencao)
 
-    buscaImpedimentoStr :: String -> String-> [Impedimento] -> String
+    buscaImpedimentoStr :: String -> String -> [Impedimento] -> String
     buscaImpedimentoStr tipo procurado [] = ""
     buscaImpedimentoStr tipo procurado (h:t)
         |tipo == (tipoImpedimento h) && tipo == "MEDICAMENTO" && procurado == composto h = impedimentoToString h
@@ -45,18 +45,19 @@ module Impedimento where
         |tipoImpedimento impedimento == "DOENCA" = "(Doenca) >CID: " ++ cid impedimento ++ " >Tempo Suspencao: " 
                         ++ show (tempoSuspencao impedimento) ++ " Dias\n" 
 
-    buscaImpedimento :: String -> String-> [Impedimento] -> Maybe Impedimento
-    buscaImpedimento tipo procurado [] = Nothing
+    buscaImpedimento :: String -> String-> [Impedimento] -> Impedimento
+    buscaImpedimento tipo procurado [] = (Medicamento "MEDICAMENTO" " 0dias de suspencao" "Nenhum composto" 0)
     buscaImpedimento tipo procurado (h:t)
-        |tipo == (tipoImpedimento h) && tipo == "MEDICAMENTO" && procurado == composto h = Just h
-        |tipo == (tipoImpedimento h) && tipo == "DOENCA" && procurado == cid h = Just h
+        |tipo == (tipoImpedimento h) && tipo == "MEDICAMENTO" && procurado == composto h = h
+        |tipo == (tipoImpedimento h) && tipo == "DOENCA" && procurado == cid h = h
         |otherwise = buscaImpedimento procurado tipo t
+
 
     removeImpedimetno :: Impedimento -> [Impedimento] -> [Impedimento]
     removeImpedimetno _ [] = []
     removeImpedimetno impedimento (h:t) 
-        | impedimento == h = removeImpedimetno impedimento t
-        | otherwise = (h : removeImpedimetno impedimento t)
+        |impedimento == h = removeImpedimetno impedimento t
+        |otherwise = (h : removeImpedimetno impedimento t)
 
 
     ultimoDiaImpedido :: [Impedimento] -> IO(Day)
