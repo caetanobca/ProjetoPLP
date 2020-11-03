@@ -9,10 +9,12 @@ import qualified Agenda as Agenda
 import Data.Map as Map
 import System.IO
 import Data.Time.Calendar
+import qualified DatasCriticas as DatasCriticas
 
 main :: IO ()
 main = do
     Auxiliar.criaArquivos
+    
     menuInicial
 
 
@@ -39,7 +41,7 @@ menuInicial  = do
     else if input == "4" then do
         enfermeiros carregaEnfermeiros carregaEscala
     else if input == "5" then do
-        cadastroDeImpedimentos carregaImpedimentos    
+        impedimentos carregaImpedimentos    
     else if input == "6" then do
         agendaDoacao carregaAgenda
     else if input == "7" then do
@@ -52,11 +54,12 @@ menuInicial  = do
        putStrLn("Entrada invalida")
         
 
-cadastroDeImpedimentos :: [Impedimento.Impedimento] -> IO()
-cadastroDeImpedimentos listaImpedimentos = do 
+impedimentos :: [Impedimento.Impedimento] -> IO()
+impedimentos listaImpedimentos = do 
     putStr ("\n1. Cadastro de Impedimento\n" ++ 
             "2. Buscar Impedimento\n" ++
-            "3. Listar Impedimentos\n")
+            "3. Listar Impedimentos\n" ++
+            "4. Deletar Impedimento\n")
     opcao <- getLine
     if (opcao == "1") then do
         putStr ("Cadastro de Impedimentos\n" ++
@@ -92,11 +95,55 @@ cadastroDeImpedimentos listaImpedimentos = do
             putStrLn("Entrada Invalida")
             menuInicial
     else if (opcao == "2") then do 
-        putStrLn("nao implementado")
+        putStr ("Buscar Impedimentos\n" ++
+            "1. Buscar Medicamento\n" ++
+            "2. Buscar Doenca\n")
+        tipo <- getLine
+        if (tipo == "1") then do
+            putStr("Buscar Medicamento\n" ++
+                "Composto: ")
+            input <- getLine
+            let composto = input
+            putStrLn (Impedimento.buscaImpedimentoStr ("MEDICAMENTO" composto listaImpedimentos))
+            menuInicial
+        else if (tipo == "2") then do
+            putStr("Buscar Doenca\n" ++
+                    "CID: ")
+            input <- getLine
+            let cid = input
+            putStrLn (Impedimento.buscaImpedimentoStr ("DOENCA" cid listaImpedimentos))
+            menuInicial
+        else do
+            putStrLn("Entrada Invalida")
+            menuInicial
     else if (opcao == "3") then do
         putStrLn ("Listar Impedimentos")
         putStr(Impedimento.listarImpedimentos listaImpedimentos)
         menuInicial
+    else if (opcao == "4") then do
+        putStr ("Deletar Impedimentos\n" ++
+            "1. Deletar Medicamento\n" ++
+            "2. Deletar Doenca\n")
+        tipo <- getLine
+        if (tipo == "1") then do
+            putStr("Deletar Medicamento\n" ++
+                    "Composto: ")
+            input <- getLine
+            let composto = input
+            Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento("MEDICAMENTO" composto listaImpedimentos) listaImpedimentos))
+            putStrLn ("Impedimento deletado")
+            menuInicial
+        else if (tipo == "2") then do
+            putStr("Deletar Doenca\n" ++
+                    "CID: ")
+            input <- getLine
+            let cid = input
+            Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento("DOENCA" cid listaImpedimentos) listaImpedimentos))
+            putStrLn ("Impedimento deletado")
+            menuInicial
+        else do
+            putStrLn("Entrada Invalida")
+            menuInicial
     else do
         putStrLn("Entrada Invalida")
         menuInicial
@@ -308,3 +355,16 @@ estoque = do
 
 carregaEstoque ::  [Bolsa.Bolsa]
 carregaEstoque = Auxiliar.iniciaEstoque
+
+{-
+    Caso hoje seja dia primeiro, compara o estoque com o do ano passado 
+-}
+verificaDataCritica :: IO()
+verificaDataCritica
+    |dia == 1 = do
+        today <- toGregorian <$> (utctDay <$> getCurrentTime)
+        DatasCriticas.verificaHoje carregaEstoque
+    where dia = (getDia today)
+
+getMes :: (a, b, c) -> a
+getMes (y, _, _) = y 

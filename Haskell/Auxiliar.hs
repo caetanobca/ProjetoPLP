@@ -96,7 +96,8 @@ criaArquivos = do
     appendFile "estoque.txt" ("")
     appendFile "escala.txt" ("")
     appendFile "doador.txt" ("")
-    appendFile "agendaLocal.txt" ("")    
+    appendFile "agendaLocal.txt" ("")
+    appendFile "estoqueMes.txt" ("")    
 
 
 --metodos q vao salvar as listas 
@@ -111,6 +112,24 @@ escreverImpedimento impedimento = do
         let impedimentoStr =  Impedimento.tipoImpedimento impedimento ++ "," ++ Impedimento.cid impedimento ++ "," ++ show (Impedimento.tempoSuspencao impedimento) ++ "\n"
         appendFile "impedimentos.txt" (impedimentoStr)
         return ()   
+
+escreverImpedimentos :: [Impedimento.Impedimento] -> IO()
+escreverImpedimentos [] = return ()
+escreverImpedimentos (h:t) = do
+    if(Impedimento.tipoImpedimento impedimento) == "MEDICAMENTO" then do
+        let impedimentoStr =  Impedimento.tipoImpedimento impedimento ++ "," ++ Impedimento.funcao impedimento ++ "," ++ Impedimento.composto impedimento ++ "," ++ show (Impedimento.tempoSuspencao impedimento) ++ "\n"
+        appendFile "impedimentos.txt" (impedimentoStr)
+        return ()  
+    else do  
+        let impedimentoStr =  Impedimento.tipoImpedimento impedimento ++ "," ++ Impedimento.cid impedimento ++ "," ++ show (Impedimento.tempoSuspencao impedimento) ++ "\n"
+        appendFile "impedimentos.txt" (impedimentoStr)
+        return ()  
+
+rescreverImpedimento :: [Doador.Doador] ->IO()
+rescreverImpedimento impedimentos = do
+    writeFile "impedimentos.txt" ("")
+    escreverImpedimentos impedimentos
+    return()
 
 escreverEnfermeiros :: Enfermeiro.Enfermeiro -> IO()
 escreverEnfermeiros enfermeiro = do
@@ -177,18 +196,24 @@ constroiDoador lista =
         Doador.doacoes = lista !! 6 
         }
 
-escreverDoador :: [Doador.Doador] -> IO()
-escreverDoador [] = return ()
-escreverDoador (h:t) = do
+escreverDoador :: Doador.Doador -> IO()
+escreverDoador doador = do
+    let doadorStr = Doador.nome doador ++ "," ++ Doador.endereco doador ++ "," ++ (show (Doador.idade doador)) ++ "," ++ Doador.telefone doador ++ "," ++ Doador.impedimentoStr doador ++ "," ++ (show (Doador.ultimoDiaImpedido doador)) ++ "," ++ Doador.doacoes doador ++  "\n" 
+    appendFile "doador.txt" (doadorStr) 
+    return ()
+
+escreverDoadores :: [Doador.Doador] -> IO()
+escreverDoadores [] = return ()
+escreverDoadores (h:t) = do
     let doadorStr = Doador.nome h ++ "," ++ Doador.endereco h ++ "," ++ (show (Doador.idade h)) ++ "," ++ Doador.telefone h ++ "," ++ Doador.impedimentoStr h ++ "," ++ (show (Doador.ultimoDiaImpedido h)) ++ "," ++ Doador.doacoes h ++  "\n" 
     appendFile "doador.txt" (doadorStr)
-    escreverDoador t
+    escreverDoadores t
     return ()
 
 rescreverDoador :: [Doador.Doador] ->IO()
 rescreverDoador doador = do
     writeFile "doador.txt" ("")
-    escreverDoador doador
+    escreverDoadores doador
     return()
 
 --Implementar metodo q vai salvar a lista de impedimentos

@@ -3,7 +3,8 @@ module Estoque where
   import Data.Char
   import Data.Maybe
   import Bolsa
-  
+  import Data.Map as Map
+
   adicionaBolsa:: String -> Int -> Bolsa.Bolsa
   adicionaBolsa tipoSanguineo qtdSangue = (Bolsa.Bolsa (toUpperCase tipoSanguineo) qtdSangue)
   -- tem que escrever em um arquivo pra conseguir saber quais bolsas estao cadastradas
@@ -55,5 +56,15 @@ module Estoque where
   bolsaToString:: Maybe Bolsa -> String
   bolsaToString (Just bolsa) = "[RETIRADA] " ++ imprimeBolsa (tipoSanguineo bolsa) (qtdSangue bolsa)
 
--- retornaTodasBolsas :: [Bolsa.Bolsa]
---  retornaTodasBolsas (h:t) = Bolsa h ++ [Bolsa t]
+  -- retornaTodasBolsas :: [Bolsa.Bolsa]
+  --  retornaTodasBolsas (h:t) = Bolsa h ++ [Bolsa t]
+
+  {-
+    pega uma lista de tupas onde o primeiro elemento eh o mes e o segundo a qtd de sangue no estoque-}
+  estoqueEmMapa :: [Bolsa.Bolsa] -> Map String String -> String -> [(String, String)]
+  estoqueEmMapa estoque mapa mes = Map.toList(insert mes (show (totalSangue estoque)) mapa)
+  {-
+    Retorna o total de sangue do banco (em ml)-}
+  totalSangue :: [Bolsa.Bolsa] -> Int
+  totalSangue [] = 0
+  totalSangue (h:t) = qtdSangue h + totalSangue t

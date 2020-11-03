@@ -22,13 +22,13 @@ module Impedimento where
     adicionaImpedimento  [] cid  tempoSuspencao  = (Doenca "DOENCA" cid tempoSuspencao)
     adicionaImpedimento  funcao composto tempoSuspencao = (Medicamento "MEDICAMENTO" funcao composto tempoSuspencao)
 
-    buscaImpedimento :: String -> String-> [Impedimento] -> Maybe Impedimento
-    buscaImpedimento tipo procurado [] = Nothing
-    buscaImpedimento tipo procurado (h:t)
-        |tipo == (tipoImpedimento h) && tipo == "MEDICAMENTO" && procurado == funcao h = Just h
-        |tipo == (tipoImpedimento h) && tipo == "DOENCA" && procurado == funcao h = Just h
-        |otherwise = buscaImpedimento procurado tipo t
-
+    buscaImpedimentoStr :: String -> String-> [Impedimento] -> String
+    buscaImpedimentoStr tipo procurado [] = ""
+    buscaImpedimentoStr tipo procurado (h:t)
+        |tipo == (tipoImpedimento h) && tipo == "MEDICAMENTO" && procurado == composto h = impedimentoToString h
+        |tipo == (tipoImpedimento h) && tipo == "DOENCA" && procurado == cid h = impedimentoToString h
+        |otherwise = buscaImpedimentoStr procurado tipo t
+        
     listarImpedimentos:: [Impedimento] -> String
     listarImpedimentos [] = " "
     listarImpedimentos (h:t)
@@ -38,8 +38,25 @@ module Impedimento where
                         ++ show (tempoSuspencao h) ++ " Dias\n" ++ listarImpedimentos t
 
         
+    impedimentoToString :: Impedimento -> String
+    impedimentoToString impedimento
+        |tipoImpedimento impedimento == "MEDICAMENTO" = "(Medicamento) >Funcao: "  ++ funcao impedimento  ++
+                        " >Composto: " ++ composto impedimento ++ " >Tempo Supencao: " ++ show (tempoSuspencao impedimento) ++ " Dias\n"
+        |tipoImpedimento impedimento == "DOENCA" = "(Doenca) >CID: " ++ cid impedimento ++ " >Tempo Suspencao: " 
+                        ++ show (tempoSuspencao impedimento) ++ " Dias\n" 
 
+    buscaImpedimento :: String -> String-> [Impedimento] -> Maybe Impedimento
+    buscaImpedimento tipo procurado [] = Nothing
+    buscaImpedimento tipo procurado (h:t)
+        |tipo == (tipoImpedimento h) && tipo == "MEDICAMENTO" && procurado == composto h = Just h
+        |tipo == (tipoImpedimento h) && tipo == "DOENCA" && procurado == cid h = Just h
+        |otherwise = buscaImpedimento procurado tipo t
 
+    removeImpedimetno :: Impedimento -> [Impedimento] -> [Impedimento]
+    removeImpedimetno _ [] = []
+    removeImpedimetno impedimento (h:t) 
+        | impedimento == h = removeImpedimetno impedimento t
+        | otherwise = (h : removeImpedimetno impedimento t)
 
 
     ultimoDiaImpedido :: [Impedimento] -> IO(Day)
