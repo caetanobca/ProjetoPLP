@@ -8,6 +8,7 @@ import qualified Enfermeiro as Enfermeiro
 import qualified Recebedor as Recebedor
 import qualified Estoque as Estoque
 import qualified Bolsa as Bolsa
+import qualified Doador as Doador
 import Data.Map as Map
 import Data.List
 import System.IO.Unsafe(unsafeDupablePerformIO)
@@ -95,8 +96,7 @@ criaArquivos = do
     appendFile "estoque.txt" ("")
     appendFile "escala.txt" ("")
     appendFile "doador.txt" ("")
-    appendFile "agendaLocal.txt" ("")
-    appendFile "agendaDomicilio.txt" ("")
+    appendFile "agendaLocal.txt" ("")    
 
 
 --metodos q vao salvar as listas 
@@ -158,8 +158,6 @@ iniciaRecebedores :: [Recebedor.Recebedor]
 iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 1250), (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1000)]
 
 
-
-{--
 iniciaDoador :: [Doador.Doador]
 iniciaDoador = do
     let arquivo = unsafeDupablePerformIO(readFile "doador.txt")
@@ -175,25 +173,23 @@ constroiDoador lista =
         Doador.idade = read (lista !! 2),
         Doador.telefone = lista !! 3,
         Doador.impedimentoStr =  lista !! 4,
-        Doador.ultimoDiaImpedido =  lista !! 5,
-        Doador.doacoes = lista !! 6
---}
+        Doador.ultimoDiaImpedido =  (stringEmDataAmericana (lista !! 5)),
+        Doador.doacoes = lista !! 6 
+        }
 
-{--
-escreverDoador :: Doador.Doador -> IO()
-escreverDoador doador = do
-    let doadorStr = Doador.nome doador ++ "," ++ Doador.endereco doador ++ "," ++ show (Doador.idade doador) ++ "," ++ Doador.telefone doador ++ "," ++ Doador.impedimento doador ++ "," ++ Doador.ultimoDiaImpedido doador ++ "," ++ Doador.doacoes doador ++  "\n"
+escreverDoador :: [Doador.Doador] -> IO()
+escreverDoador [] = return ()
+escreverDoador (h:t) = do
+    let doadorStr = Doador.nome h ++ "," ++ Doador.endereco h ++ "," ++ (show (Doador.idade h)) ++ "," ++ Doador.telefone h ++ "," ++ Doador.impedimentoStr h ++ "," ++ (show (Doador.ultimoDiaImpedido h)) ++ "," ++ Doador.doacoes h ++  "\n" 
     appendFile "doador.txt" (doadorStr)
+    escreverDoador t
     return ()
 
-
-rescreverDoador :: [(Day,String)] ->IO()
+rescreverDoador :: [Doador.Doador] ->IO()
 rescreverDoador doador = do
     writeFile "doador.txt" ("")
     escreverDoador doador
     return()
-
---}
 
 --Implementar metodo q vai salvar a lista de impedimentos
 

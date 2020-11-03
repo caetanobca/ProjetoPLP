@@ -7,14 +7,11 @@ module Agenda where
     import Data.Time    
 
     
-    agendaDoacaoLocal :: Day -> Map Day String -> String -> String -> [(Day,String)]
-    agendaDoacaoLocal diaMes agenda doador enfermeiro = Map.toList(insertWith (++) diaMes novaDoacao agenda)
-        where novaDoacao = "Doador: " ++ doador ++ "--" ++ "Enfermeiro :" ++ enfermeiro ++ ""
+    agendaDoacaoLocal :: Day -> Map Day String -> String -> String -> String -> [(Day,String)]
+    agendaDoacaoLocal diaMes agenda doador enfermeiro local = Map.toList(insertWith (++) diaMes novaDoacao agenda)
+        where novaDoacao = "Doador: " ++ doador ++ "--" ++ "Enfermeiro :" ++ enfermeiro ++ "Local:" ++ local
     
-    agendaDoacaoDomicilio :: Day -> Map Day String -> String -> String -> [(Day,String)]
-    agendaDoacaoDomicilio diaMes agenda doador enfermeiro = Map.toList(insertWith (++) diaMes novaDoacao agenda)
-        where novaDoacao = "Doador: " ++ doador ++ "--" ++ "Enfermeiro :" ++ enfermeiro ++ ""
-
+    
     
 
     

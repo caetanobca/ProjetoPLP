@@ -14,7 +14,14 @@ module Doador where
 
     adicionaDoador :: String -> String -> Int -> String -> [Impedimento] -> Doador
     adicionaDoador nome endereco idade telefone impedimento = 
-        (Doador {nome = nome, endereco = endereco,idade = idade, telefone = telefone, impedimentoStr = Impedimento.listarImpedimentos (impedimento), Doador.ultimoDiaImpedido =  getUltimoDia})
+        (Doador {nome = nome, 
+        endereco = endereco,
+        idade = idade, 
+        telefone = telefone, 
+        impedimentoStr = Impedimento.listarImpedimentos (impedimento), 
+        Doador.ultimoDiaImpedido =  getUltimoDia,
+        doacoes = ""})
+
         where getUltimoDia = unsafeDupablePerformIO(Impedimento.ultimoDiaImpedido impedimento)
 
 --nao sei se ta certo pq n sei se ta adicionando nas doacoes ou so ta salvando a ultima doacao 
@@ -42,7 +49,7 @@ module Doador where
 --metodos relacionados a achar e mostrar os doadores
 
     encontraDoadorString :: String -> [Doador] -> String
-    encontraDoadorString procurado [] = "Resultados: \n"
+    encontraDoadorString procurado [] = ""
     encontraDoadorString procurado (h:t)
         |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = show h ++ encontraDoadorString procurado t
         |otherwise = encontraDoadorString procurado t
@@ -65,6 +72,11 @@ module Doador where
         |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = True
         |otherwise = doadorCadastrado procurado t
 
+    getEnderecoDoador :: String -> [Doador] -> String
+    getEnderecoDoador procurado []= ""
+    getEnderecoDoador procurado (h:t)
+        |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = endereco h
+        |otherwise = getEnderecoDoador procurado t
  
     visualizaDoadores :: [Doador] -> String
     visualizaDoadores [] = ""

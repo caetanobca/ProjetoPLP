@@ -4,6 +4,8 @@ import qualified Enfermeiro as Enfermeiro
 import qualified Recebedor as Recebedor
 import qualified Estoque as Estoque
 import qualified Bolsa as Bolsa
+import qualified Doador as Doador
+import qualified Agenda as Agenda
 import Data.Map as Map
 import System.IO
 import Data.Time.Calendar
@@ -34,12 +36,12 @@ menuInicial  = do
         putStrLn ("IMPLEMENTAR CONTROLE DO ESTOQUE DE BOLSAS")
     else if input == "3" then do
         putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")    
-    {-else if input == "4" then do
+    else if input == "4" then do
         enfermeiros carregaEnfermeiros carregaEscala
     else if input == "5" then do
         cadastroDeImpedimentos carregaImpedimentos    
-    -}else if input == "6" then do
-        putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM DOADOR")
+    else if input == "6" then do
+        agendaDoacao carregaAgenda
     else if input == "7" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM ENFERMEIRO")
     else if input == "8" then do
@@ -99,7 +101,7 @@ cadastroDeImpedimentos listaImpedimentos = do
         putStrLn("Entrada Invalida")
         menuInicial
         
-{-
+
 enfermeiros :: [Enfermeiro.Enfermeiro] -> Map Day String -> IO()
 enfermeiros listaEnfermeiros mapaEscala = do      
     putStr ("1. Cadastro de Enfermeiros\n" ++
@@ -151,6 +153,48 @@ enfermeiros listaEnfermeiros mapaEscala = do
     else do
         putStrLn ("Ainda não implementado")
 
+agendaDoacao :: Map Day String -> IO()
+agendaDoacao agenda = do
+    putStr ("\n1. Agendar coleta no Hemocentro\n" ++ "2. Agendar coleta em domicílio\n")
+    tipo <- getLine
+    if(tipo == "1")then do
+        putStrLn("Insira a data")
+        diaMesAno <- getLine
+        putStrLn("Insira o nome do Doador")
+        doador <- getLine
+        putStrLn("Insira o nome do Enfermeiro")
+        enfermeiro <- getLine
+        if((Doador.encontraDoadorString doador carregaDoadores) == "") then do
+            putStrLn ("Doador não cadastrado")
+            menuInicial
+        else if(Enfermeiro.encontraEnfermeiroString enfermeiro carregaEnfermeiros == "") then do
+            putStrLn ("Enfermeiro não cadastrado")
+            menuInicial
+        else do
+            Auxiliar.rescreverAgendaLocal (Agenda.agendaDoacaoLocal (Auxiliar.stringEmData diaMesAno) agenda doador enfermeiro "Hemocentro")
+            menuInicial
+    else do
+        putStrLn("Insira a data")
+        diaMesAno <- getLine
+        putStrLn("Insira o nome do Doador")
+        doador <- getLine
+        putStrLn("Insira o nome do Enfermeiro")
+        enfermeiro <- getLine
+        if((Doador.encontraDoadorString doador carregaDoadores) == "") then do
+            putStrLn ("Doador não cadastrado")
+            menuInicial
+        else if(Enfermeiro.encontraEnfermeiroString enfermeiro carregaEnfermeiros == "") then do
+            putStrLn ("Enfermeiro não cadastrado")
+            menuInicial
+        else do
+            let doadorEndereco = Doador.getEnderecoDoador doador carregaDoadores
+            Auxiliar.rescreverAgendaLocal (Agenda.agendaDoacaoLocal (Auxiliar.stringEmData diaMesAno) agenda doador enfermeiro doadorEndereco)
+            menuInicial
+        
+           
+carregaAgenda :: Map Day String
+carregaAgenda = Auxiliar.iniciaAgendaLocal
+
 carregaEnfermeiros ::  [Enfermeiro.Enfermeiro]
 carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
 
@@ -159,9 +203,12 @@ carregaEscala = Auxiliar.iniciaEscala
 
 carregaImpedimentos :: [Impedimento.Impedimento]
 carregaImpedimentos = Auxiliar.iniciaImpedimentos
--}
+
 carregaRecebedores :: [Recebedor.Recebedor]
 carregaRecebedores = Auxiliar.iniciaRecebedores
+
+carregaDoadores :: [Doador.Doador]
+carregaDoadores = Auxiliar.iniciaDoador
 
 cadastroDeRecebedor :: IO()
 cadastroDeRecebedor = do
