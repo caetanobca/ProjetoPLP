@@ -394,7 +394,6 @@ carregaRecebedores = Auxiliar.iniciaRecebedores
 carregaDoadores :: IO([Doador.Doador])
 carregaDoadores = Auxiliar.iniciaDoador
 
-
 cadastroDeRecebedor :: IO()
 cadastroDeRecebedor = do
     putStr (
@@ -413,10 +412,10 @@ cadastroDeRecebedor = do
         nome <- prompt "Digite o nome do recebedor: "
         let recebedor = Recebedor.recebedorCadastrado nome carregaRecebedores
         if (recebedor == True) then do
-            verFicha <- prompt "Visualizar:\n(1) Ficha Médica do recebedor\n(2) Ficha de Dados\n(3) Sair"
+            verFicha <- prompt "Visualizar:\n(1) Ficha Médica do recebedor\n(2) Ficha de Dados\n(3) Sair \n"
             putStrLn "\n"
             if (verFicha == "1") then do
-                putStrLn "IMPLEMENTAR FICHA MEDICA"
+                putStrLn "IMPLEMENTAR FICHA MEDICA toString"
             else --putStr Recebedor.imprimeRecebedor nome carregaRecebedores
                 putStr "IMPLEMENTAR RECEBEDOR TO STRING"
             
@@ -430,14 +429,14 @@ cadastroDeRecebedor = do
         let listaRecebedores = Recebedor.todosOsRecebedores carregaRecebedores
         putStr ("\n" ++ listaRecebedores)
 
-
-    else putStr ("Entrada Inválida xxxx")
-    {-
+{-
     else if (input == "4") then do
         putStr("Digite o nome do recebedor: ")
         nome <- getLine
         fichaRecebedor = Recebedor.fichaDeDadosRecebedor nome
-    -}
+    
+-}
+    else putStr ("Entrada Inválida xxxx")
 
 prompt :: String -> IO String
 prompt text = do
