@@ -3,7 +3,7 @@
 
 ## **`BloodLife`**
 ---
-*O BloodLife é um sistema que auxilia o controle de estoque e manutenção de um hemocentro que visa sempre a saúde e bem-estar de todos os envolvidos: começandoo pelo doadores até quem irá receber o sangue passando pelos enfermeiros envolvidos. Ele unifica várias funcionalidades e utilidades a fim de facilitar o controle e monitoramento do banco de sangue, podendo ter acesso ao estoque de bolsas até diálogo com doadores, cadastro de enfermeiros entre outras funcionalidades*
+*O BloodLife é um sistema que auxilia o controle de estoque e manutenção de um hemocentro que visa sempre a saúde e bem-estar de todos os envolvidos: começando pelo doadores até quem irá receber o sangue passando pelos enfermeiros envolvidos. Ele unifica várias funcionalidades e utilidades a fim de facilitar o controle e monitoramento do banco de sangue, podendo ter acesso ao estoque de bolsas até diálogo com doadores, cadastro de enfermeiros entre outras funcionalidades*
 
 ## Funcionalidades
 ---
