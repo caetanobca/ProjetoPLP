@@ -14,7 +14,14 @@ module Doador where
 
     adicionaDoador :: String -> String -> Int -> String -> [Impedimento] -> Doador
     adicionaDoador nome endereco idade telefone impedimento = 
-        (Doador {nome = nome, endereco = endereco,idade = idade, telefone = telefone, impedimentoStr = Impedimento.listarImpedimentos (impedimento), Doador.ultimoDiaImpedido =  getUltimoDia})
+        (Doador {nome = nome, 
+        endereco = endereco,
+        idade = idade, 
+        telefone = telefone, 
+        impedimentoStr = Impedimento.listarImpedimentos (impedimento), 
+        Doador.ultimoDiaImpedido =  getUltimoDia,
+        doacoes = ""})
+
         where getUltimoDia = unsafeDupablePerformIO(Impedimento.ultimoDiaImpedido impedimento)
 
 --nao sei se ta certo pq n sei se ta adicionando nas doacoes ou so ta salvando a ultima doacao 
@@ -25,11 +32,12 @@ module Doador where
         |otherwise = adicionaDoacao doador t doacao
 
     
-    mostraFichaTecnica :: Doador -> String
-    mostraFichaTecnica  doador =   (impedimentoStr doador)
+    mostraFichaTecnica :: String -> [Doador] -> String
+    mostraFichaTecnica  nome doador = impedimentoStr (Doador.encontraDoador nome doador)
+    
 
-    listarDoacoes :: Doador -> String
-    listarDoacoes doador = (doacoes doador)
+    listarDoacoes :: String -> [Doador] -> String
+    listarDoacoes nome doador = (doacoes (Doador.encontraDoador nome doador))
 
 
     mensagemDeAgradecimentoIndividual :: Doador -> String
@@ -42,22 +50,22 @@ module Doador where
 --metodos relacionados a achar e mostrar os doadores
 
     encontraDoadorString :: String -> [Doador] -> String
-    encontraDoadorString procurado [] = "Resultados: \n"
+    encontraDoadorString procurado [] = ""
     encontraDoadorString procurado (h:t)
         |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = show h ++ encontraDoadorString procurado t
         |otherwise = encontraDoadorString procurado t
 
-    encontraDoador :: String -> [Doador] -> Maybe Doador
-    encontraDoador procurado [] = Nothing
+    encontraDoador :: String -> [Doador] ->  Doador
+    encontraDoador procurado [] = (Doador "" "" 5 "" "" (fromGregorian 1888 12 25) "")
     encontraDoador procurado (h:t)
-        |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = Just h
+        |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = h
         |otherwise = encontraDoador procurado t
 
     todosOsDoadores:: [Doador] -> String
     todosOsDoadores [] = " "
     todosOsDoadores (h:t) = "Nome: " ++ nome h 
         ++ " " ++ "Endereço: " ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
-        ++ "Telefone: " ++ telefone h ++ "Impedimentos: " ++ mostraFichaTecnica h    ++ "\n"++ todosOsDoadores t
+        ++ "Telefone: " ++ telefone h ++ "Impedimentos: " ++ impedimentoStr h     ++ "\n"++ todosOsDoadores t
     
     doadorCadastrado :: String -> [Doador] -> Bool
     doadorCadastrado procurado [] = False
@@ -65,6 +73,11 @@ module Doador where
         |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = True
         |otherwise = doadorCadastrado procurado t
 
+    getEnderecoDoador :: String -> [Doador] -> String
+    getEnderecoDoador procurado []= ""
+    getEnderecoDoador procurado (h:t)
+        |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = endereco h
+        |otherwise = getEnderecoDoador procurado t
  
     visualizaDoadores :: [Doador] -> String
     visualizaDoadores [] = ""
