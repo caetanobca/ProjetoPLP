@@ -34,12 +34,12 @@ menuInicial  = do
     if input == "1" then do
         cadastroDeRecebedor
         putStrLn (" ")
-    else if input == "2" then do
-        -- unico jeito de nao quebrar tudo em Datas Criticas foi colocar o metodo assim:
-        listaEstoque <- Auxiliar.atualizaEstoque
+    else if input == "2" then do        
+        listaEstoque <- carregaEstoque
         estoque listaEstoque
     else if input == "3" then do
-        putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")    
+        listaDoadores <- carregaDoadores
+        doador listaDoadores   
     else if input == "4" then do
         listaEnfermeiros <- carregaEnfermeiros
         listaEscala <- carregaEscala       
@@ -50,7 +50,8 @@ menuInicial  = do
     else if input == "6" then do
         listaEnfermeiros <- carregaEnfermeiros 
         listaAgenda <- carregaAgenda     
-        agendaDoacao listaAgenda listaEnfermeiros
+        listaDoadores <- carregaDoadores
+        agendaDoacao listaAgenda listaEnfermeiros listaDoadores
     else if input == "7" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM ENFERMEIRO")
     else if input == "8" then do
@@ -60,6 +61,57 @@ menuInicial  = do
     else do
        putStrLn("Entrada invalida")
         
+
+doador :: [Doador.Doador] -> IO()
+doador listaDoador = do      
+    putStr ("1. Cadastro de Doador\n" ++
+            "2. Buscar Doador\n" ++
+            "3. Listagem de Doador\n" ++
+            "4. Listagem de Doador por nome\n" ++
+            "5. Visualizar histórico de doações de Doador\n" ++
+            "6. Visualizar ficha medica de Doador\n")
+    tipo <- getLine
+    if(tipo == "1")then do
+        putStrLn ("Você irá cadastrar um Doador(a)")
+        putStrLn ("Insira o nome do Doador(a)")
+        nome <- getLine
+        putStrLn ("Insira o endereço do Doador(a)")
+        endereco <- getLine
+        putStrLn ("Insira a idade do Doador(a)")
+        idade <- getLine
+        putStrLn ("Insira o telefone do Doador(a)")
+        telefone <- getLine        
+        putStrLn ("Insira o tipo sanguíneo do Doador(a)")    
+        tipoSanguineo <- getLine
+        if((elem (toUpperCase tipoSanguineo) tipos) == False) then do
+            putStrLn("Tipo Inválido\n")
+            else do             
+                Auxiliar.escreverDoador(Doador.adicionaDoador nome endereco (read(idade)) telefone tipoSanguineo [])                    
+        menuInicial
+    else if(tipo == "2") then do
+        putStrLn("Insira o nome do(a) Doador(a) que você deseja")
+        nome <- getLine          
+        putStrLn (Doador.encontraDoadorString nome listaDoador)
+        menuInicial
+    else if(tipo == "3") then do        
+        putStrLn (Doador.todosOsDoadores listaDoador)
+        menuInicial
+    else if(tipo == "4") then do       
+       putStrLn (Doador.visualizaDoadores listaDoador )
+       menuInicial
+    else if(tipo == "5") then do
+        putStrLn ("Insira o nome do Doador(a)")
+        nome <- getLine
+        putStrLn (Doador.listarDoacoes nome listaDoador)
+        menuInicial
+    else if(tipo == "6") then do
+        putStrLn ("Insira o nome do Doador(a)")
+        nome <- getLine
+        putStrLn (Doador.mostraFichaTecnica nome listaDoador)
+        menuInicial
+    else do
+        putStrLn ("Opção inválida")
+
 
 impedimentos :: [Impedimento.Impedimento] -> IO()
 impedimentos listaImpedimentos = do 
@@ -279,10 +331,12 @@ estoque listaEstoque = do
         putStrLn ("Entrada Inválida!\n")
         main
 
-    where tipos = ["O-","O+","A-","A+","B+","B-","AB+","AB-"]    
 
-agendaDoacao :: Map Day String -> [Enfermeiro.Enfermeiro] -> IO()
-agendaDoacao agenda listaEnfermeiros = do
+tipos :: [String]
+tipos = ["O-","O+","A-","A+","B+","B-","AB+","AB-"]    
+
+agendaDoacao :: Map Day String -> [Enfermeiro.Enfermeiro] -> [Doador.Doador] -> IO()
+agendaDoacao agenda listaEnfermeiros listaDoadores = do
     putStr ("\n1. Agendar coleta no Hemocentro\n" ++ "2. Agendar coleta em domicílio\n")
     tipo <- getLine
     if(tipo == "1")then do
@@ -292,7 +346,7 @@ agendaDoacao agenda listaEnfermeiros = do
         doador <- getLine
         putStrLn("Insira o nome do Enfermeiro")
         enfermeiro <- getLine
-        if((Doador.encontraDoadorString doador carregaDoadores) == "") then do
+        if((Doador.encontraDoadorString doador listaDoadores) == "") then do
             putStrLn ("Doador não cadastrado")
             menuInicial
         else if(Enfermeiro.encontraEnfermeiroString enfermeiro listaEnfermeiros == "") then do
@@ -308,14 +362,14 @@ agendaDoacao agenda listaEnfermeiros = do
         doador <- getLine
         putStrLn("Insira o nome do Enfermeiro")
         enfermeiro <- getLine
-        if((Doador.encontraDoadorString doador carregaDoadores) == "") then do
+        if((Doador.encontraDoadorString doador listaDoadores) == "") then do
             putStrLn ("Doador não cadastrado")
             menuInicial
         else if(Enfermeiro.encontraEnfermeiroString enfermeiro listaEnfermeiros == "") then do
             putStrLn ("Enfermeiro não cadastrado")
             menuInicial
         else do
-            let doadorEndereco = Doador.getEnderecoDoador doador carregaDoadores
+            let doadorEndereco = Doador.getEnderecoDoador doador listaDoadores
             Auxiliar.rescreverAgendaLocal (Agenda.agendaDoacaoLocal (Auxiliar.stringEmData diaMesAno) agenda doador enfermeiro doadorEndereco)
             menuInicial
                    
@@ -328,7 +382,7 @@ carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
 carregaEscala :: IO(Map Day String)
 carregaEscala = Auxiliar.iniciaEscala
 
-carregaEstoque ::  [Bolsa.Bolsa]
+carregaEstoque ::  IO([Bolsa.Bolsa])
 carregaEstoque = Auxiliar.iniciaEstoque
 
 carregaImpedimentos :: IO([Impedimento.Impedimento])
@@ -337,7 +391,7 @@ carregaImpedimentos = Auxiliar.iniciaImpedimentos
 carregaRecebedores :: [Recebedor.Recebedor]
 carregaRecebedores = Auxiliar.iniciaRecebedores
 
-carregaDoadores :: [Doador.Doador]
+carregaDoadores :: IO([Doador.Doador])
 carregaDoadores = Auxiliar.iniciaDoador
 
 
@@ -398,8 +452,9 @@ prompt text = do
 verificaDataCritica :: IO()
 verificaDataCritica = do
     today <- hoje
+    listaEstoque <- carregaEstoque
     if((today) == 1) then do
-        DatasCriticas.verificaHoje carregaEstoque
+        DatasCriticas.verificaHoje listaEstoque
     else do
         return()       
     

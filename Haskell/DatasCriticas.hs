@@ -49,7 +49,8 @@ module DatasCriticas where
     salvaEstoqueMes = do 
         --today <- toGregorian <$> (utctDay <$> getCurrentTime)
         mes <- passaData
-        rescreverEstoqueMes (Estoque.estoqueEmMapa Auxiliar.iniciaEstoque iniciaEstoqueMes mes)
+        estoque <- Auxiliar.iniciaEstoque
+        rescreverEstoqueMes (Estoque.estoqueEmMapa estoque iniciaEstoqueMes mes)
         
         
     

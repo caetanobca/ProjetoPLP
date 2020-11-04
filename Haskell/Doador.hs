@@ -9,15 +9,16 @@ module Doador where
     import Impedimento
 
 
-    data Doador = Doador{nome :: String, endereco :: String, idade :: Int, telefone :: String, impedimentoStr :: String, ultimoDiaImpedido :: Day ,doacoes :: String
+    data Doador = Doador{nome :: String, endereco :: String, idade :: Int, telefone :: String, tipoSanguineo :: String ,impedimentoStr :: String, ultimoDiaImpedido :: Day ,doacoes :: String
     } deriving (Show,Eq)
 
-    adicionaDoador :: String -> String -> Int -> String -> [Impedimento] -> Doador
-    adicionaDoador nome endereco idade telefone impedimento = 
+    adicionaDoador :: String -> String -> Int -> String -> String -> [Impedimento] -> Doador
+    adicionaDoador nome endereco idade telefone tipoSanguineo impedimento = 
         (Doador {nome = nome, 
         endereco = endereco,
         idade = idade, 
         telefone = telefone, 
+        tipoSanguineo = tipoSanguineo,
         impedimentoStr = Impedimento.listarImpedimentos (impedimento), 
         Doador.ultimoDiaImpedido =  getUltimoDia,
         doacoes = ""})
@@ -56,7 +57,7 @@ module Doador where
         |otherwise = encontraDoadorString procurado t
 
     encontraDoador :: String -> [Doador] ->  Doador
-    encontraDoador procurado [] = (Doador "" "" 5 "" "" (fromGregorian 1888 12 25) "")
+    encontraDoador procurado [] = (Doador "" "" 5 ""  "" "" (fromGregorian 1888 12 25) "")
     encontraDoador procurado (h:t)
         |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = h
         |otherwise = encontraDoador procurado t
@@ -65,7 +66,7 @@ module Doador where
     todosOsDoadores [] = " "
     todosOsDoadores (h:t) = "Nome: " ++ nome h 
         ++ " " ++ "Endereço: " ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
-        ++ "Telefone: " ++ telefone h ++ "Impedimentos: " ++ impedimentoStr h     ++ "\n"++ todosOsDoadores t
+        ++ "Telefone: " ++ telefone h ++ "Tipo Sanguíneo: " ++ tipoSanguineo h ++ "Impedimentos: " ++ impedimentoStr h ++ "\n"++ todosOsDoadores t
     
     doadorCadastrado :: String -> [Doador] -> Bool
     doadorCadastrado procurado [] = False

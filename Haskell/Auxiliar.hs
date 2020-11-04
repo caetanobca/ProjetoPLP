@@ -48,15 +48,8 @@ iniciaAgendaLocal = do
     let mapa_escala = Map.fromList lista_agenda
     return mapa_escala
 
-iniciaEstoque :: [Bolsa.Bolsa]
+iniciaEstoque :: IO([Bolsa.Bolsa])
 iniciaEstoque = do
-    let arquivo = unsafeDupablePerformIO (readFile "estoque.txt")
-    let lista = Data.List.map ( splitOn ",") (lines arquivo)
-    let lista_estoque = (Data.List.map constroiEstoque lista)
-    return lista_estoque !! 0
-
-atualizaEstoque :: IO([Bolsa.Bolsa])
-atualizaEstoque = do
     arquivo <- Strict.readFile "estoque.txt"
     let lista = Data.List.map ( splitOn ",") (lines arquivo)
     let lista_estoque = (Data.List.map constroiEstoque lista)
@@ -66,12 +59,12 @@ atualizaEstoque = do
 iniciaRecebedores :: [Recebedor.Recebedor]
 iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 1250), (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1000)]
 
-iniciaDoador :: [Doador.Doador]
+iniciaDoador :: IO([Doador.Doador])
 iniciaDoador = do
-    let arquivo = unsafeDupablePerformIO(readFile "doador.txt")
+    arquivo <- Strict.readFile "doador.txt"
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_doador = ((Data.List.map constroiDoador lista))
-    return lista_doador !! 0
+    return lista_doador
 
 
 --Esses métodos irão construir os TypeClasses do sistema
@@ -111,9 +104,10 @@ constroiDoador lista =
         Doador.endereco = lista !! 1,
         Doador.idade = read (lista !! 2),
         Doador.telefone = lista !! 3,
-        Doador.impedimentoStr =  lista !! 4,
-        Doador.ultimoDiaImpedido =  (stringEmDataAmericana (lista !! 5)),
-        Doador.doacoes = lista !! 6 
+        Doador.tipoSanguineo = lista !! 4,
+        Doador.impedimentoStr =  lista !! 5,
+        Doador.ultimoDiaImpedido =  (stringEmDataAmericana (lista !! 6)),
+        Doador.doacoes = lista !! 7 
         }
 
 constroiEscala:: [String] -> (Day,String)
@@ -219,7 +213,7 @@ rescreverAgendaLocal agendaLocal = do
 
 escreverDoador :: Doador.Doador -> IO()
 escreverDoador doador = do
-    let doadorStr = Doador.nome doador ++ "," ++ Doador.endereco doador ++ "," ++ (show (Doador.idade doador)) ++ "," ++ Doador.telefone doador ++ "," ++ Doador.impedimentoStr doador ++ "," ++ (show (Doador.ultimoDiaImpedido doador)) ++ "," ++ Doador.doacoes doador ++  "\n" 
+    let doadorStr = Doador.nome doador ++ "," ++ Doador.endereco doador ++ "," ++ (show (Doador.idade doador)) ++ "," ++ Doador.telefone doador ++ "," ++ Doador.tipoSanguineo doador ++ "," ++ Doador.impedimentoStr doador ++ "," ++ (show (Doador.ultimoDiaImpedido doador)) ++ "," ++ Doador.doacoes doador ++  "\n" 
     appendFile "doador.txt" (doadorStr) 
     return ()
 
