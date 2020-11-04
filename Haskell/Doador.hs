@@ -32,11 +32,12 @@ module Doador where
         |otherwise = adicionaDoacao doador t doacao
 
     
-    mostraFichaTecnica :: Doador -> String
-    mostraFichaTecnica  doador =   (impedimentoStr doador)
+    mostraFichaTecnica :: String -> [Doador] -> String
+    mostraFichaTecnica  nome doador = impedimentoStr (Doador.encontraDoador nome doador)
+    
 
-    listarDoacoes :: Doador -> String
-    listarDoacoes doador = (doacoes doador)
+    listarDoacoes :: String -> [Doador] -> String
+    listarDoacoes nome doador = (doacoes (Doador.encontraDoador nome doador))
 
 
     mensagemDeAgradecimentoIndividual :: Doador -> String
@@ -54,17 +55,17 @@ module Doador where
         |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = show h ++ encontraDoadorString procurado t
         |otherwise = encontraDoadorString procurado t
 
-    encontraDoador :: String -> [Doador] -> Maybe Doador
-    encontraDoador procurado [] = Nothing
+    encontraDoador :: String -> [Doador] ->  Doador
+    encontraDoador procurado [] = (Doador "" "" 5 "" "" (fromGregorian 1888 12 25) "")
     encontraDoador procurado (h:t)
-        |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = Just h
+        |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = h
         |otherwise = encontraDoador procurado t
 
     todosOsDoadores:: [Doador] -> String
     todosOsDoadores [] = " "
     todosOsDoadores (h:t) = "Nome: " ++ nome h 
         ++ " " ++ "Endereço: " ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
-        ++ "Telefone: " ++ telefone h ++ "Impedimentos: " ++ mostraFichaTecnica h    ++ "\n"++ todosOsDoadores t
+        ++ "Telefone: " ++ telefone h ++ "Impedimentos: " ++ impedimentoStr h     ++ "\n"++ todosOsDoadores t
     
     doadorCadastrado :: String -> [Doador] -> Bool
     doadorCadastrado procurado [] = False
