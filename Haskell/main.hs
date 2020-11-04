@@ -12,9 +12,8 @@ import Data.Time
 import qualified DatasCriticas as DatasCriticas
 
 main :: IO ()
-main = do
-    Auxiliar.criaArquivos
-    
+main = do    
+    Auxiliar.criaArquivos        
     menuInicial
 
 
@@ -39,11 +38,16 @@ menuInicial  = do
     else if input == "3" then do
         putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")    
     else if input == "4" then do
-        enfermeiros carregaEnfermeiros carregaEscala
+        listaEnfermeiros <- carregaEnfermeiros
+        listaEscala <- carregaEscala       
+        enfermeiros listaEnfermeiros listaEscala
     else if input == "5" then do
-        impedimentos carregaImpedimentos    
+        listaImpedimentos <- carregaImpedimentos
+        impedimentos listaImpedimentos    
     else if input == "6" then do
-        agendaDoacao carregaAgenda
+        listaEnfermeiros <- carregaEnfermeiros 
+        listaAgenda <- carregaAgenda     
+        agendaDoacao listaAgenda listaEnfermeiros
     else if input == "7" then do
         putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM ENFERMEIRO")
     else if input == "8" then do
@@ -111,7 +115,7 @@ impedimentos listaImpedimentos = do
                     "CID: ")
             input <- getLine
             let cid = input
-            putStrLn (Impedimento.buscaImpedimentoStr "DOENCA" cid listaImpedimentos)
+            putStrLn (show (Impedimento.buscaImpedimentoStr "DOENCA" cid listaImpedimentos))
             menuInicial
         else do
             putStrLn("Entrada Invalida")
@@ -129,7 +133,7 @@ impedimentos listaImpedimentos = do
             putStr("Deletar Medicamento\n" ++
                     "Composto: ")
             input <- getLine
-            let composto = input
+            let composto = input            
             Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento "MEDICAMENTO" composto listaImpedimentos) listaImpedimentos)
             putStrLn ("Impedimento deletado")
             menuInicial
@@ -137,7 +141,7 @@ impedimentos listaImpedimentos = do
             putStr("Deletar Doenca\n" ++
                     "CID: ")
             input <- getLine
-            let cid = input
+            let cid = input            
             Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento "DOENCA" cid listaImpedimentos) listaImpedimentos)
             putStrLn ("Impedimento deletado")
             menuInicial
@@ -169,39 +173,39 @@ enfermeiros listaEnfermeiros mapaEscala = do
         putStrLn ("Insira o telefone do Enfermeiro(a)")
         telefone <- getLine
         Auxiliar.escreverEnfermeiros(Enfermeiro.adicionaEnfermeiro nome endereco (read(idade)) telefone)                    
-        menuInicial
+        main
     else if(tipo == "2") then do
         putStrLn("Insira o nome do(a) Enfermeiro(a) que você deseja")
         nome <- getLine          
         putStrLn (Enfermeiro.encontraEnfermeiroString nome listaEnfermeiros)
-        menuInicial
+        main
     else if(tipo == "3") then do        
         putStrLn (Enfermeiro.todosOsEnfermeiros listaEnfermeiros)
-        menuInicial
+        main
     else if(tipo == "4") then do       
        putStrLn (Enfermeiro.visualizaEnfermeiros listaEnfermeiros )
-       menuInicial
+       main
     else if(tipo == "5") then do
         putStrLn("Insira a data")
         diaMesAno <- getLine
         putStrLn("Insira o nome do Enfermeiro")
         enfermeiro <- getLine              
         Auxiliar.rescreverEscala (Enfermeiro.organizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala enfermeiro listaEnfermeiros)
-        menuInicial
+        main
     else if(tipo == "6") then do
         putStrLn("Insira a data")
         diaMesAno <- getLine                    
         if((Enfermeiro.visualizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala) == Nothing) then do 
         putStrLn("Data não encontrada")
-        menuInicial
+        main
         else do
         putStrLn (show (Enfermeiro.visualizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala))
-        menuInicial    
+        main   
     else do
         putStrLn ("Ainda não implementado")
 
-agendaDoacao :: Map Day String -> IO()
-agendaDoacao agenda = do
+agendaDoacao :: Map Day String -> [Enfermeiro.Enfermeiro] -> IO()
+agendaDoacao agenda listaEnfermeiros = do
     putStr ("\n1. Agendar coleta no Hemocentro\n" ++ "2. Agendar coleta em domicílio\n")
     tipo <- getLine
     if(tipo == "1")then do
@@ -214,7 +218,7 @@ agendaDoacao agenda = do
         if((Doador.encontraDoadorString doador carregaDoadores) == "") then do
             putStrLn ("Doador não cadastrado")
             menuInicial
-        else if(Enfermeiro.encontraEnfermeiroString enfermeiro carregaEnfermeiros == "") then do
+        else if(Enfermeiro.encontraEnfermeiroString enfermeiro listaEnfermeiros == "") then do
             putStrLn ("Enfermeiro não cadastrado")
             menuInicial
         else do
@@ -230,7 +234,7 @@ agendaDoacao agenda = do
         if((Doador.encontraDoadorString doador carregaDoadores) == "") then do
             putStrLn ("Doador não cadastrado")
             menuInicial
-        else if(Enfermeiro.encontraEnfermeiroString enfermeiro carregaEnfermeiros == "") then do
+        else if(Enfermeiro.encontraEnfermeiroString enfermeiro listaEnfermeiros == "") then do
             putStrLn ("Enfermeiro não cadastrado")
             menuInicial
         else do
@@ -239,16 +243,16 @@ agendaDoacao agenda = do
             menuInicial
         
            
-carregaAgenda :: Map Day String
+carregaAgenda :: IO(Map Day String)
 carregaAgenda = Auxiliar.iniciaAgendaLocal
 
-carregaEnfermeiros ::  [Enfermeiro.Enfermeiro]
+carregaEnfermeiros ::  IO([Enfermeiro.Enfermeiro])
 carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
 
-carregaEscala :: Map Day String
+carregaEscala :: IO(Map Day String)
 carregaEscala = Auxiliar.iniciaEscala
 
-carregaImpedimentos :: [Impedimento.Impedimento]
+carregaImpedimentos :: IO([Impedimento.Impedimento])
 carregaImpedimentos = Auxiliar.iniciaImpedimentos
 
 carregaRecebedores :: [Recebedor.Recebedor]
@@ -375,3 +379,5 @@ hoje :: IO(Int)
 hoje = do
     today <- toGregorian <$> (utctDay <$> getCurrentTime)
     return (getDia today)
+
+    

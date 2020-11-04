@@ -21,8 +21,8 @@ module Enfermeiro where
     encontraEnfermeiroStringNome :: String -> [Enfermeiro] -> String
     encontraEnfermeiroStringNome procurado [] = ""
     encontraEnfermeiroStringNome procurado (h:t)
-        |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = nome h ++ encontraEnfermeiroString procurado t
-        |otherwise = encontraEnfermeiroString procurado t    
+        |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = nome h ++ "--" ++ encontraEnfermeiroStringNome procurado t
+        |otherwise = encontraEnfermeiroStringNome procurado t    
 
     encontraEnfermeiro :: String -> [Enfermeiro] -> Maybe Enfermeiro
     encontraEnfermeiro procurado [] = Nothing
