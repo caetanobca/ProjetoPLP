@@ -2,6 +2,7 @@
 module Auxiliar where
 
 import qualified Recebedor as Recebedor
+import qualified FichaMedica as FichaMedica
 --import qualified Doador as Doador
 import qualified Impedimento as Impedimento
 import qualified Enfermeiro as Enfermeiro
@@ -57,7 +58,8 @@ iniciaEstoque = do
 
 
 iniciaRecebedores :: [Recebedor.Recebedor]
-iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 1250), (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1000)]
+iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 2 "A+" "Dom Pedro I" (FichaMedica.adicionaFichaMedica "Masculino" "09/01/1999" "Antoin da silva" "Josefa da Silva" False False "Nenhuma")), 
+                    (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1 "A+" "Dom Pedro I" (FichaMedica.adicionaFichaMedica "Feminino" "09/11/1944" "Seu José" "Josefina Conceicao" False True "Nenhuma"))]
 
 iniciaDoador :: IO([Doador.Doador])
 iniciaDoador = do
