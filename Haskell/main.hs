@@ -406,7 +406,44 @@ cadastroDeRecebedor = do
     input <- getLine
 
     if (input == "1") then do
-        Recebedor.cadastrarRecebedor
+        nome <- prompt "Digite o nome do(a) Recebedor(a) "
+        endereco <- prompt "Digite o endereço do(a) Recebedor(a) "
+        age <- prompt "Digite a idade do(a) Recebedor(a) "
+        let idade = read age
+        telefone <- prompt "Digite o telefone do(a) Recebedor(a) "
+        qtd <- prompt "Digite a quantidade de bolsas de sangue que o(a) Recebedor(a) precisa "
+        let quantidade = read qtd
+        tipo <- prompt "Tipo Sanguineo: "
+        hospital <- prompt "Hospital internado: "
+        --------------------------------------------------------------------------------------------
+        -- cadastrar ficha medica 
+        
+        sexo <- prompt "Sexo Feminino (f) Masculino (m) "
+        dataNascimento <- prompt "Data de nascimento: "
+        pai <- prompt "Nome do pai: "
+        mae <- prompt "Nome da mãe: "
+        acompanhamentoMedico <- prompt "Tem acompanhamento médico ou psicológico? NAO (n) Sim (s) "
+        
+        {-
+        let acompanhamentoMedicoBool = False
+        
+        if (acompanhamentoMedico == "1") then do 
+            let acompanhamentoMedicoBool = False 
+            putStr "" 
+            else if (acompanhamentoMedico == "2") then do 
+                let acompanhamentoMedicoBool = True 
+                putStr ""
+                else do 
+                    let acompanhamentoMedicoBool = False 
+                    putStr ""
+        -}
+        condicaoFisica <- prompt "Tem alguma condição que exige atenção especial ou restrição a atividade física? NAO (n) Sim (s) "
+        alergias <- prompt "Tem alergia a algum medicamento/alimento/material? "
+        let ficha = adicionaFichaMedica sexo dataNascimento pai mae acompanhamentoMedicoBool condicaoFisicaBool alergias
+        ---------------------------------------------------------------------------------------------
+        let recebedor = adicionaRecebedor nome endereco idade telefone quantidade tipo hospital ficha
+        putStr "Recebedor Cadastrado"
+
 
     else if (input == "2") then do
         nome <- prompt "Digite o nome do recebedor: "
@@ -416,12 +453,12 @@ cadastroDeRecebedor = do
             putStrLn "\n"
             if (verFicha == "1") then do
                 putStrLn "IMPLEMENTAR FICHA MEDICA toString"
-            else --putStr Recebedor.imprimeRecebedor nome carregaRecebedores
+            else do --putStr Recebedor.imprimeRecebedor nome carregaRecebedores
                 putStr "IMPLEMENTAR RECEBEDOR TO STRING"
             
-            else do 
-                cadastrarNovo <- prompt "Recebedor não cadastrado\nCadastrar um novo Recebedor(a)?\n(1) SIM\n(2) NÃO\n"
-                if (cadastrarNovo == "1") then do Recebedor.cadastrarRecebedor else putStr " "
+        else do 
+            cadastrarNovo <- prompt "Recebedor não cadastrado\nCadastrar um novo Recebedor(a)?\n(1) SIM\n(2) NÃO\n"
+            if (cadastrarNovo == "1") then do menuInicial else do putStr ""
 
         -- se o recebedor já for cadastrado imprime os dados senao cadastra novo
 

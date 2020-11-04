@@ -17,17 +17,19 @@ module Recebedor where
         |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = show h ++ encontraRecebedorString procurado t
         |otherwise = encontraRecebedorString procurado t
 
+    {-
     encontraRecebedor :: String -> [Recebedor] -> Maybe Recebedor
     encontraRecebedor procurado [] = Nothing
     encontraRecebedor procurado (h:t)
         |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = Just h
         |otherwise = encontraRecebedor procurado t
-{-
+    -}
+    {-
     imprimeRecebedor :: String -> [Recebedor] -> String
     imprimeRecebedor procurado [] = "Nome " ++ nome procurado ++ " " ++ "Endereco" ++ endereco procurado ++ " " ++ "Idade: " ++ show (idade procurado) ++ " "
         ++ "Telefone: " ++ telefone procurado ++ " " ++ "Quantidade de Bolsas de Sangue Necessária: " ++ show (numDeBolsas procurado ) ++ "Tipo Sanguineo: " ++ tipoSanguineo procurado ++ "Hospital: " ++ hospital procurado ++ "\n"
         where procurado = Recebedor.encontraRecebedor procurado []
--}
+    -}
     todosOsRecebedores :: [Recebedor] -> String
     todosOsRecebedores [] = " "
     todosOsRecebedores (h:t) = "Nome " ++ nome h ++ " " ++ "Endereco" ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
@@ -43,7 +45,7 @@ module Recebedor where
     toUpperCase :: String -> String
     toUpperCase entrada = [toUpper x | x <- entrada]
 
-
+{-
     cadastrarRecebedor :: IO()
     cadastrarRecebedor = do
         nome <- prompt "Digite o nome do(a) Recebedor(a) "
@@ -92,6 +94,7 @@ module Recebedor where
         ---------------------------------------------------------------------------------------------
         let recebedor = adicionaRecebedor nome endereco idade telefone quantidade tipo hospital ficha
         putStr "Recebedor Cadastrado"
+-}
 
 
     prompt :: String -> IO String
