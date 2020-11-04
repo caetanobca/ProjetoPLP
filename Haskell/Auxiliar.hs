@@ -106,7 +106,7 @@ constroiDoador lista =
         Doador.endereco = lista !! 1,
         Doador.idade = read (lista !! 2),
         Doador.telefone = lista !! 3,
-        Doador.tipoSanguineo = lista !! 4,
+        Doador.tipSanguineo = lista !! 4,
         Doador.impedimentoStr =  lista !! 5,
         Doador.ultimoDiaImpedido =  (stringEmDataAmericana (lista !! 6)),
         Doador.doacoes = lista !! 7 
@@ -215,7 +215,7 @@ rescreverAgendaLocal agendaLocal = do
 
 escreverDoador :: Doador.Doador -> IO()
 escreverDoador doador = do
-    let doadorStr = Doador.nome doador ++ "," ++ Doador.endereco doador ++ "," ++ (show (Doador.idade doador)) ++ "," ++ Doador.telefone doador ++ "," ++ Doador.tipoSanguineo doador ++ "," ++ Doador.impedimentoStr doador ++ "," ++ (show (Doador.ultimoDiaImpedido doador)) ++ "," ++ Doador.doacoes doador ++  "\n" 
+    let doadorStr = Doador.nome doador ++ "," ++ Doador.endereco doador ++ "," ++ (show (Doador.idade doador)) ++ "," ++ Doador.telefone doador ++ "," ++ Doador.tipSanguineo doador ++ "," ++ Doador.impedimentoStr doador ++ "," ++ (show (Doador.ultimoDiaImpedido doador)) ++ "," ++ Doador.doacoes doador ++  "\n" 
     appendFile "doador.txt" (doadorStr) 
     return ()
 

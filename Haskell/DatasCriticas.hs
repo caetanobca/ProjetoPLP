@@ -7,6 +7,7 @@ module DatasCriticas where
     import System.IO.Unsafe(unsafeDupablePerformIO)
     import Data.List.Split ( splitOn )
     import qualified Auxiliar as Auxiliar
+    import qualified System.IO.Strict as Strict
 
 
     {-
@@ -14,12 +15,13 @@ module DatasCriticas where
     -}
     verificaHoje :: [Bolsa.Bolsa] -> IO()
     verificaHoje estoqueHoje = do
-        let estoqueMes = iniciaEstoqueMes
+        carregaEstoqueMes <- iniciaEstoqueMes
+        putStr (show carregaEstoqueMes)
 
         today <- toGregorian <$> (utctDay <$> getCurrentTime)
         let mes = (show (getMes today))
 
-        let estoqueMes = getEstoqueMes mes iniciaEstoqueMes
+        let estoqueMes = getEstoqueMes mes carregaEstoqueMes
         if(estoqueMes /= Nothing) then do
             let mlAnterior = (read (show estoqueMes)) :: Int
             let mlHoje = Estoque.totalSangue estoqueHoje
@@ -50,7 +52,8 @@ module DatasCriticas where
         --today <- toGregorian <$> (utctDay <$> getCurrentTime)
         mes <- passaData
         estoque <- Auxiliar.iniciaEstoque
-        rescreverEstoqueMes (Estoque.estoqueEmMapa estoque iniciaEstoqueMes mes)
+        estoqueMes <- iniciaEstoqueMes
+        rescreverEstoqueMes (Estoque.estoqueEmMapa estoque estoqueMes mes)
         
         
     
@@ -76,13 +79,13 @@ module DatasCriticas where
         escreverEstoqueMes estoqueMes
         return()
 
-    iniciaEstoqueMes :: Map String String
+    iniciaEstoqueMes :: IO(Map String String)
     iniciaEstoqueMes = do
-        let arquivo = unsafeDupablePerformIO(readFile "estoqueMes.txt")
+        arquivo <- Strict.readFile "estoqueMes.txt"
         let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
         let lista_estoqueMes = ((Data.List.map constroiEstoqueMes lista))
         let mapa_escala = Map.fromList lista_estoqueMes
-        return mapa_escala!!0
+        return mapa_escala
 
     constroiEstoqueMes:: [String] -> (String,String)
     constroiEstoqueMes  estoqueMes = (estoqueMes!!0, estoqueMes!!1)
