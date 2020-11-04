@@ -7,62 +7,94 @@ module Estoque where
 
   adicionaBolsa:: String -> Int -> Bolsa.Bolsa
   adicionaBolsa tipoSanguineo qtdSangue = (Bolsa.Bolsa (toUpperCase tipoSanguineo) qtdSangue)
-  -- tem que escrever em um arquivo pra conseguir saber quais bolsas estao cadastradas
 
   listaTodasAsBolsas:: [Bolsa.Bolsa] -> String
   listaTodasAsBolsas [] = " " 
   listaTodasAsBolsas (h:t) = (imprimeBolsa (Bolsa.tipoSanguineo h) (Bolsa.qtdSangue h)) ++ listaTodasAsBolsas t 
 
   listaBolsasPorTipo::  String -> [Bolsa.Bolsa] -> String
-  listaBolsasPorTipo _ [] = " "
+  listaBolsasPorTipo _ [] = "Não há bolsas desse tipo\n"
   listaBolsasPorTipo tipoProcurado bolsas
-    | toUpperCase tipoProcurado == "O-" = listaTodasAsBolsas [ x |x <- bolsas,Bolsa.tipoSanguineo x == "O-"]
-    | toUpperCase tipoProcurado == "O+" = listaTodasAsBolsas [ x |x <- bolsas, Bolsa.tipoSanguineo x == "O+"]
-    | toUpperCase tipoProcurado == "A-" = listaTodasAsBolsas [ x |x <- bolsas, Bolsa.tipoSanguineo x == "A-"]  
-    | toUpperCase tipoProcurado == "A+" = listaTodasAsBolsas [ x |x <- bolsas, Bolsa.tipoSanguineo x == "A+"]
-    | toUpperCase tipoProcurado == "B-" = listaTodasAsBolsas [ x |x <- bolsas, Bolsa.tipoSanguineo x == "B-"]  
-    | toUpperCase tipoProcurado == "B+" = listaTodasAsBolsas [ x |x <- bolsas, Bolsa.tipoSanguineo x == "B+"]
-    | toUpperCase tipoProcurado == "AB-" = listaTodasAsBolsas [ x |x <- bolsas, Bolsa.tipoSanguineo x == "AB-"]
-    | toUpperCase tipoProcurado == "AB+" = listaTodasAsBolsas [ x |x <- bolsas, Bolsa.tipoSanguineo x == "AB+"]
-    | otherwise = listaBolsasPorTipo " " []
+   | elem (toUpperCase tipoProcurado) tipos = listaTodasAsBolsas [ x |x <- bolsas,Bolsa.tipoSanguineo x == (toUpperCase tipoProcurado)]
+   | otherwise = listaBolsasPorTipo " " []
+   where tipos = ["O-","O+","A-","A+","B+","B-","AB+","AB-"]
 
-  --tem que apagar as bolsas quando forem removidas
-  removeBolsa:: String -> Int -> [Bolsa.Bolsa] -> Maybe Bolsa.Bolsa
-  removeBolsa " " 0 [] = Nothing
-  removeBolsa tipoProcurado qntBlood bolsas =
+  verificaEstoque:: String -> Int -> [Bolsa.Bolsa] -> Maybe Bolsa.Bolsa
+  verificaEstoque " " 0 [] = Nothing
+  verificaEstoque tipoProcurado qntBlood bolsas =
     if([ x |x <- bolsas, Bolsa.tipoSanguineo x == tipoProcurado] /= [])
       then if (bolsasValidas /= [])
         then Just (bolsasValidas!!0)
         else Nothing
-    else removeBolsa " " 0 []
+    else verificaEstoque " " 0 []
 
     where bolsasValidas = [x | x <- bolsas,verificaMlDaBolsa qntBlood x /= Nothing]
 
+  removeBolsa :: Maybe Bolsa -> [Bolsa] -> [Bolsa]
+  removeBolsa _ [] = []
+  removeBolsa bolsa_procurada (h:t)
+    |bolsa_procurada == Just h = removeBolsa bolsa_procurada t
+    |otherwise = (h : removeBolsa bolsa_procurada t)
    
   verificaMlDaBolsa::Int -> Bolsa.Bolsa -> Maybe Bolsa.Bolsa
   verificaMlDaBolsa qntBlood bolsa  
-    | Bolsa.qtdSangue bolsa > qntBlood =  Just bolsa
+    | Bolsa.qtdSangue bolsa > qntBlood = Just bolsa
     | Bolsa.qtdSangue bolsa == qntBlood = Just bolsa
     | otherwise = Nothing
-
+ 
 
   toUpperCase :: String -> String
   toUpperCase entrada = [toUpper x | x <- entrada]
 
 
   imprimeBolsa:: String -> Int -> String
-  imprimeBolsa tipo qtd = "(Bolsa): >Tipo: " ++ tipo ++ " >Quantidade(em ml) " ++ show qtd ++ "\n"
+  imprimeBolsa tipo qtd = "(Bolsa): >Tipo: " ++ tipo ++ " >Quantidade(em ml): " ++ show qtd ++ "\n"
 
-  bolsaToString:: Maybe Bolsa -> String
-  bolsaToString (Just bolsa) = "[RETIRADA] " ++ imprimeBolsa (tipoSanguineo bolsa) (qtdSangue bolsa)
+  bolsaRetiradaToString:: Maybe Bolsa -> Int -> String
+  bolsaRetiradaToString (Just bolsa) 0 = "[RETIRADA TOTAL] " ++ imprimeBolsa (tipoSanguineo bolsa) (qtdSangue bolsa)
+  bolsaRetiradaToString (Just bolsa) qtdRetirada = "[RETIRADA PARCIAL] " ++ imprimeBolsa (tipoSanguineo bolsa) qtdRetirada
 
-  -- retornaTodasBolsas :: [Bolsa.Bolsa]
-  --  retornaTodasBolsas (h:t) = Bolsa h ++ [Bolsa t]
+  buscaBolsa:: String -> Int -> [Bolsa] -> Maybe Bolsa
+  buscaBolsa tipo_procurado qtd_procurada [] = Nothing
+  buscaBolsa tipo_procurado qtd_procurada (h:t)
+   |tipo_procurado == (tipoSanguineo h) && qtd_procurada == (qtdSangue h) = Just h
+   |otherwise = buscaBolsa tipo_procurado qtd_procurada t
 
+
+  totalSanguePorTipo:: String -> [Bolsa] -> Int
+  totalSanguePorTipo tipo [] = 0
+  totalSanguePorTipo tipo (h:t)
+   | tipo == tipoSanguineo h = qtdSangue h + totalSanguePorTipo tipo t
+   | otherwise = totalSanguePorTipo tipo t
+
+  visaoGeralEstoque:: [Bolsa] -> String
+  visaoGeralEstoque listaEstoque = "O-:" ++ show (totalSanguePorTipo("O-") listaEstoque) ++ " ml" ++ "\n" ++
+        "O+:" ++ show (totalSanguePorTipo("O+") listaEstoque)++ " ml" ++ "\n" ++
+        "A-:" ++ show (totalSanguePorTipo("A-") listaEstoque)++ " ml"++ "\n" ++
+        "A+:" ++ show (totalSanguePorTipo("A+") listaEstoque)++ " ml"++ "\n" ++
+        "B-:" ++ show (totalSanguePorTipo("B-") listaEstoque)++ " ml"++ "\n" ++      
+        "B+:" ++ show (totalSanguePorTipo("B+") listaEstoque)++ " ml"++ "\n" ++
+        "AB-:" ++ show (totalSanguePorTipo("AB-") listaEstoque)++ " ml"++ "\n" ++    
+        "AB+:" ++ show (totalSanguePorTipo("AB+") listaEstoque)++ " ml"++ "\n\n"
+
+
+  mensagemDeAviso:: [Bolsa] -> Int -> String
+  mensagemDeAviso _ 8 = "\n"
+  mensagemDeAviso estoque i
+   |(totalSanguePorTipo (tipos !! i) estoque < 1000 ) = "Está faltando sangue do tipo " ++ (tipos !! i) ++ "! " ++
+    "(" ++ show (totalSanguePorTipo (tipos !! i) estoque) ++ " ml restantes)" ++ "\n" ++ mensagemDeAviso estoque (i+1)
+   |(totalSanguePorTipo (tipos !! i) estoque > 10000 ) = "Está sobrando sangue do tipo " ++ (tipos !! i) ++ 
+    "Há " ++ show (totalSanguePorTipo (tipos !! i) estoque) ++ " ml, é uma boa ideia doar para outra instutuição que precise!" ++"\n" ++  mensagemDeAviso estoque (i+1)
+   |otherwise = mensagemDeAviso estoque (i+1)
+   where tipos = ["O-","O+","A-","A+","B+","B-","AB+","AB-"]
+  
+  
   {-
-    pega uma lista de tupas onde o primeiro elemento eh o mes e o segundo a qtd de sangue no estoque-}
+    pega uma lista de tuplas onde o primeiro elemento eh o mes e o segundo a qtd de sangue no estoque-}
   estoqueEmMapa :: [Bolsa.Bolsa] -> Map String String -> String -> [(String, String)]
   estoqueEmMapa estoque mapa mes = Map.toList(insert mes (show (totalSangue estoque)) mapa)
+  
+  
   {-
     Retorna o total de sangue do banco (em ml)-}
   totalSangue :: [Bolsa.Bolsa] -> Int

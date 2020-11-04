@@ -10,6 +10,7 @@ import Data.Map as Map
 import System.IO
 import Data.Time
 import qualified DatasCriticas as DatasCriticas
+import Data.Char
 
 main :: IO ()
 main = do    
@@ -18,10 +19,10 @@ main = do
 
 
 opcoes :: String
-opcoes = ("BloodLife\n1. Cadastro de Recebedores\n2. Controle de estoque de bolsas de sangue\n" ++
+opcoes = ("BloodLife\n1. Cadastro de Recebedores\n2. Controle de Estoque de Bolsas de Sangue\n" ++
  "3. Cadastro de doadores\n4. Cadastro de Enfermeiros\n" ++
  "5. Cadastro de impedimentos\n6. Agendamento de coleta com doadores\n" ++ 
- "7. Agendamento de coleta com enfermeiros\n8. Dashboards\n9. sai\n")
+ "7. Agendamento de coleta com enfermeiros\n8. Dashboards\n9. Sair\n")
 
 
 menuInicial :: IO()
@@ -34,7 +35,9 @@ menuInicial  = do
         cadastroDeRecebedor
         putStrLn (" ")
     else if input == "2" then do
-        putStrLn ("IMPLEMENTAR CONTROLE DO ESTOQUE DE BOLSAS")
+        -- unico jeito de nao quebrar tudo em Datas Criticas foi colocar o metodo assim:
+        listaEstoque <- Auxiliar.atualizaEstoque
+        estoque listaEstoque
     else if input == "3" then do
         putStrLn ("IMPLEMENTAR CADASTRO DE DOADORES")    
     else if input == "4" then do
@@ -204,6 +207,80 @@ enfermeiros listaEnfermeiros mapaEscala = do
     else do
         putStrLn ("Ainda não implementado")
 
+estoque ::[Bolsa.Bolsa] -> IO()
+estoque listaEstoque = do
+    {- Mensagem de Estoque: se tiver menos de 1000 ml por tipo sanguineo é dado um aviso de falta de sangue
+                            se tiver mais de 10000 ml por tipo sanguineo é dado um aviso de sobra de sangue
+    -}
+    putStrLn(Estoque.mensagemDeAviso listaEstoque 0)
+    putStr ("1. Adicionar Bolsa de Sangue\n" ++
+            "2. Retirar Bolsa de Sangue\n" ++
+            "3. Visão Geral do Estoque\n" ++
+            "4. Listar Todas as Bolsas\n" ++
+            "5. Listar Bolsas por Tipo\n")
+    tipo <- getLine
+    if(tipo == "1")then do
+        putStrLn("Tipo Sanguineo: ")          
+        typeSanguineo <- getLine
+        let tipoSanguineo = typeSanguineo
+        if((elem (toUpperCase tipoSanguineo) tipos) == False) then do
+            putStrLn("Tipo Inválido\n")
+        else do   
+            putStrLn("Quantidade de sangue (em ml): ")
+            input <- getLine 
+            let qtdSangue = read input :: Int
+            if(qtdSangue > 450) then do
+                putStrLn("Não há como doar mais que 450 ml por pessoa!\n")
+            else do    
+                Auxiliar.escreverEstoque([Estoque.adicionaBolsa tipoSanguineo qtdSangue])    
+                putStrLn("Bolsa cadastrada!\n")
+        main
+    else if(tipo == "2") then do
+        putStrLn("Tipo Sanguineo:: ")
+        input <- getLine
+        let tipo = input
+        putStrLn("Quantidade de sangue: ")
+        input <- getLine 
+        let qtdSangue = read input :: Int
+        let bolsaComSangueDisponivel = Estoque.verificaEstoque tipo qtdSangue listaEstoque
+        if(bolsaComSangueDisponivel /= Nothing) then do
+            putStrLn("Sangue retirado com sucesso! ")
+            Auxiliar.reescreveEstoque(Estoque.removeBolsa bolsaComSangueDisponivel listaEstoque)
+ --           if(qtdSangue < Bolsa.qtdSangue bolsaComSangueDisponivel) then do
+ --               let qtdSangueRestante = ((Bolsa.qtdSangue bolsaComSangueDisponivel) - qtdSangue )
+ --               Auxiliar.escreverEstoque([Estoque.adicionaBolsa (Bolsa.tipoSanguineo bolsaComSangueDisponivel) qtdSangueRestante ])             
+ --               putStrLn(Estoque.bolsaRetiradaToString bolsaComSangueDisponivel qtdSangue)
+ --           else do
+            putStrLn(Estoque.bolsaRetiradaToString bolsaComSangueDisponivel 0)
+            main
+        else do 
+            putStr ("Não há bolsas disponiveis :(\n")
+        main
+    else if(tipo == "3") then do
+        putStrLn("\nVisão Geral Do Estoque:")
+        putStrLn(Estoque.visaoGeralEstoque listaEstoque)
+        main                                
+    else if(tipo == "4") then do
+        let estoque = Estoque.listaTodasAsBolsas listaEstoque
+        putStrLn estoque
+        main
+    else if(tipo == "5") then do
+        putStrLn("Tipo Sanguineo: ")
+        input <- getLine
+        let tipoSanguineo = input
+        if((elem (toUpperCase tipoSanguineo) tipos) == False) then do
+            putStrLn("Tipo Inválido!\n")
+            main
+        else do    
+            let estoque = Estoque.listaBolsasPorTipo tipoSanguineo listaEstoque
+            putStrLn estoque
+            main
+    else do
+        putStrLn ("Entrada Inválida!\n")
+        main
+
+    where tipos = ["O-","O+","A-","A+","B+","B-","AB+","AB-"]    
+
 agendaDoacao :: Map Day String -> [Enfermeiro.Enfermeiro] -> IO()
 agendaDoacao agenda listaEnfermeiros = do
     putStr ("\n1. Agendar coleta no Hemocentro\n" ++ "2. Agendar coleta em domicílio\n")
@@ -241,8 +318,7 @@ agendaDoacao agenda listaEnfermeiros = do
             let doadorEndereco = Doador.getEnderecoDoador doador carregaDoadores
             Auxiliar.rescreverAgendaLocal (Agenda.agendaDoacaoLocal (Auxiliar.stringEmData diaMesAno) agenda doador enfermeiro doadorEndereco)
             menuInicial
-        
-           
+                   
 carregaAgenda :: IO(Map Day String)
 carregaAgenda = Auxiliar.iniciaAgendaLocal
 
@@ -252,6 +328,9 @@ carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
 carregaEscala :: IO(Map Day String)
 carregaEscala = Auxiliar.iniciaEscala
 
+carregaEstoque ::  [Bolsa.Bolsa]
+carregaEstoque = Auxiliar.iniciaEstoque
+
 carregaImpedimentos :: IO([Impedimento.Impedimento])
 carregaImpedimentos = Auxiliar.iniciaImpedimentos
 
@@ -260,6 +339,7 @@ carregaRecebedores = Auxiliar.iniciaRecebedores
 
 carregaDoadores :: [Doador.Doador]
 carregaDoadores = Auxiliar.iniciaDoador
+
 
 cadastroDeRecebedor :: IO()
 cadastroDeRecebedor = do
@@ -311,54 +391,6 @@ prompt text = do
     hFlush stdout
     getLine
 
-{-
-estoque :: IO()
-estoque = do
-    putStr ("1. Adicionar Bolsa de Sangue\n" ++
-            "2. Retirar Bolsa de Sangue\n" ++
-            "3. Listar Todas as Bolsas\n" ++
-            "4. Listar Bolsas por Tipo\n")
-    tipo <- getLine
-    if(tipo== "1") then do
-        putStr("Tipo Sanguineo(cadastrar): ")
-        input <- getLine
-        let tipoSanguineo = input
-        putStr("Quantidade de sangue (em ml): ")
-        input <- getLine 
-        let qtdSangue = read input :: Int
-        Auxiliar.escreverBolsa(Estoque.adicionaBolsa tipoSanguineo qtdSangue)    
-        putStrLn ("Bolsa cadastrada")
-    else if(tipo == "2") then do
-        putStrLn("Tipo Sanguineo(retirar): ")
-        input <- getLine
-        let tipo = input
-        putStr("Quantidade de sangue (em ml): ")
-        input <- getLine 
-        let qtdSangue = read input :: Int
-        let bolsa = Estoque.removeBolsa tipo qtdSangue carregaEstoque
-        if(bolsa /= Nothing) then do
-            putStrLn("Sangue retirado com sucesso! ")
-            putStrLn(Estoque.bolsaToString bolsa)
-            --Auxiliar.removeBolsa bolsa
-        else do 
-            putStr ("Nao ha bolsas disponiveis :(")
-    -- deve ter alguma logica pra remover a bolsa do .txt
-
-    else if(tipo == "3") then do
-        let estoque = Estoque.listaTodasAsBolsas carregaEstoque
-        putStrLn estoque
-    else if(tipo == "4") then do
-        putStrLn("Tipo Sanguineo(listar): ")
-        input <- getLine
-        let tipoSanguineo = input
-        let estoque = Estoque.listaBolsasPorTipo tipoSanguineo carregaEstoque
-        putStrLn estoque
-    else do
-        putStrLn ("Ainda não implementado")
--}
-
-carregaEstoque ::  [Bolsa.Bolsa]
-carregaEstoque = Auxiliar.iniciaEstoque
 
 {-
     Caso hoje seja dia primeiro, compara o estoque com o do ano passado 
@@ -380,4 +412,6 @@ hoje = do
     today <- toGregorian <$> (utctDay <$> getCurrentTime)
     return (getDia today)
 
-    
+
+toUpperCase :: String -> String
+toUpperCase entrada = [toUpper x | x <- entrada]    
