@@ -10,13 +10,14 @@ import qualified Recebedor as Recebedor
 import qualified Estoque as Estoque
 import qualified Bolsa as Bolsa
 import qualified Doador as Doador
-import Data.Map as Map
+import Data.Map as Map ( fromList, Map)
 import Data.List
 import System.IO.Unsafe(unsafeDupablePerformIO)
 import Data.List.Split ( splitOn )
 import Data.Typeable
 import Data.Time.Calendar
 import qualified System.IO.Strict as Strict
+
 
 --Esses metodos vão iniciar os arrays salvos
 iniciaImpedimentos :: IO([Impedimento.Impedimento])
@@ -57,9 +58,13 @@ iniciaEstoque = do
     return lista_estoque
 
 
-iniciaRecebedores :: [Recebedor.Recebedor]
-iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 2 "A+" "Dom Pedro I" (FichaMedica.adicionaFichaMedica "Masculino" "09/01/1999" "Antoin da silva" "Josefa da Silva" False False "Nenhuma")), 
-                    (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1 "A+" "Dom Pedro I" (FichaMedica.adicionaFichaMedica "Feminino" "09/11/1944" "Seu José" "Josefina Conceicao" False True "Nenhuma"))]
+iniciaRecebedores :: IO([Recebedor.Recebedor])
+iniciaRecebedores = do
+    arquivo <- Strict.readFile "recebedor.txt"
+    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
+    let lista_recebedor = ((Data.List.map constroiRecebedor lista))
+    return lista_recebedor   
+    
 
 iniciaDoador :: IO([Doador.Doador])
 iniciaDoador = do
@@ -68,6 +73,31 @@ iniciaDoador = do
     let lista_doador = ((Data.List.map constroiDoador lista))
     return lista_doador
 
+
+constroiRecebedor :: [String] -> Recebedor.Recebedor
+constroiRecebedor lista =
+    Recebedor.Recebedor{ 
+    Recebedor.nome = lista!!0,
+    Recebedor.endereco  = lista !!1,
+    Recebedor.idade = read(lista!!2),
+    Recebedor.telefone = lista!!3,
+    Recebedor.numDeBolsas = read(lista!!4),
+    Recebedor.tipoSanguineo = lista!!5,
+    Recebedor.hospital = lista!!6,
+    Recebedor.fichaMedica = constroiFichaMedica (splitOn "-" (lista!!7))
+    }
+
+constroiFichaMedica :: [String] -> FichaMedica.FichaMedica
+constroiFichaMedica lista =
+    FichaMedica.FichaMedica{
+        FichaMedica.sexo = lista!!0,
+        FichaMedica.dataNascimento = lista!!1,
+        FichaMedica.pai = lista!!2,
+        FichaMedica.mae = lista!!3,
+        FichaMedica.acompanhamentoMedico = lista!!4,
+        FichaMedica.condicaoFisica = lista!!5,
+        FichaMedica.alergias = lista!!6        
+    }
 
 --Esses métodos irão construir os TypeClasses do sistema
 constroiImpedimento ::[String] -> Impedimento.Impedimento
@@ -130,6 +160,7 @@ criaArquivos = do
     appendFile "doador.txt" ("")
     appendFile "agendaLocal.txt" ("")
     appendFile "estoqueMes.txt" ("")
+    appendFile "recebedor.txt" ("")
 
 
 --metodos q vao salvar as listas 
@@ -170,6 +201,16 @@ escreverEnfermeiros enfermeiro = do
     let enfermeiroStr = Enfermeiro.nome enfermeiro ++ "," ++ Enfermeiro.endereco enfermeiro ++ "," ++ show (Enfermeiro.idade enfermeiro) ++ "," ++ Enfermeiro.telefone enfermeiro ++ "\n"
     appendFile "enfermeiros.txt" (enfermeiroStr)
     return ()
+
+escreverRecebedores :: Recebedor.Recebedor -> IO()
+escreverRecebedores recebedor = do
+    let recebedorStr = Recebedor.nome recebedor ++ "," ++ Recebedor.endereco recebedor ++ "," ++ show(Recebedor.idade recebedor) ++ "," ++ Recebedor.telefone recebedor ++ "," ++ show(Recebedor.numDeBolsas recebedor) ++ "," ++ Recebedor.tipoSanguineo recebedor ++ "," ++ Recebedor.hospital recebedor ++ "," ++ escreveFichaMedica (Recebedor.fichaMedica recebedor) ++ "\n" 
+    appendFile "recebedor.txt" (recebedorStr)
+    return ()
+
+escreveFichaMedica :: FichaMedica.FichaMedica -> String
+escreveFichaMedica ficha = FichaMedica.sexo ficha ++ "-" ++ FichaMedica.dataNascimento ficha ++ "-" ++ FichaMedica.pai ficha ++ "-" ++ FichaMedica.mae ficha ++ "-" ++ FichaMedica.acompanhamentoMedico ficha ++ "-" ++ FichaMedica.condicaoFisica ficha ++ "-" ++ FichaMedica.alergias ficha
+     
 
 escreverEscala :: [(Day,String)] -> IO()
 escreverEscala [] = return ()
