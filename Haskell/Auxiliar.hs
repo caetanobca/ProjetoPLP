@@ -49,7 +49,19 @@ iniciaAgendaLocal = do
     return mapa_escala
 
 iniciaEstoque :: [Bolsa.Bolsa]
-iniciaEstoque = [(Bolsa.Bolsa "A+" 450), (Bolsa.Bolsa "O-" 400)]
+iniciaEstoque = do
+    let arquivo = unsafeDupablePerformIO (readFile "estoque.txt")
+    let lista = Data.List.map ( splitOn ",") (lines arquivo)
+    let lista_estoque = (Data.List.map constroiEstoque lista)
+    return lista_estoque !! 0
+
+atualizaEstoque :: IO([Bolsa.Bolsa])
+atualizaEstoque = do
+    arquivo <- Strict.readFile "estoque.txt"
+    let lista = Data.List.map ( splitOn ",") (lines arquivo)
+    let lista_estoque = (Data.List.map constroiEstoque lista)
+    return lista_estoque
+
 
 iniciaRecebedores :: [Recebedor.Recebedor]
 iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 1250), (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1000)]
@@ -76,6 +88,12 @@ constroiImpedimento lista =
         Impedimento.cid = lista !! 1,
         Impedimento.tempoSuspencao = read (lista !! 2)}
 
+constroiEstoque:: [String] -> Bolsa.Bolsa
+constroiEstoque lista = 
+    Bolsa.Bolsa{
+        Bolsa.tipoSanguineo = lista !! 0,
+        Bolsa.qtdSangue = read (lista !! 1)
+    }
 
 constroiEnfermeiro:: [String] -> Enfermeiro.Enfermeiro
 constroiEnfermeiro lista = 
@@ -103,6 +121,7 @@ constroiEscala  diaMesEnfermeiros = ((stringEmDataAmericana (diaMesEnfermeiros!!
 
 constroiAgendaLocal:: [String] -> (Day,String)
 constroiAgendaLocal  diaMesAgenda = ((stringEmDataAmericana (diaMesAgenda!!0)),diaMesAgenda!!1)
+
 
 
 --esse metodos cria todos txts responsaveis por armazenar os dados do sistema       
@@ -170,11 +189,19 @@ rescreverEscala escala = do
     escreverEscala escala
     return()
 
-escreverBolsa:: Bolsa.Bolsa -> IO()
-escreverBolsa bolsa = do
-    let bolsaStr = Bolsa.tipoSanguineo bolsa ++ ","++ show (Bolsa.qtdSangue bolsa) ++ "\n"
+escreverEstoque:: [Bolsa.Bolsa] -> IO()
+escreverEstoque [] = return ()
+escreverEstoque (h:t) = do
+    let bolsaStr = Bolsa.tipoSanguineo h ++ ","++ show (Bolsa.qtdSangue h) ++ "\n"
     appendFile "estoque.txt" (bolsaStr)
+    escreverEstoque t
     return ()
+
+reescreveEstoque :: [Bolsa.Bolsa] ->IO()
+reescreveEstoque estoque = do
+    writeFile "estoque.txt" ("")
+    escreverEstoque estoque
+    return()
 
 escreverAgendaLocal :: [(Day,String)] -> IO()
 escreverAgendaLocal [] = return ()
@@ -218,9 +245,3 @@ stringEmData dados = fromGregorian (read (datas!!2)) (read (datas!!1)) (read (da
 stringEmDataAmericana :: String -> Day
 stringEmDataAmericana dados = fromGregorian (read (datas!!0)) (read (datas!!1)) (read (datas!!2))
     where datas = splitOn ("-") dados
-
-
-
-
-
-
