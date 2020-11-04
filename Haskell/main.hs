@@ -116,36 +116,36 @@ doador listaDoador = do
 
 impedimentos :: [Impedimento.Impedimento] -> IO()
 impedimentos listaImpedimentos = do 
-    putStr ("\n1. Cadastro de Impedimento\n" ++ 
+    putStrLn ("\n1. Cadastro de Impedimento\n" ++ 
             "2. Buscar Impedimento\n" ++
             "3. Listar Impedimentos\n" ++
-            "4. Deletar Impedimento\n")
+            "4. Deletar Impedimento")
     opcao <- getLine
     if (opcao == "1") then do
-        putStr ("Cadastro de Impedimentos\n" ++
+        putStrLn ("Cadastro de Impedimentos\n" ++
             "1. Cadastro de Medicamento\n" ++
-            "2. Cadastro de Doenca\n")
+            "2. Cadastro de Doenca")
         tipo <- getLine
         if (tipo == "1") then do
-            putStr("Cadastro de Medicamento\n" ++
+            putStrLn("Cadastro de Medicamento\n" ++
                     "Funcao: ")
             input <- getLine
             let funcao = input
-            putStr("Composto: ")
+            putStrLn("Composto: ")
             input <- getLine
             let composto = input
-            putStr("tempo de Suspencao (em dias): ")
+            putStrLn("tempo de Suspencao (em dias): ")
             input <- getLine 
             let tempoSuspencao = read input :: Integer
             Auxiliar.escreverImpedimento (Impedimento.adicionaImpedimento funcao composto tempoSuspencao)
             putStrLn ("Impedimento cadastrado")
             menuInicial
         else if (tipo == "2") then do
-            putStr("Cadastro de Doenca\n" ++
+            putStrLn("Cadastro de Doenca\n" ++
                     "CID: ")
             input <- getLine
             let cid = input
-            putStr("tempo de Suspencao (em dias): ")
+            putStrLn("tempo de Suspencao (em dias): ")
             input <- getLine
             let tempoSuspencao = read input :: Integer
             Auxiliar.escreverImpedimento (Impedimento.adicionaImpedimento [] cid tempoSuspencao)
@@ -155,51 +155,55 @@ impedimentos listaImpedimentos = do
             putStrLn("Entrada Invalida")
             menuInicial
     else if (opcao == "2") then do 
-        putStr ("Buscar Impedimentos\n" ++
+        putStrLn ("Buscar Impedimentos\n" ++
             "1. Buscar Medicamento\n" ++
-            "2. Buscar Doenca\n")
+            "2. Buscar Doenca")
         tipo <- getLine
         if (tipo == "1") then do
-            putStr("Buscar Medicamento\n" ++
+            putStrLn("Buscar Medicamento\n" ++
                 "Composto: ")
             input <- getLine
             let composto = input
-            putStrLn (show (Impedimento.buscaImpedimentoStr "MEDICAMENTO" composto listaImpedimentos))
+            if ((Impedimento.existeImpedimento "MEDICAMENTO" composto listaImpedimentos)) then do
+                putStrLn (Impedimento.buscaImpedimentoStr "MEDICAMENTO" composto listaImpedimentos)
+            else do
+                putStrLn("Medicamento nao cadastrado")
             menuInicial
         else if (tipo == "2") then do
-            putStr("Buscar Doenca\n" ++
+            putStrLn("Buscar Doenca\n" ++
                     "CID: ")
             input <- getLine
             let cid = input
-            putStrLn (show (Impedimento.buscaImpedimentoStr "DOENCA" cid listaImpedimentos))
+            if ((Impedimento.existeImpedimento "DOENCA" cid listaImpedimentos)) then do
+                putStrLn (Impedimento.buscaImpedimentoStr "DOENCA" cid listaImpedimentos)
+            else do
+                putStrLn("Doença não cadastrado")
             menuInicial
         else do
             putStrLn("Entrada Invalida")
             menuInicial
     else if (opcao == "3") then do
         putStrLn ("Listar Impedimentos")
-        putStr(Impedimento.listarImpedimentos listaImpedimentos)
+        putStrLn(Impedimento.listarImpedimentos listaImpedimentos)
         menuInicial
     else if (opcao == "4") then do
-        putStr ("Deletar Impedimentos\n" ++
+        putStrLn ("Deletar Impedimentos\n" ++
             "1. Deletar Medicamento\n" ++
-            "2. Deletar Doenca\n")
+            "2. Deletar Doenca")
         tipo <- getLine
         if (tipo == "1") then do
-            putStr("Deletar Medicamento\n" ++
+            putStrLn("Deletar Medicamento\n" ++
                     "Composto: ")
             input <- getLine
             let composto = input            
             Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento "MEDICAMENTO" composto listaImpedimentos) listaImpedimentos)
-            putStrLn ("Impedimento deletado")
             menuInicial
         else if (tipo == "2") then do
-            putStr("Deletar Doenca\n" ++
+            putStrLn("Deletar Doenca\n" ++
                     "CID: ")
             input <- getLine
             let cid = input            
             Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento "DOENCA" cid listaImpedimentos) listaImpedimentos)
-            putStrLn ("Impedimento deletado")
             menuInicial
         else do
             putStrLn("Entrada Invalida")
