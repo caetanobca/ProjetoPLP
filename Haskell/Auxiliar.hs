@@ -15,15 +15,54 @@ import System.IO.Unsafe(unsafeDupablePerformIO)
 import Data.List.Split ( splitOn )
 import Data.Typeable
 import Data.Time.Calendar
+import qualified System.IO.Strict as Strict
 
---Esses metodos vai carregar os empedimentos que estavam salvos em um arquivo
-iniciaImpedimentos :: [Impedimento.Impedimento]
+--Esses metodos vão iniciar os arrays salvos
+iniciaImpedimentos :: IO([Impedimento.Impedimento])
 iniciaImpedimentos = do
-    let arquivo = unsafeDupablePerformIO(readFile "impedimentos.txt")
+    arquivo <- Strict.readFile "impedimentos.txt"
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_impedimentos = ((Data.List.map constroiImpedimento lista))
-    return lista_impedimentos !! 0
+    return lista_impedimentos
 
+iniciaEnfermeiros :: IO([Enfermeiro.Enfermeiro])
+iniciaEnfermeiros = do
+    arquivo <- Strict.readFile "enfermeiros.txt"    
+    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
+    let lista_enfermeiros = ((Data.List.map constroiEnfermeiro lista))   
+    return lista_enfermeiros
+
+iniciaEscala :: IO(Map Day String)
+iniciaEscala = do
+    arquivo <- Strict.readFile "escala.txt"
+    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
+    let lista_escala = ((Data.List.map constroiEscala lista))
+    let mapa_escala = Map.fromList lista_escala
+    return mapa_escala
+
+iniciaAgendaLocal :: IO(Map Day String)
+iniciaAgendaLocal = do
+    arquivo <- Strict.readFile "agendaLocal.txt"
+    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
+    let lista_agenda = ((Data.List.map constroiAgendaLocal lista))
+    let mapa_escala = Map.fromList lista_agenda
+    return mapa_escala
+
+iniciaEstoque :: [Bolsa.Bolsa]
+iniciaEstoque = [(Bolsa.Bolsa "A+" 450), (Bolsa.Bolsa "O-" 400)]
+
+iniciaRecebedores :: [Recebedor.Recebedor]
+iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 1250), (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1000)]
+
+iniciaDoador :: [Doador.Doador]
+iniciaDoador = do
+    let arquivo = unsafeDupablePerformIO(readFile "doador.txt")
+    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
+    let lista_doador = ((Data.List.map constroiDoador lista))
+    return lista_doador !! 0
+
+
+--Esses métodos irão construir os TypeClasses do sistema
 constroiImpedimento ::[String] -> Impedimento.Impedimento
 constroiImpedimento lista = 
     if((lista!! 0) == "MEDICAMENTO") then Impedimento.Medicamento{
@@ -37,12 +76,6 @@ constroiImpedimento lista =
         Impedimento.cid = lista !! 1,
         Impedimento.tempoSuspencao = read (lista !! 2)}
 
-iniciaEnfermeiros :: [Enfermeiro.Enfermeiro]
-iniciaEnfermeiros = do
-    let arquivo = unsafeDupablePerformIO(readFile "enfermeiros.txt")
-    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
-    let lista_enfermeiros = ((Data.List.map constroiEnfermeiro lista))
-    return lista_enfermeiros !! 0
 
 constroiEnfermeiro:: [String] -> Enfermeiro.Enfermeiro
 constroiEnfermeiro lista = 
@@ -53,42 +86,26 @@ constroiEnfermeiro lista =
         Enfermeiro.telefone = lista !! 3
     }
 
-escreverBolsa:: Bolsa.Bolsa -> IO()
-escreverBolsa bolsa = do
-    let bolsaStr = Bolsa.tipoSanguineo bolsa ++ ","++ show (Bolsa.qtdSangue bolsa) ++ "\n"
-    appendFile "estoque.txt" (bolsaStr)
-    return ()
-
-iniciaEscala :: Map Day String
-iniciaEscala = do
-    let arquivo = unsafeDupablePerformIO(readFile "escala.txt")
-    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
-    let lista_enfermeiros = ((Data.List.map constroiEscala lista))
-    let mapa_escala = Map.fromList lista_enfermeiros
-    return mapa_escala!!0
+constroiDoador :: [String] -> Doador.Doador
+constroiDoador lista = 
+    Doador.Doador{
+        Doador.nome = lista !! 0,
+        Doador.endereco = lista !! 1,
+        Doador.idade = read (lista !! 2),
+        Doador.telefone = lista !! 3,
+        Doador.impedimentoStr =  lista !! 4,
+        Doador.ultimoDiaImpedido =  (stringEmDataAmericana (lista !! 5)),
+        Doador.doacoes = lista !! 6 
+        }
 
 constroiEscala:: [String] -> (Day,String)
 constroiEscala  diaMesEnfermeiros = ((stringEmDataAmericana (diaMesEnfermeiros!!0)),diaMesEnfermeiros!!1)
 
-
-iniciaAgendaLocal :: Map Day String
-iniciaAgendaLocal = do
-    let arquivo = unsafeDupablePerformIO(readFile "agendaLocal.txt")
-    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
-    let lista_agenda = ((Data.List.map constroiAgendaLocal lista))
-    let mapa_escala = Map.fromList lista_agenda
-    return mapa_escala!!0
-    
 constroiAgendaLocal:: [String] -> (Day,String)
 constroiAgendaLocal  diaMesAgenda = ((stringEmDataAmericana (diaMesAgenda!!0)),diaMesAgenda!!1)
 
-iniciaEstoque :: [Bolsa.Bolsa]
-iniciaEstoque = [(Bolsa.Bolsa "A+" 450), (Bolsa.Bolsa "O-" 400)]
-    
---iniciaEscala :: Map String String
---iniciaEscala = Map.fromList [("16/10", "José"), ("17/10","Pedro")]
 
---esses metodos criam txts responsaveis por armazenar os dados do sistema       
+--esse metodos cria todos txts responsaveis por armazenar os dados do sistema       
 criaArquivos :: IO()
 criaArquivos = do
     appendFile "impedimentos.txt" ("")
@@ -97,11 +114,11 @@ criaArquivos = do
     appendFile "escala.txt" ("")
     appendFile "doador.txt" ("")
     appendFile "agendaLocal.txt" ("")
-    appendFile "estoqueMes.txt" ("")    
+    appendFile "estoqueMes.txt" ("")
 
 
 --metodos q vao salvar as listas 
---esses metodos irão escrever novas informações no arquivo de cada tipo   
+--esses metodos irão escrever novas informalçoes ou reescrever informações no arquivo de cada tipo   
 escreverImpedimento:: Impedimento.Impedimento -> IO ()
 escreverImpedimento impedimento = do
     if(Impedimento.tipoImpedimento impedimento) == "MEDICAMENTO" then do
@@ -153,6 +170,12 @@ rescreverEscala escala = do
     escreverEscala escala
     return()
 
+escreverBolsa:: Bolsa.Bolsa -> IO()
+escreverBolsa bolsa = do
+    let bolsaStr = Bolsa.tipoSanguineo bolsa ++ ","++ show (Bolsa.qtdSangue bolsa) ++ "\n"
+    appendFile "estoque.txt" (bolsaStr)
+    return ()
+
 escreverAgendaLocal :: [(Day,String)] -> IO()
 escreverAgendaLocal [] = return ()
 escreverAgendaLocal (h:t) = do
@@ -166,37 +189,6 @@ rescreverAgendaLocal agendaLocal = do
     writeFile "agendaLocal.txt" ("")
     escreverAgendaLocal agendaLocal
     return()
-
-stringEmData :: String -> Day
-stringEmData dados = fromGregorian (read (datas!!2)) (read (datas!!1)) (read (datas!!0))
-    where datas = splitOn ("/") dados
-
-stringEmDataAmericana :: String -> Day
-stringEmDataAmericana dados = fromGregorian (read (datas!!0)) (read (datas!!1)) (read (datas!!2))
-    where datas = splitOn ("-") dados
-    
-iniciaRecebedores :: [Recebedor.Recebedor]
-iniciaRecebedores = [(Recebedor.Recebedor "Lukas Nascimento" "Rua Princesa Isabel" 21 "33442211" 1250), (Recebedor.Recebedor "Maria Oliveira" "Rua Manoel Tavares" 64 "33123322" 1000)]
-
-
-iniciaDoador :: [Doador.Doador]
-iniciaDoador = do
-    let arquivo = unsafeDupablePerformIO(readFile "doador.txt")
-    let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
-    let lista_doador = ((Data.List.map constroiDoador lista))
-    return lista_doador !! 0
-
-constroiDoador :: [String] -> Doador.Doador
-constroiDoador lista = 
-    Doador.Doador{
-        Doador.nome = lista !! 0,
-        Doador.endereco = lista !! 1,
-        Doador.idade = read (lista !! 2),
-        Doador.telefone = lista !! 3,
-        Doador.impedimentoStr =  lista !! 4,
-        Doador.ultimoDiaImpedido =  (stringEmDataAmericana (lista !! 5)),
-        Doador.doacoes = lista !! 6 
-        }
 
 escreverDoador :: Doador.Doador -> IO()
 escreverDoador doador = do
@@ -218,6 +210,17 @@ rescreverDoador doador = do
     escreverDoadores doador
     return()
 
---Implementar metodo q vai salvar a lista de impedimentos
+--metodos auxiliares de formatação
+stringEmData :: String -> Day
+stringEmData dados = fromGregorian (read (datas!!2)) (read (datas!!1)) (read (datas!!0))
+    where datas = splitOn ("/") dados
+
+stringEmDataAmericana :: String -> Day
+stringEmDataAmericana dados = fromGregorian (read (datas!!0)) (read (datas!!1)) (read (datas!!2))
+    where datas = splitOn ("-") dados
+
+
+
+
 
 

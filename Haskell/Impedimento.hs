@@ -27,7 +27,7 @@ module Impedimento where
     buscaImpedimentoStr tipo procurado (h:t)
         |tipo == (tipoImpedimento h) && tipo == "MEDICAMENTO" && procurado == composto h = impedimentoToString h
         |tipo == (tipoImpedimento h) && tipo == "DOENCA" && procurado == cid h = impedimentoToString h
-        |otherwise = buscaImpedimentoStr procurado tipo t
+        |otherwise = buscaImpedimentoStr tipo procurado t
         
     listarImpedimentos:: [Impedimento] -> String
     listarImpedimentos [] = " "
