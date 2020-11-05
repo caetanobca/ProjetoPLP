@@ -37,6 +37,15 @@ module Impedimento where
         |tipoImpedimento impedimento == "DOENCA" = "Doenca\n  >CID: " ++ cid impedimento ++ " \n  >Tempo Suspencao: " 
                         ++ show (tempoSuspencao impedimento) ++ " Dias\n" 
 
+    impedimentoImprime :: Impedimento -> String
+    impedimentoImprime impedimento
+        |tipoImpedimento impedimento == "MEDICAMENTO" = "Medicamento" ++ " Composto: " ++ composto impedimento ++" Funcao: "  
+                        ++ funcao impedimento  ++ " Tempo Supencao: " ++ show (tempoSuspencao impedimento) ++ " Dias ~~~ "
+        |tipoImpedimento impedimento == "DOENCA" = "Doenca CID: " ++ cid impedimento ++ " Tempo Suspencao: " 
+                        ++ show (tempoSuspencao impedimento) ++ " Dias ~~~ " 
+
+
+
     buscaImpedimentoStr :: String -> String -> [Impedimento] -> String
     buscaImpedimentoStr tipo procurado [] = ""
     buscaImpedimentoStr tipo procurado (h:t)
@@ -85,7 +94,6 @@ module Impedimento where
     getHoje :: IO(Day)
     getHoje = do
         a <- utctDay <$> getCurrentTime
-
         return a
     
     toUpperCaseStr :: String -> String

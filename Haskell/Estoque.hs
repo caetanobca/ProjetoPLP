@@ -19,29 +19,26 @@ module Estoque where
    | otherwise = listaBolsasPorTipo " " []
    where tipos = ["O-","O+","A-","A+","B+","B-","AB+","AB-"]
 
-  verificaEstoque:: String -> Int -> [Bolsa.Bolsa] -> Maybe Bolsa.Bolsa
-  verificaEstoque " " 0 [] = Nothing
-  verificaEstoque tipoProcurado qntBlood bolsas =
-    if([ x |x <- bolsas, Bolsa.tipoSanguineo x == tipoProcurado] /= [])
-      then if (bolsasValidas /= [])
-        then Just (bolsasValidas!!0)
-        else Nothing
-    else verificaEstoque " " 0 []
+  
+  verificaQtdBolsas:: Int -> String -> [Bolsa] -> [Bolsa]
+  verificaQtdBolsas _ _ [] = [(Bolsa "" (-1))]
+  verificaQtdBolsas qtdBolsas tipoProcurado (h:t)
+    |tipoProcurado == tipoSanguineo h = [h] ++ verificaQtdBolsas (qtdBolsas - 1) tipoProcurado t
+    |otherwise = verificaQtdBolsas qtdBolsas tipoProcurado t
 
-    where bolsasValidas = [x | x <- bolsas,verificaMlDaBolsa qntBlood x /= Nothing]
-
-  removeBolsa :: Maybe Bolsa -> [Bolsa] -> [Bolsa]
+  removeBolsa :: Bolsa -> [Bolsa] -> [Bolsa]
   removeBolsa _ [] = []
   removeBolsa bolsa_procurada (h:t)
-    |bolsa_procurada == Just h = removeBolsa bolsa_procurada t
+    |bolsa_procurada == h = removeBolsa bolsa_procurada t
     |otherwise = (h : removeBolsa bolsa_procurada t)
    
+   {-
   verificaMlDaBolsa::Int -> Bolsa.Bolsa -> Maybe Bolsa.Bolsa
   verificaMlDaBolsa qntBlood bolsa  
     | Bolsa.qtdSangue bolsa > qntBlood = Just bolsa
     | Bolsa.qtdSangue bolsa == qntBlood = Just bolsa
     | otherwise = Nothing
- 
+ -}
 
   toUpperCase :: String -> String
   toUpperCase entrada = [toUpper x | x <- entrada]

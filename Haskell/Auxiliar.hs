@@ -263,7 +263,7 @@ escreverDoador doador = do
 escreverDoadores :: [Doador.Doador] -> IO()
 escreverDoadores [] = return ()
 escreverDoadores (h:t) = do
-    let doadorStr = Doador.nome h ++ "," ++ Doador.endereco h ++ "," ++ (show (Doador.idade h)) ++ "," ++ Doador.telefone h ++ "," ++ Doador.impedimentoStr h ++ "," ++ (show (Doador.ultimoDiaImpedido h)) ++ "," ++ Doador.doacoes h ++  "\n" 
+    let doadorStr = Doador.nome h ++ "," ++ Doador.endereco h ++ "," ++ (show (Doador.idade h)) ++ "," ++ Doador.telefone h ++ "," ++ Doador.tipSanguineo h ++ "," ++ Doador.impedimentoStr h ++ "," ++ (show (Doador.ultimoDiaImpedido h)) ++ "," ++ Doador.doacoes h ++  "\n" 
     appendFile "doador.txt" (doadorStr)
     escreverDoadores t
     return ()
@@ -282,3 +282,10 @@ stringEmData dados = fromGregorian (read (datas!!2)) (read (datas!!1)) (read (da
 stringEmDataAmericana :: String -> Day
 stringEmDataAmericana dados = fromGregorian (read (datas!!0)) (read (datas!!1)) (read (datas!!2))
     where datas = splitOn ("-") dados
+
+verificaDataPassada :: String -> Bool
+verificaDataPassada dia
+    |hoje > stringEmData dia = False
+    |otherwise = True
+    where hoje = unsafeDupablePerformIO(Impedimento.getHoje)
+
