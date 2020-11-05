@@ -18,7 +18,7 @@ module Doador where
         endereco = endereco,
         idade = idade, 
         telefone = telefone, 
-        tipSanguineo = tipoSanguineo, 
+        tipSanguineo = (toUpperCase tipoSanguineo), 
         impedimentoStr = "",
         Doador.ultimoDiaImpedido =  getUltimoDia,
         doacoes = ""})
@@ -56,9 +56,9 @@ module Doador where
 
     todosOsDoadores:: [Doador] -> String
     todosOsDoadores [] = " "
-    todosOsDoadores (h:t) = "Nome: " ++ nome h 
-        ++ " " ++ "Endereço: " ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
-        ++ "Telefone: " ++ telefone h ++ "Impedimentos: " ++ impedimentoStr h     ++ "\n"++ todosOsDoadores t
+    todosOsDoadores (h:t) = "Nome: " ++ nome h ++ " Tipo Sanguineo: " ++ tipSanguineo h ++
+        " " ++ "Endereço: " ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
+        ++ "Telefone: " ++ telefone h ++ " Impedimentos: " ++ impedimentoStr h     ++ "\n"++ todosOsDoadores t
     
     doadorCadastrado :: String -> [Doador] -> Bool
     doadorCadastrado procurado [] = False

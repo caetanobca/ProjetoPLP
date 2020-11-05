@@ -22,8 +22,8 @@ main = do
 
 opcoes :: String
 opcoes = ("BloodLife\n1. Cadastro de Recebedores\n2. Controle de Estoque de Bolsas de Sangue\n" ++
- "3. Cadastro de doadores\n4. Controle de Enfermeiros\n" ++
- "5. Controle de impedimentos\n6. Coleta de sangue\n" ++ 
+ "3. Cadastro de Doadores\n4. Controle de Enfermeiros\n" ++
+ "5. Controle de Impedimentos\n6. Agendar Coleta de sangue\n" ++ 
  "7. Dashboards\n8. Sair\n")
 
 
@@ -76,18 +76,19 @@ doador listaDoador = do
         putStrLn ("Você irá cadastrar um Doador(a)")
         putStrLn ("Insira o nome do Doador(a)")
         nome <- getLine
+        putStrLn ("Insira o tipo sanguíneo do Doador(a)")    
+        tipoSanguineo <- getLine
         putStrLn ("Insira o endereço do Doador(a)")
         endereco <- getLine
         putStrLn ("Insira a idade do Doador(a)")
         idade <- getLine
         putStrLn ("Insira o telefone do Doador(a)")
         telefone <- getLine        
-        putStrLn ("Insira o tipo sanguíneo do Doador(a)")    
-        tipoSanguineo <- getLine
+
         if((elem (toUpperCase tipoSanguineo) tipos) == False) then do
             putStrLn("Tipo Inválido\n")
             else do             
-                Auxiliar.escreverDoador(Doador.adicionaDoador nome endereco (read(idade)) telefone tipoSanguineo)                    
+                Auxiliar.escreverDoador(Doador.adicionaDoador nome endereco (read(idade)) telefone (toUpperCase tipoSanguineo))                    
         menuInicial
     else if(tipo == "2") then do
         putStrLn("Insira o nome do(a) Doador(a) que você deseja")
@@ -292,24 +293,25 @@ estoque listaEstoque = do
             "4. Listar Todas as Bolsas\n" ++
             "5. Listar Bolsas por Tipo\n")
     tipo <- getLine
+    
     if(tipo == "1")then do
         putStrLn("Qual o nome do Doador? (digite anon para anônimo)")          
         nomeDoador <- getLine
         if((toUpperCase nomeDoador) /= "ANON") then do
             listaDoadores <- carregaDoadores
-            let doador = Doador.encontraDoador nomeDoador listaDoadores
-            if(Doador.tipSanguineo doador == "") then do
+            let doador = Doador.encontraDoador nomeDoador listaDoadores 
+            -- se nao achar o doador, ele volta um doador com nome vazio:
+            if(Doador.nome doador == "") then do 
                 putStrLn("Doador não encontrado\n")
                 menuInicial
             else do
                 diaHoje <- getToday
                 if(Doador.isImpedido doador diaHoje) then do
-                    putStrLn ("Doador impedido")
+                    putStrLn ("Doador com impedimento!")
                     menuInicial
                 else do
                     let tipoSanguineo = Doador.tipSanguineo doador
                     putStrLn("Doador encontrado!")
-                    -- tem que verificar os impedimentos do Doador
                     today <- hoje
                     let adicionaDoacao = Doador.adicionaDoacao nomeDoador listaDoadores ("Doação realizada dia " ++ show (getDia today) ++ "/" ++ show(getMes today) ++  "/" ++ show (getAno today))
                     putStrLn("Uma Bolsa de 450 ml do tipo " ++ (Doador.tipSanguineo doador) ++ " foi cadastrada no estoque!\n")
@@ -323,8 +325,8 @@ estoque listaEstoque = do
                 putStrLn("Tipo Inválido\n")
                 menuInicial
             else do    
-                putStrLn("Uma Bolsa de 450 ml do tipo " ++ tipoSanguineo ++ " foi cadastrada no estoque!\n")
-                Auxiliar.escreverEstoque([Estoque.adicionaBolsa tipoSanguineo 450]) 
+                putStrLn("Uma Bolsa de 450 ml do tipo " ++ (toUpperCase tipoSanguineo) ++ " foi cadastrada no estoque!\n")
+                Auxiliar.escreverEstoque([Estoque.adicionaBolsa (toUpperCase tipoSanguineo) 450]) 
                 menuInicial  
 
     else if(tipo == "2") then do
@@ -342,13 +344,16 @@ estoque listaEstoque = do
                 putStrLn("Quantas bolsas serão necessárias?")
                 numBolsas <- getLine
                 let bolsasDisponiveis = Estoque.verificaQtdBolsas (read numBolsas) tipoSanguineo listaEstoque
-                if((Bolsa.qtdSangue (bolsasDisponiveis!!0)) == (-1)) then do    
+                if(bolsasDisponiveis == []) then do    
                     putStrLn("Não há bolsas suficiente disponíveis")
                     menuInicial                
                 else do
-
+                    let bolsasRestantes = Estoque.removeBolsa (bolsasDisponiveis!!0) (read numBolsas) listaEstoque
+                    Auxiliar.reescreveEstoque (bolsasRestantes)
+                    let presunto = (Prelude.map (\bolsa_procurada -> Estoque.avisaRemocao bolsa_procurada) bolsasDisponiveis) 
+                    print(show presunto)
                     menuInicial
-        else do
+        else do 
             menuInicial
     else if(tipo == "3") then do
         putStrLn("\nVisão Geral Do Estoque:")
