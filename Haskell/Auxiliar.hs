@@ -3,7 +3,7 @@ module Auxiliar where
 
 import qualified Recebedor as Recebedor
 import qualified FichaMedica as FichaMedica
---import qualified Doador as Doador
+import qualified Doador as Doador
 import qualified Impedimento as Impedimento
 import qualified Enfermeiro as Enfermeiro
 import qualified Recebedor as Recebedor

@@ -21,24 +21,21 @@ module Estoque where
 
   
   verificaQtdBolsas:: Int -> String -> [Bolsa] -> [Bolsa]
-  verificaQtdBolsas _ _ [] = [(Bolsa "" (-1))]
+  verificaQtdBolsas 0 _ [] = []
+  verificaQtdBolsas _ _ [] = []
   verificaQtdBolsas qtdBolsas tipoProcurado (h:t)
     |tipoProcurado == tipoSanguineo h = [h] ++ verificaQtdBolsas (qtdBolsas - 1) tipoProcurado t
     |otherwise = verificaQtdBolsas qtdBolsas tipoProcurado t
 
-  removeBolsa :: Bolsa -> [Bolsa] -> [Bolsa]
-  removeBolsa _ [] = []
-  removeBolsa bolsa_procurada (h:t)
-    |bolsa_procurada == h = removeBolsa bolsa_procurada t
-    |otherwise = (h : removeBolsa bolsa_procurada t)
+  removeBolsa :: Bolsa -> Int -> [Bolsa] -> [Bolsa]
+  removeBolsa _ 0 _ = []
+  removeBolsa bolsa_procurada num_bolsas (h:t)
+    |bolsa_procurada == h = removeBolsa bolsa_procurada (num_bolsas - 1) t
+    |otherwise = (h : removeBolsa bolsa_procurada num_bolsas t)
    
-   {-
-  verificaMlDaBolsa::Int -> Bolsa.Bolsa -> Maybe Bolsa.Bolsa
-  verificaMlDaBolsa qntBlood bolsa  
-    | Bolsa.qtdSangue bolsa > qntBlood = Just bolsa
-    | Bolsa.qtdSangue bolsa == qntBlood = Just bolsa
-    | otherwise = Nothing
- -}
+  avisaRemocao :: Bolsa -> String
+  avisaRemocao bolsa_removida = "Bolsa com " ++ show (qtdSangue bolsa_removida) ++ " ml de sangue do tipo " ++
+              tipoSanguineo bolsa_removida ++ " retirada com sucesso!"
 
   toUpperCase :: String -> String
   toUpperCase entrada = [toUpper x | x <- entrada]
