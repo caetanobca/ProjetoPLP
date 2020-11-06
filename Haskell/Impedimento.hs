@@ -32,8 +32,8 @@ module Impedimento where
         
     impedimentoToString :: Impedimento -> String
     impedimentoToString impedimento
-        |tipoImpedimento impedimento == "MEDICAMENTO" = "Medicamento" ++ "\n    >Composto: " ++ composto impedimento ++"\n    >Funcao: "  
-                        ++ funcao impedimento  ++ " \n    >Tempo Supencao: " ++ show (tempoSuspencao impedimento) ++ " Dias\n"
+        |tipoImpedimento impedimento == "MEDICAMENTO" = "Medicamento" ++ "\n  >Composto: " ++ composto impedimento ++"\n  >Funcao: "  
+                        ++ funcao impedimento  ++ " \n  >Tempo Supencao: " ++ show (tempoSuspencao impedimento) ++ " Dias\n"
         |tipoImpedimento impedimento == "DOENCA" = "Doenca\n  >CID: " ++ cid impedimento ++ " \n  >Tempo Suspencao: " 
                         ++ show (tempoSuspencao impedimento) ++ " Dias\n" 
 
@@ -47,25 +47,37 @@ module Impedimento where
 
 
     buscaImpedimentoStr :: String -> String -> [Impedimento] -> String
-    buscaImpedimentoStr tipo procurado [] = ""
-    buscaImpedimentoStr tipo procurado (h:t)
-        |tipo == (tipoImpedimento h) && tipo == "MEDICAMENTO" &&(isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (composto h))) == True = impedimentoToString h
-        |tipo == (tipoImpedimento h) && tipo == "DOENCA" && isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (cid h)) == True = impedimentoToString h
-        |otherwise = buscaImpedimentoStr tipo procurado t
+    buscaImpedimentoStr _ _ [] = ""
+    buscaImpedimentoStr "MEDICAMENTO" procurado (h:t)
+        |(tipoImpedimento h) == "MEDICAMENTO" = if (isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (composto h))) then impedimentoToString h
+        else buscaImpedimentoStr "MEDICAMENTO" procurado t
+        |otherwise = buscaImpedimentoStr "MEDICAMENTO" procurado t
+    buscaImpedimentoStr "DOENCA" procurado (h:t)
+        |(tipoImpedimento h) == "DOENCA" = if (isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (cid h))) then impedimentoToString h
+        else buscaImpedimentoStr "DOENCA" procurado t
+        |otherwise = buscaImpedimentoStr "DOENCA" procurado t
 
     buscaImpedimento :: String -> String-> [Impedimento] -> Impedimento
-    buscaImpedimento tipo procurado [] = (Medicamento "MEDICAMENTO" " 0dias de suspencao" "Nenhum composto" 0)
-    buscaImpedimento tipo procurado (h:t)
-        |tipo == (tipoImpedimento h) && tipo == "MEDICAMENTO" && (isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (composto h))) == True = h
-        |tipo == (tipoImpedimento h) && tipo == "DOENCA" && isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (cid h)) == True = h
-        |otherwise = buscaImpedimento procurado tipo t
+    buscaImpedimento _ _ [] = (Medicamento "MEDICAMENTO" " 0dias de suspencao" "Nenhum composto" 0)
+    buscaImpedimento "MEDICAMENTO" procurado (h:t)
+        |(tipoImpedimento h) == "MEDICAMENTO" = if (isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (composto h))) then  h
+        else buscaImpedimento "MEDICAMENTO" procurado  t
+        |otherwise = buscaImpedimento "MEDICAMENTO" procurado  t
+    buscaImpedimento "DOENCA" procurado (h:t) 
+        |(tipoImpedimento h) == "DOENCA" = if (isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (cid h))) then h
+        else buscaImpedimento "DOENCA" procurado  t
+        |otherwise = buscaImpedimento "DOENCA" procurado  t
 
     existeImpedimento :: String -> String-> [Impedimento] -> Bool
-    existeImpedimento tipo procurado [] = False
-    existeImpedimento tipo procurado (h:t)
-        |tipo == (tipoImpedimento h) && tipo == "MEDICAMENTO" && (isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (composto h))) == True = True
-        |tipo == (tipoImpedimento h) && tipo == "DOENCA" && isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (cid h)) == True = True
-        |otherwise = existeImpedimento procurado tipo t
+    existeImpedimento _ _ [] = False
+    existeImpedimento "MEDICAMENTO" procurado (h:t)
+        |(tipoImpedimento h) == "MEDICAMENTO" = if (isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (composto h))) then True
+        else existeImpedimento "MEDICAMENTO" procurado  t
+        |otherwise = existeImpedimento "MEDICAMENTO" procurado  t
+    existeImpedimento "DOENCA" procurado (h:t)        
+        |(tipoImpedimento h) == "DOENCA" = if (isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (cid h))) then True
+        else existeImpedimento "DOENCA" procurado  t
+        |otherwise = existeImpedimento "DOENCA" procurado  t
         
     removeImpedimetno :: Impedimento -> [Impedimento] -> [Impedimento]
     removeImpedimetno _ [] = []
@@ -78,19 +90,7 @@ module Impedimento where
         |diaAtual > diaNovo = diaAtual
         |diaAtual < diaNovo = diaNovo
         where diaNovo =  unsafeDupablePerformIO(addDays (tempoSuspencao (impedimentos)) <$> getHoje)
-{-    
-    ultimoDiaImpedido :: [Impedimento] -> IO(Day)
-    ultimoDiaImpedido impedimentos = addDays (tempoSuspencao (impedimentoMaisLongo impedimentos)) <$> getHoje
 
-  
-    impedimentoMaisLongo :: [Impedimento] -> Impedimento
-    impedimentoMaisLongo [] = (Medicamento "MEDICAMENTO" " 0dias de suspencao" "Nenhum composto" 0)
-    impedimentoMaisLongo (h:t)
-        | (tempoSuspencao h) > (tempoSuspencao (impedimentoMaisLongo t)) = h
-        | (tempoSuspencao h) < (tempoSuspencao (impedimentoMaisLongo t)) = impedimentoMaisLongo t
-        | otherwise = h
-
-  -}
     getHoje :: IO(Day)
     getHoje = do
         a <- utctDay <$> getCurrentTime
