@@ -19,6 +19,7 @@ import Data.Time.Calendar
 import qualified System.IO.Strict as Strict
 
 
+
 --Esses metodos vão iniciar os arrays salvos
 iniciaImpedimentos :: IO([Impedimento.Impedimento])
 iniciaImpedimentos = do
@@ -282,6 +283,8 @@ stringEmData dados = fromGregorian (read (datas!!2)) (read (datas!!1)) (read (da
 stringEmDataAmericana :: String -> Day
 stringEmDataAmericana dados = fromGregorian (read (datas!!0)) (read (datas!!1)) (read (datas!!2))
     where datas = splitOn ("-") dados
+
+
 
 verificaDataPassada :: String -> Bool
 verificaDataPassada dia

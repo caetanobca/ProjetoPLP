@@ -39,10 +39,10 @@ module Impedimento where
 
     impedimentoImprime :: Impedimento -> String
     impedimentoImprime impedimento
-        |tipoImpedimento impedimento == "MEDICAMENTO" = "Medicamento" ++ " Composto: " ++ composto impedimento ++" Funcao: "  
-                        ++ funcao impedimento  ++ " Tempo Supencao: " ++ show (tempoSuspencao impedimento) ++ " Dias ~~~ "
-        |tipoImpedimento impedimento == "DOENCA" = "Doenca CID: " ++ cid impedimento ++ " Tempo Suspencao: " 
-                        ++ show (tempoSuspencao impedimento) ++ " Dias ~~~ " 
+        |tipoImpedimento impedimento == "MEDICAMENTO" = "Impedimento:" ++ " Composto: " ++ composto impedimento ++" Funcao: "  
+                        ++ funcao impedimento  ++ " Tempo Supencao: " ++ show (tempoSuspencao impedimento) ++ " Dias / "
+        |tipoImpedimento impedimento == "DOENCA" = "Impedimento: " ++ cid impedimento ++ " Tempo Suspencao: " 
+                        ++ show (tempoSuspencao impedimento) ++ " Dias / " 
 
 
 
