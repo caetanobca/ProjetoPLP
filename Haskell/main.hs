@@ -260,6 +260,9 @@ enfermeiros listaEnfermeiros mapaEscala = do
     else if(tipo == "5") then do
         putStrLn("Insira a data")
         diaMesAno <- getLine
+        if(Auxiliar.verificaDataPassada diaMesAno == False) then do
+            putStrLn("Data passada")
+        else do
         putStrLn("Insira o nome do Enfermeiro")
         enfermeiro <- getLine 
         if (Enfermeiro.enfermeiroCadastrado enfermeiro listaEnfermeiros) then do             
@@ -277,8 +280,7 @@ enfermeiros listaEnfermeiros mapaEscala = do
         else do
             putStrLn (show (Enfermeiro.visualizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala))
             menuInicial   
-    else do
-        putStrLn ("Ainda não implementado")
+    else do        
         menuInicial
 
 estoque ::[Bolsa.Bolsa] -> IO()
@@ -350,11 +352,27 @@ estoque listaEstoque = do
                 else do
                     let bolsasRestantes = Estoque.removeBolsa (bolsasDisponiveis!!0) (read numBolsas) listaEstoque
                     Auxiliar.reescreveEstoque (bolsasRestantes)
-                    let presunto = (Prelude.map (\bolsa_procurada -> Estoque.avisaRemocao bolsa_procurada) bolsasDisponiveis) 
-                    print(show presunto)
+                    putStrLn(numBolsas ++ " bolsas do tipo " ++ tipoSanguineo ++ " retiradas com sucesso!")
                     menuInicial
         else do 
-            menuInicial
+            putStrLn("Qual o tipo sanguineo do doador anônimo?")
+            tipoSanguineo <- getLine
+            if((elem (toUpperCase tipoSanguineo) tipos) == False) then do
+                putStrLn("Tipo Inválido\n")
+                menuInicial
+            else do
+                putStrLn("Quantas bolsas serão necessárias?")
+                numBolsas <- getLine
+                let bolsasDisponiveis = Estoque.verificaQtdBolsas (read numBolsas) tipoSanguineo listaEstoque
+                if(bolsasDisponiveis == []) then do    
+                    putStrLn("Não há bolsas suficiente disponíveis")
+                    menuInicial  
+                else do    
+                let bolsasRestantes = Estoque.removeBolsa (bolsasDisponiveis!!0) (read numBolsas) listaEstoque
+                Auxiliar.reescreveEstoque (bolsasRestantes)
+                putStrLn(numBolsas ++ " bolsas do tipo " ++ tipoSanguineo ++ " retiradas com sucesso!")
+                menuInicial
+
     else if(tipo == "3") then do
         putStrLn("\nVisão Geral Do Estoque:")
         putStrLn(Estoque.visaoGeralEstoque listaEstoque)
@@ -384,11 +402,14 @@ tipos = ["O-","O+","A-","A+","B+","B-","AB+","AB-"]
 
 agendaDoacao :: Map Day String -> [Enfermeiro.Enfermeiro] -> [Doador.Doador] -> IO()
 agendaDoacao agenda listaEnfermeiros listaDoadores = do
-    putStr ("\n1. Agendar coleta no Hemocentro\n" ++ "2. Agendar coleta em domicílio\n")
+    putStr ("\n1. Agendar coleta no Hemocentro\n" ++ "2. Agendar coleta em domicílio\n" ++ "3. Visualizar agenda de doações")
     tipo <- getLine
     if(tipo == "1")then do
         putStrLn("Insira a data")
         diaMesAno <- getLine
+        if(Auxiliar.verificaDataPassada diaMesAno == False) then do
+            putStrLn("Data passada")
+        else do
         putStrLn("Insira o nome do Doador")
         doador <- getLine
         putStrLn("Insira o nome do Enfermeiro")
@@ -399,12 +420,18 @@ agendaDoacao agenda listaEnfermeiros listaDoadores = do
         else if(Enfermeiro.encontraEnfermeiroString enfermeiro listaEnfermeiros == "") then do
             putStrLn ("Enfermeiro não cadastrado")
             menuInicial
+        else if (Doador.isImpedido (Doador.encontraDoador doador listaDoadores) (Auxiliar.stringEmData diaMesAno)) then do
+            putStrLn ("Doador impedido até dia " ++ (show (Doador.ultimoDiaImpedido (Doador.encontraDoador doador listaDoadores))))
+            menuInicial
         else do
             Auxiliar.rescreverAgendaLocal (Agenda.agendaDoacaoLocal (Auxiliar.stringEmData diaMesAno) agenda doador enfermeiro "Hemocentro")
             menuInicial
-    else do
+    else if(tipo == "2") then do
         putStrLn("Insira a data")
         diaMesAno <- getLine
+        if(Auxiliar.verificaDataPassada diaMesAno == False) then do
+            putStrLn("Data passada")
+        else do
         putStrLn("Insira o nome do Doador")
         doador <- getLine
         putStrLn("Insira o nome do Enfermeiro")
@@ -419,7 +446,15 @@ agendaDoacao agenda listaEnfermeiros listaDoadores = do
             let doadorEndereco = Doador.getEnderecoDoador doador listaDoadores
             Auxiliar.rescreverAgendaLocal (Agenda.agendaDoacaoLocal (Auxiliar.stringEmData diaMesAno) agenda doador enfermeiro doadorEndereco)
             menuInicial
-                   
+    else if(tipo == "3") then do
+        putStrLn("Insira a data")
+        diaMesAno <- getLine
+        putStrLn (Agenda.agendaDoacaoImprime agenda (Auxiliar.stringEmData diaMesAno))
+        menuInicial
+    else do
+        menuInicial
+        
+
 cadastroDeRecebedor :: [Recebedor.Recebedor] -> IO()
 cadastroDeRecebedor listaRecebedores = do
     putStr (

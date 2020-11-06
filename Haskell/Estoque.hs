@@ -28,7 +28,8 @@ module Estoque where
     |otherwise = verificaQtdBolsas qtdBolsas tipoProcurado t
 
   removeBolsa :: Bolsa -> Int -> [Bolsa] -> [Bolsa]
-  removeBolsa _ 0 _ = []
+  removeBolsa _ _ [] = []
+  removeBolsa _ 0 estoque = estoque
   removeBolsa bolsa_procurada num_bolsas (h:t)
     |bolsa_procurada == h = removeBolsa bolsa_procurada (num_bolsas - 1) t
     |otherwise = (h : removeBolsa bolsa_procurada num_bolsas t)
