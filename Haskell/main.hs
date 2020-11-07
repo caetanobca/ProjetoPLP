@@ -19,23 +19,23 @@ main = do
     verificaDataCritica 
     menuInicial
 
-
-opcoes :: String
-opcoes = ("BloodLife\n1. Cadastro de Recebedores\n2. Controle de Estoque de Bolsas de Sangue\n" ++
+--Método que retorna o menu inicial
+menu :: String
+menu = ("BloodLife\n1. Cadastro de Recebedores\n2. Controle de Estoque de Bolsas de Sangue\n" ++
  "3. Cadastro de Doadores\n4. Controle de Enfermeiros\n" ++
  "5. Controle de Impedimentos\n6. Agendar Coleta de sangue\n" ++ 
  "7. Dashboards\n8. Sair\n")
 
-
+--Método que mostra na tela o menu inicial e invoca o método responsável pelo sub-menu que o usuário escolheu. 
 menuInicial :: IO()
 menuInicial  = do    
-    putStr(opcoes)
+    putStr(menu)
 
     input <- getLine 
 
     if input == "1" then do
         listaRecebedores <- carregaRecebedores
-        cadastroDeRecebedor listaRecebedores
+        recebedores listaRecebedores
         putStrLn (" ")
     else if input == "2" then do        
         listaEstoque <- carregaEstoque
@@ -62,7 +62,8 @@ menuInicial  = do
     else do
        putStrLn("Entrada invalida")
         
-
+--Método responsével por exibir o sub-menu de doadores e faz a troca de dados entre o usuario e  os métodos  
+--que lidam com doadores
 doador :: [Doador.Doador] -> IO()
 doador listaDoador  = do      
     putStr ("1. Cadastro de Doador\n" ++
@@ -150,7 +151,8 @@ doador listaDoador  = do
     else do
         putStrLn ("Opção inválida")
 
-
+--Método responsével por exibir o sub-menu de impedimentos e faz a troca de dados entre o usuario e os métodos  
+--que lidam com impedimentos
 impedimentos :: [Impedimento.Impedimento] -> IO()
 impedimentos listaImpedimentos = do 
     putStrLn ("\n1. Cadastro de Impedimento\n" ++ 
@@ -174,7 +176,7 @@ impedimentos listaImpedimentos = do
             putStrLn("tempo de Suspencao (em dias): ")
             input <- getLine 
             let tempoSuspencao = read input :: Integer
-            Auxiliar.escreverImpedimento (Impedimento.adicionaImpedimento funcao composto tempoSuspencao)
+            Auxiliar.escreverImpedimento (Impedimento.criarImpedimento funcao composto tempoSuspencao)
             putStrLn ("Impedimento cadastrado")
             menuInicial
         else if (tipo == "2") then do
@@ -185,7 +187,7 @@ impedimentos listaImpedimentos = do
             putStrLn("tempo de Suspencao (em dias): ")
             input <- getLine
             let tempoSuspencao = read input :: Integer
-            Auxiliar.escreverImpedimento (Impedimento.adicionaImpedimento [] cid tempoSuspencao)
+            Auxiliar.escreverImpedimento (Impedimento.criarImpedimento [] cid tempoSuspencao)
             putStrLn ("Impedimento cadastrado")
             menuInicial
         else do
@@ -202,7 +204,7 @@ impedimentos listaImpedimentos = do
             input <- getLine
             let composto = input
             if ((Impedimento.existeImpedimento "MEDICAMENTO" composto listaImpedimentos)) then do
-                putStrLn (Impedimento.buscaImpedimentoStr "MEDICAMENTO" composto listaImpedimentos)
+                putStrLn (Impedimento.impedimentoToString(Impedimento.buscaImpedimento "MEDICAMENTO" composto listaImpedimentos))
             else do
                 putStrLn("Medicamento nao cadastrado")
             menuInicial
@@ -212,7 +214,7 @@ impedimentos listaImpedimentos = do
             input <- getLine
             let cid = input
             if ((Impedimento.existeImpedimento "DOENCA" cid listaImpedimentos)) then do
-                putStrLn (Impedimento.buscaImpedimentoStr "DOENCA" cid listaImpedimentos)
+                putStrLn (Impedimento.impedimentoToString (Impedimento.buscaImpedimento "DOENCA" cid listaImpedimentos))
             else do
                 putStrLn("Doença não cadastrado")
             menuInicial
@@ -257,7 +259,8 @@ impedimentos listaImpedimentos = do
         putStrLn("Entrada Invalida")
         menuInicial
         
-
+--Método responsével por exibir o sub-menu de enfermeiros e faz a troca de dados entre o usuario e  os métodos  
+--que lidam com enfermeiros
 enfermeiros :: [Enfermeiro.Enfermeiro] -> Map Day String -> IO()
 enfermeiros listaEnfermeiros mapaEscala = do      
     putStr ("1. Cadastro de Enfermeiros\n" ++
@@ -312,6 +315,8 @@ enfermeiros listaEnfermeiros mapaEscala = do
     else do        
         menuInicial
 
+--Método responsével por exibir o sub-menu de estoque e faz a troca de dados entre o usuario e  os métodos  
+--que lidam com estoque
 estoque ::[Bolsa.Bolsa] -> IO()
 estoque listaEstoque = do
     {- Mensagem de Estoque: se tiver menos de 1000 ml por tipo sanguineo é dado um aviso de falta de sangue
@@ -425,10 +430,11 @@ estoque listaEstoque = do
         putStrLn ("Entrada Inválida!\n")
         main
 
-
 tipos :: [String]
 tipos = ["O-","O+","A-","A+","B+","B-","AB+","AB-"]    
 
+--Método responsével por exibir o sub-menu de agenda de doações e faz a troca de dados entre o usuario e  os métodos  
+--que lidam com agenda de doações
 agendaDoacao :: Map Day String -> [Enfermeiro.Enfermeiro] -> [Doador.Doador] -> IO()
 agendaDoacao agenda listaEnfermeiros listaDoadores = do
     putStrLn ("\n1. Agendar coleta no Hemocentro\n" ++ "2. Agendar coleta em domicílio\n" ++ "3. Visualizar agenda de doações")
@@ -490,9 +496,10 @@ agendaDoacao agenda listaEnfermeiros listaDoadores = do
     else do
         menuInicial
         
-
-cadastroDeRecebedor :: [Recebedor.Recebedor] -> IO()
-cadastroDeRecebedor listaRecebedores = do
+--Método responsével por exibir o sub-menu de recebedores e faz a troca de dados entre o usuario e  os métodos  
+--que lidam com recebedores
+recebedores :: [Recebedor.Recebedor] -> IO()
+recebedores listaRecebedores = do
     putStr (
         "1. Cadastro de Recebedor\n" ++
         "2. Buscar Recebedor\n" ++
@@ -512,7 +519,7 @@ cadastroDeRecebedor listaRecebedores = do
         tipo <- prompt "Tipo Sanguíneo: "
         if((elem (toUpperCase tipo) tipos) == False) then do
             putStrLn("Tipo Inválido\n")
-            cadastroDeRecebedor listaRecebedores
+            recebedores listaRecebedores
         else do
         hospital <- prompt "Hospital internado: "
         --------------------------------------------------------------------------------------------
@@ -565,9 +572,9 @@ prompt text = do
     hFlush stdout
     getLine
 
-
 {-
-    Caso hoje seja dia primeiro, compara o estoque com o do ano passado 
+    Método responsavel por verficar datas criticas
+    Todas as vezes que o programa for executado
 -}
 verificaDataCritica :: IO()
 verificaDataCritica = do
