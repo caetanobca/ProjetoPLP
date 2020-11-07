@@ -62,7 +62,16 @@ menuInicial  = do
         listaImpedimentos <- carregaImpedimentos
         listaEnfermeiros <- carregaEnfermeiros     
         listaDoadores <- carregaDoadores
-        D.criarDashBoard (Estoque.visaoGeralEstoque listaEstoque) (Doador.todosOsDoadores listaDoadores) (Recebedor.todosOsRecebedores listaRecebedores) (Enfermeiro.todosOsEnfermeiros listaEnfermeiros) (Impedimento.listarImpedimentos listaImpedimentos)
+        escala <- carregaEscala
+        let listaEscala = (Map.toList escala)
+        agenda <- carregaAgenda
+        let listaAgenda =  (Map.toList agenda)
+        historicoEstoque <- DatasCriticas.historicoEstoque
+
+        D.criarDashBoard (Estoque.visaoGeralEstoque listaEstoque) (show (length listaDoadores)) (show(length listaRecebedores)) 
+            (show (length listaEnfermeiros)) (show (length listaImpedimentos)) (Enfermeiro.escalaToString listaEscala) (Agenda.agendaLocalToString listaAgenda) 
+            (historicoEstoque, (show (Estoque.totalSangue listaEstoque)))
+
         menuInicial
     else if input == "8" then do
         putStrLn ("Encerrando")

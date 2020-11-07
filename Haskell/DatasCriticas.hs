@@ -15,12 +15,12 @@ module DatasCriticas where
     -}
     verificaHoje :: [Bolsa.Bolsa] -> IO()
     verificaHoje estoqueHoje = do
-        carregaEstoqueMes <- iniciaEstoqueMes
+        carregaEstoqueMes <- iniciaHistoricoEstoque
 
         today <- toGregorian <$> (utctDay <$> getCurrentTime)
         let mes = (show (getMes today))
 
-        let estoqueMes = getEstoqueMes mes carregaEstoqueMes
+        let estoqueMes = getHistoricoEstoque mes carregaEstoqueMes
         if(estoqueMes /= 0) then do
             let mlAnterior = (read (show estoqueMes) :: Float)
             let mlHoje = (read (show (Estoque.totalSangue estoqueHoje)) ::Float)
@@ -39,7 +39,7 @@ module DatasCriticas where
                    
         today <- hoje
         if((getDia today) == 1) then do
-            salvaEstoqueMes
+            salvaHistoricoEstoque
         else do
             return()                
 
@@ -53,19 +53,18 @@ module DatasCriticas where
     getDia (_, _, y) = y
     
 
-    getEstoqueMes :: String -> Map String String -> Int
-    getEstoqueMes mes estoqueMes
+    getHistoricoEstoque :: String -> Map String String -> Int
+    getHistoricoEstoque mes estoqueMes
         |member mes estoqueMes == False = 0
         |member mes estoqueMes == True = (read (estoqueMes ! mes) :: Int)
 
-    salvaEstoqueMes :: IO()
-    salvaEstoqueMes = do 
+    salvaHistoricoEstoque :: IO()
+    salvaHistoricoEstoque = do 
         --today <- toGregorian <$> (utctDay <$> getCurrentTime)
         mes <- passaData
         estoque <- Auxiliar.iniciaEstoque
-        estoqueMes <- iniciaEstoqueMes
-        rescreverEstoqueMes (Estoque.estoqueEmMapa estoque estoqueMes mes)
-        
+        estoqueMes <- iniciaHistoricoEstoque
+        rescreveHistoricoEstoque (Estoque.estoqueEmMapa estoque estoqueMes mes)
         
     
     passaData :: IO(String)
@@ -76,27 +75,36 @@ module DatasCriticas where
     getMes :: (a, b, c) -> b  
     getMes (_, y, _) = y  
     
-    escreverEstoqueMes :: [(String,String)] -> IO()
-    escreverEstoqueMes [] = return ()
-    escreverEstoqueMes (h:t) = do
+    escreveHistoricoEstoque :: [(String,String)] -> IO()
+    escreveHistoricoEstoque [] = return ()
+    escreveHistoricoEstoque (h:t) = do
         let estoqueMesStr = fst h ++ "," ++ snd h ++ "\n" 
         appendFile "estoqueMes.txt" (estoqueMesStr)
-        escreverEstoqueMes t
+        escreveHistoricoEstoque t
         return ()
 
-    rescreverEstoqueMes :: [(String,String)] ->IO()
-    rescreverEstoqueMes estoqueMes = do
+    rescreveHistoricoEstoque :: [(String,String)] ->IO()
+    rescreveHistoricoEstoque estoqueMes = do
         writeFile "estoqueMes.txt" ("")
-        escreverEstoqueMes estoqueMes
+        escreveHistoricoEstoque estoqueMes
         return()
 
-    iniciaEstoqueMes :: IO(Map String String)
-    iniciaEstoqueMes = do
+    iniciaHistoricoEstoque :: IO(Map String String)
+    iniciaHistoricoEstoque = do
         arquivo <- Strict.readFile "estoqueMes.txt"
         let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
-        let lista_estoqueMes = ((Data.List.map constroiEstoqueMes lista))
+        let lista_estoqueMes = ((Data.List.map constroiHistoricoEstoque lista))
         let mapa_escala = Map.fromList lista_estoqueMes
         return mapa_escala
 
-    constroiEstoqueMes:: [String] -> (String,String)
-    constroiEstoqueMes  estoqueMes = (estoqueMes!!0, estoqueMes!!1)
+    constroiHistoricoEstoque:: [String] -> (String,String)
+    constroiHistoricoEstoque  estoqueMes = (estoqueMes!!0, estoqueMes!!1)
+
+    historicoEstoque :: IO(String)
+    historicoEstoque = do
+        carregaEstoqueMes <- iniciaHistoricoEstoque
+        today <- toGregorian <$> (utctDay <$> getCurrentTime)
+        let mes = (show (getMes today))
+        return (show (getHistoricoEstoque mes carregaEstoqueMes))
+
+

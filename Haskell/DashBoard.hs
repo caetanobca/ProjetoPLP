@@ -13,6 +13,7 @@ import Data.Monoid ((<>))
 import qualified Data.Text as T
 import qualified Graphics.Vty as V
 
+import Brick
 import qualified Brick.Main as M
 import Brick.Util (fg, on)
 import qualified Brick.AttrMap as A
@@ -30,6 +31,7 @@ import Brick.Widgets.Core
     , withBorderStyle
     , txt
     , str
+    , fill
     )
 import qualified Brick.Widgets.Center as C
 import qualified Brick.Widgets.Border as B
@@ -38,43 +40,77 @@ import qualified Brick.Widgets.Border.Style as BS
 
 
 titleAttr :: A.AttrName
-titleAttr = "DASHBOARD"
+titleAttr = "titulo"
+
+corpoAttr :: A.AttrName
+corpoAttr = "corpo"
 
 borderMappings :: [(A.AttrName, V.Attr)]
 borderMappings =
-    [ (B.borderAttr,         V.yellow `on` V.black)
-    , (titleAttr,            V.blue `on` V.white)
+    [ (B.borderAttr,         V.black `on` V.brightBlack)
+    , (titleAttr,            V.white `on` V.brightBlack)
+    , (corpoAttr,            V.white `on` V.brightBlack)
     ]
+
+estoqueWdgt :: String -> Widget ()
+estoqueWdgt string = hBox[(withAttr corpoAttr $ fill ' ')
+                    ,(withAttr corpoAttr $ str string) 
+                    ,(withAttr corpoAttr $ fill ' ')]
+
 
 caixaFixa :: String -> String -> Widget ()
 caixaFixa representacao string =
     updateAttrMap (A.applyAttrMappings borderMappings) $
     B.borderWithLabel (withAttr titleAttr $ str representacao) $
-    hLimit 20 $
-    vLimit 8 $
+    vLimit 10 $
     C.center $
-    str string
+    if (representacao == "Estoque") then estoqueWdgt string
+    else (  ((withAttr corpoAttr $ str string
+            <+> (withAttr corpoAttr $ fill ' '))
+            <=> (withAttr corpoAttr $ fill ' '))
+            <+> (withAttr corpoAttr $ fill ' '))
+   
+    
 
-caixaTamVariado :: Int-> Int-> String -> String -> Widget ()
-caixaTamVariado h v representacao string =
+caixaQtd :: String -> String -> Widget ()
+caixaQtd representacao string =
     updateAttrMap (A.applyAttrMappings borderMappings) $
     B.borderWithLabel (withAttr titleAttr $ str representacao) $
-    hLimit h $
-    vLimit v $
+    vLimit 3 $
     C.center $
-    str string
+    hBox[(withAttr corpoAttr $ str (string ++ " " ++ representacao ++ " Cadastrado(s)"))
+          ,(withAttr corpoAttr $ fill ' ')]
 
 
-ui :: String -> String -> String -> String -> String -> Widget ()
-ui estoque doador recebedor enfermeiros impedimentos =
-    hBox [(caixaFixa "Estoque" estoque)
-        ,(caixaFixa "Doadores" doador)
-        ,(caixaFixa "Recebedores" recebedor)]
-    <=> hBox [(caixaFixa "Enfermeiros" enfermeiros)
-        ,(caixaFixa "Impedimentos" impedimentos)]
+caixaLateral :: String -> (String, String) -> Widget ()
+caixaLateral representacao texto =
+    updateAttrMap (A.applyAttrMappings borderMappings) $
+    B.borderWithLabel (withAttr titleAttr $ str representacao) $
+    vLimit 4 $
+    C.center $
+    hBox[((withAttr corpoAttr $ str ("Estoque no ano passado: "  ++ snd texto  ++ " mililitros (ml)\nEstoque atual: " ++ fst texto ++ " mililitros (ml)"))
+        <=> (withAttr corpoAttr $ fill ' '))
+        ,(withAttr corpoAttr $ fill ' ')]
+    
 
 
+ui :: String -> String -> String -> String -> String -> String -> String -> (String, String) -> Widget ()
+ui estoque doador recebedor enfermeiros impedimentos escala agenda historicoEstoque =
+    updateAttrMap (A.applyAttrMappings borderMappings) $
+    B.borderWithLabel (withAttr titleAttr $ str "DASHBOARD") $
+    (vBox [hBox [(caixaFixa "Estoque" ("\n" ++ estoque))
+           ,vBox [(caixaLateral "Historico de Estoque" historicoEstoque)
+           ,(caixaLateral "Estoque" historicoEstoque)]]
+           ,(caixaFixa "Agenda" agenda)
+           ,(caixaFixa "Escala de enfermeiros" escala)
+           ,hBox [(caixaQtd "Enfermeiro(s)" enfermeiros)
+            ,(caixaQtd "Impedimento(s)" impedimentos)
+            ,(caixaQtd "Doadore(s)" doador)
+            ,(caixaQtd "Recebedore(s)" recebedor)]])
+    
+    
 
-criarDashBoard :: String -> String -> String -> String  -> String -> IO ()
-criarDashBoard estoque doador recebedor enfermeiros impedimentos  = M.simpleMain (ui estoque doador recebedor enfermeiros impedimentos)
+criarDashBoard :: String -> String -> String -> String  -> String -> String -> String -> (String, String) -> IO ()
+criarDashBoard estoque doador recebedor enfermeiros impedimentos escala agenda historicoEstoque =
+    M.simpleMain (ui estoque doador recebedor enfermeiros impedimentos escala agenda historicoEstoque)
 
