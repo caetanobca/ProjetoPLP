@@ -4,6 +4,7 @@ module Estoque where
   import Data.Maybe
   import Bolsa
   import Data.Map as Map
+  import Data.Time
 
   adicionaBolsa:: String -> Int -> Bolsa.Bolsa
   adicionaBolsa tipoSanguineo qtdSangue = (Bolsa.Bolsa (toUpperCase tipoSanguineo) qtdSangue)
@@ -86,8 +87,8 @@ module Estoque where
   
   {-
     pega uma lista de tuplas onde o primeiro elemento eh o mes e o segundo a qtd de sangue no estoque-}
-  estoqueEmMapa :: [Bolsa.Bolsa] -> Map String String -> String -> [(String, String)]
-  estoqueEmMapa estoque mapa mes = Map.toList(insert mes (show (totalSangue estoque)) mapa)
+  estoqueEmMapa :: [Bolsa.Bolsa] -> Map Day String -> Day -> [(Day, String)]
+  estoqueEmMapa estoque mapa dia = Map.toList(insert dia (show (totalSangue estoque)) mapa)
   
   
   {-

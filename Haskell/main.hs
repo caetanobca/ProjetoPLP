@@ -598,7 +598,8 @@ prompt text = do
 verificaDataCritica :: IO()
 verificaDataCritica = do
     listaEstoque <- carregaEstoque   
-    DatasCriticas.verificaHoje listaEstoque
+    estadoDoEstoque <- DatasCriticas.verificaHoje listaEstoque
+    putStrLn(estadoDoEstoque)
     
 dayParaString :: Day -> String
 dayParaString dia = show (getDia diaMesAno) ++ "/" ++ show (getMes diaMesAno) ++ "/" ++ show (getAno diaMesAno)
