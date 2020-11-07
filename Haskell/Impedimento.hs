@@ -19,9 +19,9 @@ module Impedimento where
     } deriving (Show,Eq)
 
 
-    adicionaImpedimento :: String -> String -> Integer -> Impedimento
-    adicionaImpedimento  [] cid  tempoSuspencao  = (Doenca "DOENCA" cid tempoSuspencao)
-    adicionaImpedimento  funcao composto tempoSuspencao = (Medicamento "MEDICAMENTO" funcao composto tempoSuspencao)
+    criarImpedimento :: String -> String -> Integer -> Impedimento
+    criarImpedimento  [] cid  tempoSuspencao  = (Doenca "DOENCA" cid tempoSuspencao)
+    criarImpedimento  funcao composto tempoSuspencao = (Medicamento "MEDICAMENTO" funcao composto tempoSuspencao)
         
     listarImpedimentos:: [Impedimento] -> String
     listarImpedimentos [] = " "
@@ -43,19 +43,6 @@ module Impedimento where
                         ++ funcao impedimento  ++ " Tempo Supencao: " ++ show (tempoSuspencao impedimento) ++ " Dias / "
         |tipoImpedimento impedimento == "DOENCA" = "Impedimento: " ++ cid impedimento ++ " Tempo Suspencao: " 
                         ++ show (tempoSuspencao impedimento) ++ " Dias / " 
-
-
-
-    buscaImpedimentoStr :: String -> String -> [Impedimento] -> String
-    buscaImpedimentoStr _ _ [] = ""
-    buscaImpedimentoStr "MEDICAMENTO" procurado (h:t)
-        |(tipoImpedimento h) == "MEDICAMENTO" = if (isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (composto h))) then impedimentoToString h
-        else buscaImpedimentoStr "MEDICAMENTO" procurado t
-        |otherwise = buscaImpedimentoStr "MEDICAMENTO" procurado t
-    buscaImpedimentoStr "DOENCA" procurado (h:t)
-        |(tipoImpedimento h) == "DOENCA" = if (isInfixOf (toUpperCaseStr procurado)  (toUpperCaseStr (cid h))) then impedimentoToString h
-        else buscaImpedimentoStr "DOENCA" procurado t
-        |otherwise = buscaImpedimentoStr "DOENCA" procurado t
 
     buscaImpedimento :: String -> String-> [Impedimento] -> Impedimento
     buscaImpedimento _ _ [] = (Medicamento "MEDICAMENTO" " 0dias de suspencao" "Nenhum composto" 0)
