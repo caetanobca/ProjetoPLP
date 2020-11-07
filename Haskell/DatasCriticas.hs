@@ -70,19 +70,19 @@ module DatasCriticas where
     escreveHistoricoEstoque [] = return ()
     escreveHistoricoEstoque (h:t) = do
         let estoqueMesStr = (show (fst h)) ++ "," ++ snd h ++ "\n" 
-        appendFile "estoqueMes.txt" (estoqueMesStr)
+        appendFile "dados/historicoEstoque.txt" (estoqueMesStr)
         escreveHistoricoEstoque t
         return ()
 
     rescreveHistoricoEstoque :: [(Day,String)] ->IO()
     rescreveHistoricoEstoque estoque = do
-        writeFile "estoqueMes.txt" ("")
+        writeFile "dados/historicoEstoque.txt" ("")
         escreveHistoricoEstoque estoque
         return()
 
     iniciaHistoricoEstoque :: IO(Map Day String)
     iniciaHistoricoEstoque = do
-        arquivo <- Strict.readFile "estoqueMes.txt"
+        arquivo <- Strict.readFile "dados/historicoEstoque.txt"
         let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
         let lista_estoqueMes = ((Data.List.map constroiHistoricoEstoque lista))
         let mapa_escala = Map.fromList lista_estoqueMes

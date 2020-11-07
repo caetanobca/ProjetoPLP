@@ -23,21 +23,21 @@ import qualified System.IO.Strict as Strict
 --Esses metodos vão iniciar os arrays salvos
 iniciaImpedimentos :: IO([Impedimento.Impedimento])
 iniciaImpedimentos = do
-    arquivo <- Strict.readFile "impedimentos.txt"
+    arquivo <- Strict.readFile "dados/impedimentos.txt"
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_impedimentos = ((Data.List.map constroiImpedimento lista))
     return lista_impedimentos
 
 iniciaEnfermeiros :: IO([Enfermeiro.Enfermeiro])
 iniciaEnfermeiros = do
-    arquivo <- Strict.readFile "enfermeiros.txt"    
+    arquivo <- Strict.readFile "dados/enfermeiros.txt"    
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_enfermeiros = ((Data.List.map constroiEnfermeiro lista))   
     return lista_enfermeiros
 
 iniciaEscala :: IO(Map Day String)
 iniciaEscala = do
-    arquivo <- Strict.readFile "escala.txt"
+    arquivo <- Strict.readFile "dados/escala.txt"
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_escala = ((Data.List.map constroiEscala lista))
     let mapa_escala = Map.fromList lista_escala
@@ -45,7 +45,7 @@ iniciaEscala = do
 
 iniciaAgendaLocal :: IO(Map Day String)
 iniciaAgendaLocal = do
-    arquivo <- Strict.readFile "agendaLocal.txt"
+    arquivo <- Strict.readFile "dados/agendaLocal.txt"
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_agenda = ((Data.List.map constroiAgendaLocal lista))
     let mapa_escala = Map.fromList lista_agenda
@@ -53,7 +53,7 @@ iniciaAgendaLocal = do
 
 iniciaEstoque :: IO([Bolsa.Bolsa])
 iniciaEstoque = do
-    arquivo <- Strict.readFile "estoque.txt"
+    arquivo <- Strict.readFile "dados/estoque.txt"
     let lista = Data.List.map ( splitOn ",") (lines arquivo)
     let lista_estoque = (Data.List.map constroiEstoque lista)
     return lista_estoque
@@ -61,7 +61,7 @@ iniciaEstoque = do
 
 iniciaRecebedores :: IO([Recebedor.Recebedor])
 iniciaRecebedores = do
-    arquivo <- Strict.readFile "recebedor.txt"
+    arquivo <- Strict.readFile "dados/recebedor.txt"
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_recebedor = ((Data.List.map constroiRecebedor lista))
     return lista_recebedor   
@@ -69,7 +69,7 @@ iniciaRecebedores = do
 
 iniciaDoador :: IO([Doador.Doador])
 iniciaDoador = do
-    arquivo <- Strict.readFile "doador.txt"
+    arquivo <- Strict.readFile "dados/doador.txt"
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_doador = ((Data.List.map constroiDoador lista))
     return lista_doador
@@ -154,14 +154,14 @@ constroiAgendaLocal  diaMesAgenda = ((stringEmDataAmericana (diaMesAgenda!!0)),d
 --esse metodos cria todos txts responsaveis por armazenar os dados do sistema       
 criaArquivos :: IO()
 criaArquivos = do
-    appendFile "impedimentos.txt" ("")
-    appendFile "enfermeiros.txt" ("")
-    appendFile "estoque.txt" ("")
-    appendFile "escala.txt" ("")
-    appendFile "doador.txt" ("")
-    appendFile "agendaLocal.txt" ("")
-    appendFile "estoqueMes.txt" ("")
-    appendFile "recebedor.txt" ("")
+    appendFile "dados/impedimentos.txt" ("")
+    appendFile "dados/enfermeiros.txt" ("")
+    appendFile "dados/estoque.txt" ("")
+    appendFile "dados/escala.txt" ("")
+    appendFile "dados/doador.txt" ("")
+    appendFile "dados/agendaLocal.txt" ("")
+    appendFile "dados/historicoEstoque.txt" ("")
+    appendFile "dados/recebedor.txt" ("")
 
 
 --metodos q vao salvar as listas 
@@ -170,11 +170,11 @@ escreverImpedimento:: Impedimento.Impedimento -> IO ()
 escreverImpedimento impedimento = do
     if(Impedimento.tipoImpedimento impedimento) == "MEDICAMENTO" then do
         let impedimentoStr =  Impedimento.tipoImpedimento impedimento ++ "," ++ Impedimento.funcao impedimento ++ "," ++ Impedimento.composto impedimento ++ "," ++ show (Impedimento.tempoSuspencao impedimento) ++ "\n"
-        appendFile "impedimentos.txt" (impedimentoStr)
+        appendFile "dados/impedimentos.txt" (impedimentoStr)
         return ()  
     else do  
         let impedimentoStr =  Impedimento.tipoImpedimento impedimento ++ "," ++ Impedimento.cid impedimento ++ "," ++ show (Impedimento.tempoSuspencao impedimento) ++ "\n"
-        appendFile "impedimentos.txt" (impedimentoStr)
+        appendFile "dados/impedimentos.txt" (impedimentoStr)
         return ()   
 
 escreverImpedimentos :: [Impedimento.Impedimento] -> IO()
@@ -182,31 +182,31 @@ escreverImpedimentos [] = return ()
 escreverImpedimentos (h:t) = do
     if(Impedimento.tipoImpedimento h) == "MEDICAMENTO" then do
         let impedimentoStr =  Impedimento.tipoImpedimento h ++ "," ++ Impedimento.funcao h ++ "," ++ Impedimento.composto h ++ "," ++ show (Impedimento.tempoSuspencao h) ++ "\n"
-        appendFile "impedimentos.txt" (impedimentoStr)
+        appendFile "dados/impedimentos.txt" (impedimentoStr)
         escreverImpedimentos t
         return ()  
     else do  
         let impedimentoStr =  Impedimento.tipoImpedimento h ++ "," ++ Impedimento.cid h ++ "," ++ show (Impedimento.tempoSuspencao h) ++ "\n"
-        appendFile "impedimentos.txt" (impedimentoStr)
+        appendFile "dados/impedimentos.txt" (impedimentoStr)
         escreverImpedimentos t
         return ()  
 
 rescreverImpedimento :: [Impedimento.Impedimento] ->IO()
 rescreverImpedimento impedimentos = do
-    writeFile "impedimentos.txt" ("")
+    writeFile "dados/impedimentos.txt" ("")
     escreverImpedimentos impedimentos
     return()
 
 escreverEnfermeiros :: Enfermeiro.Enfermeiro -> IO()
 escreverEnfermeiros enfermeiro = do
     let enfermeiroStr = Enfermeiro.nome enfermeiro ++ "," ++ Enfermeiro.endereco enfermeiro ++ "," ++ show (Enfermeiro.idade enfermeiro) ++ "," ++ Enfermeiro.telefone enfermeiro ++ "\n"
-    appendFile "enfermeiros.txt" (enfermeiroStr)
+    appendFile "dados/enfermeiros.txt" (enfermeiroStr)
     return ()
 
 escreverRecebedores :: Recebedor.Recebedor -> IO()
 escreverRecebedores recebedor = do
     let recebedorStr = Recebedor.nome recebedor ++ "," ++ Recebedor.endereco recebedor ++ "," ++ show(Recebedor.idade recebedor) ++ "," ++ Recebedor.telefone recebedor ++ "," ++ show(Recebedor.numDeBolsas recebedor) ++ "," ++ Recebedor.tipoSanguineo recebedor ++ "," ++ Recebedor.hospital recebedor ++ "," ++ escreveFichaMedica (Recebedor.fichaMedica recebedor) ++ "\n" 
-    appendFile "recebedor.txt" (recebedorStr)
+    appendFile "dados/recebedor.txt" (recebedorStr)
     return ()
 
 escreveFichaMedica :: FichaMedica.FichaMedica -> String
@@ -217,13 +217,13 @@ escreverEscala :: [(Day,String)] -> IO()
 escreverEscala [] = return ()
 escreverEscala (h:t) = do
     let escalaStr = (show (fst h)) ++ "," ++ snd h ++ "\n" 
-    appendFile "escala.txt" (escalaStr)
+    appendFile "dados/escala.txt" (escalaStr)
     escreverEscala t
     return ()
 
 rescreverEscala :: [(Day,String)] ->IO()
 rescreverEscala escala = do
-    writeFile "escala.txt" ("")
+    writeFile "dados/escala.txt" ("")
     escreverEscala escala
     return()
 
@@ -231,13 +231,13 @@ escreverEstoque:: [Bolsa.Bolsa] -> IO()
 escreverEstoque [] = return ()
 escreverEstoque (h:t) = do
     let bolsaStr = Bolsa.tipoSanguineo h ++ ","++ show (Bolsa.qtdSangue h) ++ "\n"
-    appendFile "estoque.txt" (bolsaStr)
+    appendFile "dados/estoque.txt" (bolsaStr)
     escreverEstoque t
     return ()
 
 reescreveEstoque :: [Bolsa.Bolsa] ->IO()
 reescreveEstoque estoque = do
-    writeFile "estoque.txt" ("")
+    writeFile "dados/estoque.txt" ("")
     escreverEstoque estoque
     return()
 
@@ -245,33 +245,33 @@ escreverAgendaLocal :: [(Day,String)] -> IO()
 escreverAgendaLocal [] = return ()
 escreverAgendaLocal (h:t) = do
     let agendaStr = (show (fst h)) ++ "," ++ snd h ++ "\n" 
-    appendFile "agendaLocal.txt" (agendaStr)
+    appendFile "dados/agendaLocal.txt" (agendaStr)
     escreverAgendaLocal t
     return ()
 
 rescreverAgendaLocal :: [(Day,String)] ->IO()
 rescreverAgendaLocal agendaLocal = do
-    writeFile "agendaLocal.txt" ("")
+    writeFile "dados/agendaLocal.txt" ("")
     escreverAgendaLocal agendaLocal
     return()
 
 escreverDoador :: Doador.Doador -> IO()
 escreverDoador doador = do
     let doadorStr = Doador.nome doador ++ "," ++ Doador.endereco doador ++ "," ++ (show (Doador.idade doador)) ++ "," ++ Doador.telefone doador ++ "," ++ Doador.tipSanguineo doador ++ "," ++ Doador.impedimentoStr doador ++ "," ++ (show (Doador.ultimoDiaImpedido doador)) ++ "," ++ Doador.doacoes doador ++  "\n" 
-    appendFile "doador.txt" (doadorStr) 
+    appendFile "dados/doador.txt" (doadorStr) 
     return ()
 
 escreverDoadores :: [Doador.Doador] -> IO()
 escreverDoadores [] = return ()
 escreverDoadores (h:t) = do
     let doadorStr = Doador.nome h ++ "," ++ Doador.endereco h ++ "," ++ (show (Doador.idade h)) ++ "," ++ Doador.telefone h ++ "," ++ Doador.tipSanguineo h ++ "," ++ Doador.impedimentoStr h ++ "," ++ (show (Doador.ultimoDiaImpedido h)) ++ "," ++ Doador.doacoes h ++  "\n" 
-    appendFile "doador.txt" (doadorStr)
+    appendFile "dados/doador.txt" (doadorStr)
     escreverDoadores t
     return ()
 
 rescreverDoador :: [Doador.Doador] ->IO()
 rescreverDoador doador = do
-    writeFile "doador.txt" ("")
+    writeFile "dados/doador.txt" ("")
     escreverDoadores doador
     return()
 
