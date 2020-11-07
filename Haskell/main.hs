@@ -12,6 +12,7 @@ import System.IO
 import Data.Time
 import qualified DatasCriticas as DatasCriticas
 import Data.Char
+import qualified DashBoard as D
 
 main :: IO ()
 main = do    
@@ -56,11 +57,18 @@ menuInicial  = do
         listaDoadores <- carregaDoadores
         agendaDoacao listaAgenda listaEnfermeiros listaDoadores
     else if input == "7" then do
-        putStrLn ("IMPLEMENTAR DASHBOARD")
+        listaEstoque <- carregaEstoque
+        listaRecebedores <- carregaRecebedores
+        listaImpedimentos <- carregaImpedimentos
+        listaEnfermeiros <- carregaEnfermeiros     
+        listaDoadores <- carregaDoadores
+        D.criarDashBoard (Estoque.visaoGeralEstoque listaEstoque) (Doador.todosOsDoadores listaDoadores) (Recebedor.todosOsRecebedores listaRecebedores) (Enfermeiro.todosOsEnfermeiros listaEnfermeiros) (Impedimento.listarImpedimentos listaImpedimentos)
+        menuInicial
     else if input == "8" then do
         putStrLn ("Encerrando")
     else do
        putStrLn("Entrada invalida")
+       menuInicial
         
 --Método responsével por exibir o sub-menu de doadores e faz a troca de dados entre o usuario e  os métodos  
 --que lidam com doadores
@@ -564,7 +572,9 @@ recebedores listaRecebedores = do
         putStr ("\n" ++ showListaRecebedores)
         menuInicial
       
-    else putStr ("Entrada Inválida")
+    else do
+        putStrLn ("Entrada Inválida")
+        menuInicial
 
 prompt :: String -> IO String
 prompt text = do
