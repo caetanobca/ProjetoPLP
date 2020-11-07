@@ -5,6 +5,7 @@ module Enfermeiro where
     import Data.Char
     import Data.Time
     import Data.List.Split ( splitOn )
+    import System.IO.Unsafe(unsafeDupablePerformIO)
 
 
     data Enfermeiro = Enfermeiro{nome :: String, endereco :: String, idade :: Int, telefone :: String
@@ -59,6 +60,32 @@ module Enfermeiro where
     formataEscala :: [String] -> String
     formataEscala  [] = ""
     formataEscala (h:t) = h ++ "\n" ++ formataEscala t 
+
+    escalaToString :: [(Day,String)] -> String
+    escalaToString [] = ""
+    escalaToString (h:t)
+        |verificaDataValida (fst h) == True = (dayParaString (fst h)) ++ " " ++ snd h ++ "\n" ++  escalaToString t
+        |otherwise =  escalaToString t
+
+
+    verificaDataValida :: Day -> Bool
+    verificaDataValida dia
+        |hoje > dia = False
+        |otherwise = True
+        where hoje = unsafeDupablePerformIO((utctDay <$> getCurrentTime))
+
+    dayParaString :: Day -> String
+    dayParaString dia = show (getDia diaMesAno) ++ "/" ++ show (getMes diaMesAno) ++ "/" ++ show (getAno diaMesAno)
+        where diaMesAno = toGregorian dia
+    
+    getAno :: (a, b, c) -> a
+    getAno (y, _, _) = y
+    getMes :: (a, b, c) -> b
+    getMes (_, y, _) = y
+    getDia :: (a, b, c) -> c
+    getDia (_, _, y) = y
+
         
     toUpperCase :: String -> String
     toUpperCase entrada = [toUpper x | x <- entrada]
+

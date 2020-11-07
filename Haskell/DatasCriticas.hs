@@ -13,35 +13,36 @@ module DatasCriticas where
     {-
         Verifica se hj eh data critica e atualiza o arquivo que armazena o estoque do mes
     -}
-    verificaHoje :: [Bolsa.Bolsa] -> IO()
+    verificaHoje :: [Bolsa.Bolsa] -> IO(String)
     verificaHoje estoqueHoje = do
-        carregaEstoqueMes <- iniciaEstoqueMes
+        carregaEstoqueMes <- iniciaHistoricoEstoque
 
-        today <- toGregorian <$> (utctDay <$> getCurrentTime)
-        let mes = (show (getMes today))
+        today <- (utctDay <$> getCurrentTime)
+        
 
-        let estoqueMes = getEstoqueMes mes carregaEstoqueMes
+        let estoqueMes = getHistoricoEstoque today carregaEstoqueMes
         if(estoqueMes /= 0) then do
             let mlAnterior = (read (show estoqueMes) :: Float)
             let mlHoje = (read (show (Estoque.totalSangue estoqueHoje)) ::Float)
             if ((mlAnterior * 0.50) >= mlHoje) then do
-                putStrLn("ESTOQUE EM ESTADO CRITICO SOLICITAR DOACOES")
+                salvaHistoricoEstoque
+                return ("ESTOQUE EM ESTADO CRITICO SOLICITAR DOACOES")
             else if ((mlAnterior * 0.90) >= mlHoje)then do
-                putStrLn ("ESTOQUE ABAIXO DA MEDIA")
+                salvaHistoricoEstoque
+                return ("ESTOQUE ABAIXO DA MEDIA")
             else if((mlAnterior * 1.10) >= mlHoje )then do 
-                putStrLn("ESTOQUE NA MEDIA")
+                salvaHistoricoEstoque
+                return ("ESTOQUE NA MEDIA")
             else if((mlAnterior * 1.50) >= mlHoje )then do 
-                putStrLn("ESTOQUE ACIMA DA MEDIA")
+                salvaHistoricoEstoque
+                return ("ESTOQUE ACIMA DA MEDIA")
             else do
-                putStrLn("ESTOQUE EM OTIMAS CONDICOES")
+                salvaHistoricoEstoque
+                return ("ESTOQUE EM OTIMAS CONDICOES")
         else do
-            putStrLn ("SEM HISTORICO DE ESTOQUE")
-                   
-        today <- hoje
-        if((getDia today) == 1) then do
-            salvaEstoqueMes
-        else do
-            return()                
+            salvaHistoricoEstoque
+            return ("SEM HISTORICO DE ESTOQUE")
+              
 
 
     hoje :: IO((Integer, Int, Int))
@@ -53,50 +54,53 @@ module DatasCriticas where
     getDia (_, _, y) = y
     
 
-    getEstoqueMes :: String -> Map String String -> Int
-    getEstoqueMes mes estoqueMes
-        |member mes estoqueMes == False = 0
-        |member mes estoqueMes == True = (read (estoqueMes ! mes) :: Int)
+    getHistoricoEstoque :: Day -> Map Day String -> Int
+    getHistoricoEstoque today historicoEstoque
+        |member today historicoEstoque == False = 0
+        |member today historicoEstoque == True = (read (historicoEstoque ! today) :: Int)
 
-    salvaEstoqueMes :: IO()
-    salvaEstoqueMes = do 
-        --today <- toGregorian <$> (utctDay <$> getCurrentTime)
-        mes <- passaData
+    salvaHistoricoEstoque :: IO()
+    salvaHistoricoEstoque = do 
+        today <- (utctDay <$> getCurrentTime)
         estoque <- Auxiliar.iniciaEstoque
-        estoqueMes <- iniciaEstoqueMes
-        rescreverEstoqueMes (Estoque.estoqueEmMapa estoque estoqueMes mes)
-        
-        
+        estoqueAntigo <- iniciaHistoricoEstoque
+        rescreveHistoricoEstoque (Estoque.estoqueEmMapa estoque estoqueAntigo today)
     
-    passaData :: IO(String)
-    passaData = do
-        today <- toGregorian <$> (utctDay <$> getCurrentTime)
-        return (show (getMes today))
-
-    getMes :: (a, b, c) -> b  
-    getMes (_, y, _) = y  
-    
-    escreverEstoqueMes :: [(String,String)] -> IO()
-    escreverEstoqueMes [] = return ()
-    escreverEstoqueMes (h:t) = do
-        let estoqueMesStr = fst h ++ "," ++ snd h ++ "\n" 
-        appendFile "estoqueMes.txt" (estoqueMesStr)
-        escreverEstoqueMes t
+    escreveHistoricoEstoque :: [(Day,String)] -> IO()
+    escreveHistoricoEstoque [] = return ()
+    escreveHistoricoEstoque (h:t) = do
+        let estoqueMesStr = (show (fst h)) ++ "," ++ snd h ++ "\n" 
+        appendFile "dados/historicoEstoque.txt" (estoqueMesStr)
+        escreveHistoricoEstoque t
         return ()
 
-    rescreverEstoqueMes :: [(String,String)] ->IO()
-    rescreverEstoqueMes estoqueMes = do
-        writeFile "estoqueMes.txt" ("")
-        escreverEstoqueMes estoqueMes
+    rescreveHistoricoEstoque :: [(Day,String)] ->IO()
+    rescreveHistoricoEstoque estoque = do
+        writeFile "dados/historicoEstoque.txt" ("")
+        escreveHistoricoEstoque estoque
         return()
 
-    iniciaEstoqueMes :: IO(Map String String)
-    iniciaEstoqueMes = do
-        arquivo <- Strict.readFile "estoqueMes.txt"
+    iniciaHistoricoEstoque :: IO(Map Day String)
+    iniciaHistoricoEstoque = do
+        arquivo <- Strict.readFile "dados/historicoEstoque.txt"
         let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
-        let lista_estoqueMes = ((Data.List.map constroiEstoqueMes lista))
+        let lista_estoqueMes = ((Data.List.map constroiHistoricoEstoque lista))
         let mapa_escala = Map.fromList lista_estoqueMes
         return mapa_escala
 
-    constroiEstoqueMes:: [String] -> (String,String)
-    constroiEstoqueMes  estoqueMes = (estoqueMes!!0, estoqueMes!!1)
+    constroiHistoricoEstoque:: [String] -> (Day,String)
+    constroiHistoricoEstoque  estoqueMes = ((stringEmDataAmericana (estoqueMes!!0)), estoqueMes!!1)
+
+    historicoEstoque :: IO(String)
+    historicoEstoque = do
+        carregaEstoqueMes <- iniciaHistoricoEstoque
+        today <- (utctDay <$> getCurrentTime)
+        return (show (getHistoricoEstoque today carregaEstoqueMes))
+
+    getMes :: (a, b, c) -> b  
+    getMes (_, y, _) = y  
+
+
+    stringEmDataAmericana :: String -> Day
+    stringEmDataAmericana dados = fromGregorian (read (datas!!0)) (read (datas!!1)) (read (datas!!2))
+        where datas = splitOn ("-") dados

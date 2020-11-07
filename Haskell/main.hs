@@ -12,6 +12,7 @@ import System.IO
 import Data.Time
 import qualified DatasCriticas as DatasCriticas
 import Data.Char
+import qualified DashBoard as D
 
 main :: IO ()
 main = do    
@@ -56,11 +57,27 @@ menuInicial  = do
         listaDoadores <- carregaDoadores
         agendaDoacao listaAgenda listaEnfermeiros listaDoadores
     else if input == "7" then do
-        putStrLn ("IMPLEMENTAR DASHBOARD")
+        listaEstoque <- carregaEstoque
+        listaRecebedores <- carregaRecebedores
+        listaImpedimentos <- carregaImpedimentos
+        listaEnfermeiros <- carregaEnfermeiros     
+        listaDoadores <- carregaDoadores
+        escala <- carregaEscala
+        let listaEscala = (Map.toList escala)
+        agenda <- carregaAgenda
+        let listaAgenda =  (Map.toList agenda)
+        historicoEstoque <- DatasCriticas.historicoEstoque
+
+        D.criarDashBoard (Estoque.visaoGeralEstoque listaEstoque) (show (length listaDoadores)) (show(length listaRecebedores)) 
+            (show (length listaEnfermeiros)) (show (length listaImpedimentos)) (Enfermeiro.escalaToString listaEscala) (Agenda.agendaLocalToString listaAgenda) 
+            (historicoEstoque, (show (Estoque.totalSangue listaEstoque)))
+
+        menuInicial
     else if input == "8" then do
         putStrLn ("Encerrando")
     else do
        putStrLn("Entrada invalida")
+       menuInicial
         
 --Método responsével por exibir o sub-menu de doadores e faz a troca de dados entre o usuario e  os métodos  
 --que lidam com doadores
@@ -549,7 +566,9 @@ recebedores listaRecebedores = do
         putStr ("\n" ++ showListaRecebedores)
         menuInicial
       
-    else putStr ("Entrada Inválida")
+    else do
+        putStrLn ("Entrada Inválida")
+        menuInicial
 
 prompt :: String -> IO String
 prompt text = do
@@ -564,7 +583,8 @@ prompt text = do
 verificaDataCritica :: IO()
 verificaDataCritica = do
     listaEstoque <- carregaEstoque   
-    DatasCriticas.verificaHoje listaEstoque
+    estadoDoEstoque <- DatasCriticas.verificaHoje listaEstoque
+    putStrLn(estadoDoEstoque)
     
 dayParaString :: Day -> String
 dayParaString dia = show (getDia diaMesAno) ++ "/" ++ show (getMes diaMesAno) ++ "/" ++ show (getAno diaMesAno)
