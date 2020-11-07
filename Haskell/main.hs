@@ -291,9 +291,7 @@ estoque listaEstoque = do
     putStrLn(Estoque.mensagemDeAviso listaEstoque 0)
     putStr ("1. Adicionar Doação de Sangue\n" ++
             "2. Retirar Bolsa de Sangue\n" ++
-            "3. Visão Geral do Estoque\n" ++
-            "4. Listar Todas as Bolsas\n" ++
-            "5. Listar Bolsas por Tipo\n")
+            "3. Visão Geral do Estoque\n")
     tipo <- getLine
     
     if(tipo == "1")then do
@@ -337,7 +335,8 @@ estoque listaEstoque = do
         if((toUpperCase nomeRecebedor) /= "ANON") then do
             listaRecebedores <- carregaRecebedores
             let recebedor = Recebedor.encontraRecebedor nomeRecebedor listaRecebedores
-            if(Recebedor.tipoSanguineo recebedor == "") then do
+            -- se recebedor vier com  o nome vazio, não há recebedor
+            if(Recebedor.nome recebedor == "") then do
                 putStrLn("Recebedor não encontrado\n")
                 menuInicial
             else do
@@ -377,24 +376,10 @@ estoque listaEstoque = do
         putStrLn("\nVisão Geral Do Estoque:")
         putStrLn(Estoque.visaoGeralEstoque listaEstoque)
         menuInicial                                
-    else if(tipo == "4") then do
-        let estoque = Estoque.listaTodasAsBolsas listaEstoque
-        putStrLn estoque
-        menuInicial
-    else if(tipo == "5") then do
-        putStrLn("Tipo Sanguineo: ")
-        input <- getLine
-        let tipoSanguineo = input
-        if((elem (toUpperCase tipoSanguineo) tipos) == False) then do
-            putStrLn("Tipo Inválido!\n")
-            menuInicial
-        else do    
-            let estoque = Estoque.listaBolsasPorTipo tipoSanguineo listaEstoque
-            putStrLn estoque
-            menuInicial
+
     else do
         putStrLn ("Entrada Inválida!\n")
-        main
+        menuInicial
 
 
 tipos :: [String]

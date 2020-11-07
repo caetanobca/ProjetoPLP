@@ -1,6 +1,9 @@
-## Data de entrega paradigma funcional: 08/11
+## Instruções para instalação:
 
-Para rodar as bibliotecas Data.List.Split e System.IO.Strict com o stack:
+* Download do [Haskell](https://www.haskell.org/platform/)
+* Download do [Stack](https://docs.haskellstack.org/en/stable/README/)
+
+**Para importar as bibliotecas Data.List.Split e System.IO.Strict com o stack, rode o seguinte no PowerShell dentro da pasta do projeto:**
 
 	stack setup
 	
@@ -9,3 +12,7 @@ Para rodar as bibliotecas Data.List.Split e System.IO.Strict com o stack:
 	stack build split
 
 	stack build strict
+
+**Finalmente, para iniciar o BloodLife:**
+
+	stack main.hs
