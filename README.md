@@ -16,4 +16,4 @@ Lukas do Nascimento (https://github.com/lukassn)
 
 ---
 # [Especificação](https://docs.google.com/document/d/1JNRNlHbjwj-HJhO-UjUqoyT4cKTxpHdYI1Cs2WvYIXQ/edit?usp=sharing)
-# [Vídeo Explicativo](youtube.com)
+# [Vídeo Explicativo](https://youtu.be/hwUGltLfQto)
