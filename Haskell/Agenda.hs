@@ -16,7 +16,7 @@ module Agenda where
     
     agendaDoacaoImprime :: Map Day String -> Day -> String
     agendaDoacaoImprime mapaAgenda dia 
-        |member dia mapaAgenda == False = "Nenhum agendamento para esta data"
+        |member dia mapaAgenda == False = "Nenhum agendamento na data procurada"
         |member dia mapaAgenda == True =  "Doações Agendadas" ++ "\n" ++ (formataDiaAgenda (splitOn "//" (mapaAgenda ! dia)))
 
     formataDiaAgenda :: [String] -> String

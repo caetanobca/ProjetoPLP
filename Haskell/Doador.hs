@@ -86,7 +86,7 @@ module Doador where
     registraImpedimento :: String -> [Doador] -> Impedimento.Impedimento -> [Doador] 
     registraImpedimento doador [] impedimento = []
     registraImpedimento doador (h:t) impedimento
-        |isInfixOf (toUpperCase doador) (toUpperCase (nome h)) == True = ((Doador(nome h) (endereco h) (idade h) (telefone h) (tipSanguineo h) (impedimentoStr h ++ "--" ++ impedimentoAsString) (Impedimento.ultimoDiaImpedido impedimento (Doador.ultimoDiaImpedido h) ) (doacoes h)) : t ) 
+        |isInfixOf (toUpperCase doador) (toUpperCase (nome h)) == True = ((Doador(nome h) (endereco h) (idade h) (telefone h) (tipSanguineo h) (impedimentoStr h ++ "--" ++ impedimentoAsString) (Impedimento.getUltimoDiaImpedido impedimento (Doador.ultimoDiaImpedido h) ) (doacoes h)) : t ) 
         |otherwise = (h: registraImpedimento doador t impedimento)
         where impedimentoAsString = Impedimento.impedimentoImprime impedimento
 

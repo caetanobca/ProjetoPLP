@@ -1,0 +1,5 @@
+Rene Gonzalez,Rua Chicago,35,14131956
+Ramon Labanino,Rua Mariano,42,03061963
+Fernando Gonzalez,Rua de Havana,37,18081963
+Adriana Perez,Rua de Havana,37,45698712
+Irmita Perez,Rua de Miami,22,20041980

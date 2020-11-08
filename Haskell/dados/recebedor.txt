@@ -1,0 +1,8 @@
+Jose da Silva,Rua Marte,30,999012134,2,A+,Santa Clara,M-10/07/1990-Joao da Silva-Joana da Silva-N-N-N
+Jessica Martins,Rua Saturno,20,988320195,1,A-,Joao Paulo,F-01/02/2000-Jesoneldo Martins-Juliana Martins-S-N-Dipirona
+Carlos Silva,Rua Terra,18,999252374,1,B+,Santa Clara,M-10/12/2001-Mateus Silva-Marcia Silva-N-N-N
+Paulo Coelho,Rua Mercurio,73,98745784,3,B-,Santa Clara,M-24/08/1947-Pedro Coelho-Lygia Coelho-S-Hipertenso-N
+Sirius Sanches,Rua Urano,5,99945612,1,O-,Santa Maria,M-13/10/2015-Bartolomeu Sanches-Marieta Sanches-N-N-Paracetamol
+Francisco Pereira,Rua Europa,46,74185296,2,AB+,Joao,M-10/10/1974-Albertino Pereira-Albertina Pereira-S-N-Alergia a lactose
+Luiz Inacio,Rua Pernambuco,76,13131313,3,AB-,Albert,M-27/10/1944-Jose-Dona Lindu-S-Fumante-Cloroquina
+Dilma Roussef,Rua Belo Horizonte,72,13131415,2,O+,Albert,F-14/12/1947-Pedro Roussef-Dilma Jane-S-N-Nao

@@ -87,9 +87,13 @@ module Estoque where
   
   {-
     pega uma lista de tuplas onde o primeiro elemento eh o mes e o segundo a qtd de sangue no estoque-}
-  estoqueEmMapa :: [Bolsa.Bolsa] -> Map Day String -> Day -> [(Day, String)]
-  estoqueEmMapa estoque mapa dia = Map.toList(insert dia (show (totalSangue estoque)) mapa)
+  estoqueEmMapa :: [Bolsa.Bolsa] -> Map String String -> Day -> [(String, String)]
+  estoqueEmMapa estoque mapa dia = Map.toList(insert diaMes (show (totalSangue estoque)) mapa)
+    where diaMes = (getDiaMes (toGregorian dia))
   
+  getDiaMes :: (a, Int, Int) -> String
+  getDiaMes (_, x, y) = (show y ++ "-" ++ show x)
+    
   
   {-
     Retorna o total de sangue do banco (em ml)-}

@@ -1,0 +1,5 @@
+2020-11-08,Doador: marighela -- Enfermeiro: rene -- Local: Hemocentro//Doador: bernardo -- Enfermeiro: irmita -- Local: Rua da Cachaça//Doador: alice -- Enfermeiro: rene -- Local: Hemocentro//
+2020-11-12,Doador: guilherme -- Enfermeiro: fernando -- Local: Hemocentro//
+2020-11-14,Doador: Fernando -- Enfermeiro: Fernando -- Local: Hemocentro//
+2020-11-20,Doador: alice -- Enfermeiro: Rene -- Local: Rua da Maravilha//
+2020-11-25,Doador: Carlos -- Enfermeiro: Irmita -- Local: Hemocentro//

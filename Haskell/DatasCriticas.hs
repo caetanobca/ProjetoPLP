@@ -25,22 +25,16 @@ module DatasCriticas where
             let mlAnterior = (read (show estoqueMes) :: Float)
             let mlHoje = (read (show (Estoque.totalSangue estoqueHoje)) ::Float)
             if ((mlAnterior * 0.50) >= mlHoje) then do
-                salvaHistoricoEstoque
                 return ("ESTOQUE EM ESTADO CRITICO SOLICITAR DOACOES")
             else if ((mlAnterior * 0.90) >= mlHoje)then do
-                salvaHistoricoEstoque
                 return ("ESTOQUE ABAIXO DA MEDIA")
             else if((mlAnterior * 1.10) >= mlHoje )then do 
-                salvaHistoricoEstoque
                 return ("ESTOQUE NA MEDIA")
             else if((mlAnterior * 1.50) >= mlHoje )then do 
-                salvaHistoricoEstoque
                 return ("ESTOQUE ACIMA DA MEDIA")
             else do
-                salvaHistoricoEstoque
                 return ("ESTOQUE EM OTIMAS CONDICOES")
         else do
-            salvaHistoricoEstoque
             return ("SEM HISTORICO DE ESTOQUE")
               
 
@@ -50,14 +44,15 @@ module DatasCriticas where
         today <- toGregorian <$> (utctDay <$> getCurrentTime)    
         return (today)    
     
-    getDia :: (a, b, c) -> c
-    getDia (_, _, y) = y
+    getDiaMes :: (a, Int, Int) -> String
+    getDiaMes (_, x, y) = (show y ++ "-" ++ show x)
     
 
-    getHistoricoEstoque :: Day -> Map Day String -> Int
+    getHistoricoEstoque :: Day -> Map String String -> Int
     getHistoricoEstoque today historicoEstoque
-        |member today historicoEstoque == False = 0
-        |member today historicoEstoque == True = (read (historicoEstoque ! today) :: Int)
+        |member diaMes historicoEstoque == False = 0
+        |member diaMes historicoEstoque == True = (read (historicoEstoque ! diaMes) :: Int)
+        where diaMes = (getDiaMes (toGregorian today))
 
     salvaHistoricoEstoque :: IO()
     salvaHistoricoEstoque = do 
@@ -66,21 +61,21 @@ module DatasCriticas where
         estoqueAntigo <- iniciaHistoricoEstoque
         rescreveHistoricoEstoque (Estoque.estoqueEmMapa estoque estoqueAntigo today)
     
-    escreveHistoricoEstoque :: [(Day,String)] -> IO()
+    escreveHistoricoEstoque :: [(String,String)] -> IO()
     escreveHistoricoEstoque [] = return ()
     escreveHistoricoEstoque (h:t) = do
-        let estoqueMesStr = (show (fst h)) ++ "," ++ snd h ++ "\n" 
+        let estoqueMesStr = (fst h) ++ "," ++ snd h ++ "\n" 
         appendFile "dados/historicoEstoque.txt" (estoqueMesStr)
         escreveHistoricoEstoque t
         return ()
 
-    rescreveHistoricoEstoque :: [(Day,String)] ->IO()
+    rescreveHistoricoEstoque :: [(String,String)] ->IO()
     rescreveHistoricoEstoque estoque = do
         writeFile "dados/historicoEstoque.txt" ("")
         escreveHistoricoEstoque estoque
         return()
 
-    iniciaHistoricoEstoque :: IO(Map Day String)
+    iniciaHistoricoEstoque :: IO(Map String String)
     iniciaHistoricoEstoque = do
         arquivo <- Strict.readFile "dados/historicoEstoque.txt"
         let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
@@ -88,18 +83,14 @@ module DatasCriticas where
         let mapa_escala = Map.fromList lista_estoqueMes
         return mapa_escala
 
-    constroiHistoricoEstoque:: [String] -> (Day,String)
-    constroiHistoricoEstoque  estoqueMes = ((stringEmDataAmericana (estoqueMes!!0)), estoqueMes!!1)
+    constroiHistoricoEstoque:: [String] -> (String,String)
+    constroiHistoricoEstoque  estoqueMes = (estoqueMes!!0, estoqueMes!!1)
 
     historicoEstoque :: IO(String)
     historicoEstoque = do
         carregaEstoqueMes <- iniciaHistoricoEstoque
         today <- (utctDay <$> getCurrentTime)
         return (show (getHistoricoEstoque today carregaEstoqueMes))
-
-    getMes :: (a, b, c) -> b  
-    getMes (_, y, _) = y  
-
 
     stringEmDataAmericana :: String -> Day
     stringEmDataAmericana dados = fromGregorian (read (datas!!0)) (read (datas!!1)) (read (datas!!2))
