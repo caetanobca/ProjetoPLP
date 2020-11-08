@@ -12,6 +12,8 @@
 	stack build split
 
 	stack build strict
+	
+	stack build brick
 
 **Finalmente, para iniciar o BloodLife:**
 
