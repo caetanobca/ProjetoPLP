@@ -1,0 +1,6 @@
+MEDICAMENTO,Anticoagulante,Varfarina,10
+DOENCA,10-B06,15
+DOENCA,B26,21
+DOENCA,10-A09,7
+MEDICAMENTO,Betabloqueador,Atenolol,2
+MEDICAMENTO,Antidepressivo,Amitriptilina,30

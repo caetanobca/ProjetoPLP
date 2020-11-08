@@ -72,8 +72,8 @@ module Impedimento where
         |impedimento == h = removeImpedimetno impedimento t
         |otherwise = (h : removeImpedimetno impedimento t)
 
-    ultimoDiaImpedido :: Impedimento -> Day -> Day
-    ultimoDiaImpedido impedimentos diaAtual
+    getUltimoDiaImpedido :: Impedimento -> Day -> Day
+    getUltimoDiaImpedido impedimentos diaAtual
         |diaAtual > diaNovo = diaAtual
         |diaAtual < diaNovo = diaNovo
         where diaNovo =  unsafeDupablePerformIO(addDays (tempoSuspencao (impedimentos)) <$> getHoje)

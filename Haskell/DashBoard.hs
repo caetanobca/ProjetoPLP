@@ -31,7 +31,6 @@ import Brick.Widgets.Core
     , withBorderStyle
     , txt
     , str
-    , fill
     )
 import qualified Brick.Widgets.Center as C
 import qualified Brick.Widgets.Border as B
@@ -47,30 +46,32 @@ corpoAttr = "corpo"
 
 borderMappings :: [(A.AttrName, V.Attr)]
 borderMappings =
-    [ (B.borderAttr,         V.black `on` V.brightBlack)
-    , (titleAttr,            V.white `on` V.brightBlack)
-    , (corpoAttr,            V.white `on` V.brightBlack)
+    [ (B.borderAttr,         fg V.white)
+    , (titleAttr,            fg V.white)
+    , (corpoAttr,            fg V.white)
     ]
 
 estoqueWdgt :: String -> Widget ()
-estoqueWdgt string = hBox[(withAttr corpoAttr $ fill ' ')
-                    ,(withAttr corpoAttr $ str string) 
-                    ,(withAttr corpoAttr $ fill ' ')]
+estoqueWdgt string = (withAttr corpoAttr $ str string) 
 
 
-caixaFixa :: String -> String -> Widget ()
-caixaFixa representacao string =
+
+caixaEstoque :: String -> String -> Widget ()
+caixaEstoque representacao string =
     updateAttrMap (A.applyAttrMappings borderMappings) $
     B.borderWithLabel (withAttr titleAttr $ str representacao) $
     vLimit 10 $
     C.center $
-    if (representacao == "Estoque") then estoqueWdgt string
-    else (  ((withAttr corpoAttr $ str string
-            <+> (withAttr corpoAttr $ fill ' '))
-            <=> (withAttr corpoAttr $ fill ' '))
-            <+> (withAttr corpoAttr $ fill ' '))
+    estoqueWdgt string
    
-    
+caixaFixa :: String -> String -> Widget ()
+caixaFixa representacao string =
+    updateAttrMap (A.applyAttrMappings borderMappings) $
+    B.borderWithLabel (withAttr titleAttr $ str representacao) $
+    vLimit 8 $
+    C.center $
+    ((withAttr corpoAttr $ str string))
+
 
 caixaQtd :: String -> String -> Widget ()
 caixaQtd representacao string =
@@ -78,8 +79,7 @@ caixaQtd representacao string =
     B.borderWithLabel (withAttr titleAttr $ str representacao) $
     vLimit 3 $
     C.center $
-    hBox[(withAttr corpoAttr $ str (string ++ " " ++ representacao ++ " Cadastrado(s)"))
-          ,(withAttr corpoAttr $ fill ' ')]
+    (withAttr corpoAttr $ str (string ++ " " ++ representacao ++ " Cadastrado(s)"))
 
 
 caixaLateral :: String -> (String, String) -> Widget ()
@@ -88,26 +88,37 @@ caixaLateral representacao texto =
     B.borderWithLabel (withAttr titleAttr $ str representacao) $
     vLimit 4 $
     C.center $
-    hBox[((withAttr corpoAttr $ str ("Estoque no ano passado: "  ++ snd texto  ++ " mililitros (ml)\nEstoque atual: " ++ fst texto ++ " mililitros (ml)"))
-        <=> (withAttr corpoAttr $ fill ' '))
-        ,(withAttr corpoAttr $ fill ' ')]
-    
+    (withAttr corpoAttr $ str ("\nEstoque no ano passado: "  ++ fst texto  ++ " mililitros (ml)\nEstoque atual: " ++ snd texto ++ " mililitros (ml)"))
+ 
+
+letreiroWidget :: Widget ()
+letreiroWidget  =
+    updateAttrMap (A.applyAttrMappings borderMappings) $
+    B.borderWithLabel (withAttr titleAttr $ str "") $
+    vLimit 4 $
+    C.center $
+    (withAttr corpoAttr $ str letreiroStr)
+
+letreiroStr :: String
+letreiroStr = (
+    " _                       _   \n" ++    
+    "|_) |  _   _   _| |  o _|_ _    \n" ++
+    "|_) | (_) (_) (_| |_ |  | (/_   \n"  )
 
 
 ui :: String -> String -> String -> String -> String -> String -> String -> (String, String) -> Widget ()
 ui estoque doador recebedor enfermeiros impedimentos escala agenda historicoEstoque =
     updateAttrMap (A.applyAttrMappings borderMappings) $
     B.borderWithLabel (withAttr titleAttr $ str "DASHBOARD") $
-    (vBox [hBox [(caixaFixa "Estoque" ("\n" ++ estoque))
-           ,vBox [(caixaLateral "Historico de Estoque" historicoEstoque)
-           ,(caixaLateral "Estoque" historicoEstoque)]]
-           ,(caixaFixa "Agenda" agenda)
-           ,(caixaFixa "Escala de enfermeiros" escala)
-           ,hBox [(caixaQtd "Enfermeiro(s)" enfermeiros)
-            ,(caixaQtd "Impedimento(s)" impedimentos)
-            ,(caixaQtd "Doadore(s)" doador)
-            ,(caixaQtd "Recebedore(s)" recebedor)]])
-    
+    (vBox [hBox [vBox [ letreiroWidget
+                ,(caixaLateral " Historico de Estoque "  historicoEstoque)]
+           ,(caixaEstoque " Estoque " ("\n" ++ estoque))]
+           ,(caixaFixa " Agenda para hoje " agenda)
+           ,(caixaFixa " Escala de enfermeiros para hoje " escala)
+           ,hBox [(caixaQtd " Enfermeiro(s) " enfermeiros)
+            ,(caixaQtd " Impedimento(s) " impedimentos)
+            ,(caixaQtd " Doadore(s) " doador)
+            ,(caixaQtd " Recebedore(s) " recebedor)]])
     
 
 criarDashBoard :: String -> String -> String -> String  -> String -> String -> String -> (String, String) -> IO ()

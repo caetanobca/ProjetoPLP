@@ -1,0 +1,8 @@
+Uzumaki Naruto,Rua Konoha,33,99879807,A+,--Impedimento: Realizou doação Tempo Suspencao: 60 Dias / ,2021-01-07,
+Carlos Drummond,Rua da Floresta,40,74185232,A-,,2020-11-08,
+Marighela,Rua da Revoluçao,70,14151212,B-,,2020-11-08,
+Fernando Haddad,Rua dos Professores,54,13121312,B+,--Impedimento: Realizou doação Tempo Suspencao: 60 Dias / ,2021-01-07,
+Guilherme Boulos,Rua da Invasao,44,74185296,AB+,--Impedimento: Composto: Atenolol Funcao: Betabloqueador Tempo Supencao: 2 Dias / ,2020-11-10,
+Marcos Aurelio,Rua da Chuva,30,7456987,AB-,,2020-11-08,
+Bernardo Farias,Rua da Cachaça,22,1235896,O+,,2020-11-08,
+Alice Green,Rua da Maravilha,19,9654123,O-,,2020-11-08,

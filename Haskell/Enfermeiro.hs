@@ -53,7 +53,7 @@ module Enfermeiro where
 
     visualizaEscala :: Day -> Map Day String -> String
     visualizaEscala diaMes escala
-        |member diaMes escala == False = "Data não encontrada"
+        |member diaMes escala == False = "Nenhum agendamento na data procurada"
         |member diaMes escala == True = escalaStr
         where escalaStr = "Enfermeiros escalados" ++ "\n" ++(formataEscala (splitOn "--" (escala ! diaMes)))
 

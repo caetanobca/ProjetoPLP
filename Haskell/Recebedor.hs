@@ -44,13 +44,13 @@ module Recebedor where
     recebedorFichaMedicaString :: String -> [Recebedor.Recebedor]-> String
     recebedorFichaMedicaString procurado [] = ""
     recebedorFichaMedicaString procurado (h:t)
-        |(toUpperCase procurado) == (toUpperCase (nome h)) = "Ficha médica de " ++ procurado ++ "\n" ++ FichaMedica.imprimeFichaMedica (fichaMedica h)
+        |isInfixOf(toUpperCase procurado) (toUpperCase (nome h)) == True = "Ficha médica de " ++ procurado ++ "\n" ++ FichaMedica.imprimeFichaMedica (fichaMedica h)
         |otherwise = recebedorFichaMedicaString procurado t        
 
     recebedorToString :: String -> [Recebedor.Recebedor] -> String
-    recebedorToString procurado [] = ""
+    recebedorToString _ [] = ""
     recebedorToString procurado (h:t)
-        |(toUpperCase procurado) == (toUpperCase (nome h)) = "Nome: " ++ nome h ++ "\n" ++ "Endereço: " ++  endereco h ++ "\n" ++ "Idade: " ++ show (idade h) ++ "\n" ++ "Telefone: " ++ telefone h ++ "\n" ++ "Número de Bolsas: " ++ (show (numDeBolsas h)) ++ "\n" ++ "Tipo Sanguíneo: " ++  tipoSanguineo h ++ "\n"
+        |isInfixOf(toUpperCase procurado) (toUpperCase (nome h)) == True = "Nome: " ++ nome h ++ "\n" ++ "Endereço: " ++  endereco h ++ "\n" ++ "Idade: " ++ show (idade h) ++ "\n" ++ "Telefone: " ++ telefone h ++ "\n" ++ "Número de Bolsas: " ++ (show (numDeBolsas h)) ++ "\n" ++ "Tipo Sanguíneo: " ++  tipoSanguineo h ++ "\n"
         |otherwise = recebedorToString procurado t 
     
     
