@@ -1,4 +1,5 @@
 :- include('Enfermeiros.pl').
+:- include('Impedimentos.pl').
 :- initialization(main).
 
 menuEnfermeiro(99):-
@@ -10,8 +11,8 @@ menuEnfermeiro(99):-
     write("5. Adicionar escala de Enfermeiros"), nl,
     write("6. Visualizar escala de Enfermeiros"), nl,
     lerNumero(Numero),
-    menuEnfermeiro(Numero),
-    menu(99).
+    menuEnfermeiro(Numero).
+    %menu(99).
 
 menuEnfermeiro(1):-
     listaEnfermeiros(ListaEnfermeiros),
@@ -44,6 +45,88 @@ menuEnfermeiro(N):-
     nl,
     menuEnfermeiro(99).
 
+
+%Menu de Impedimentos
+menuImpedimento(99):-
+    tty_clear,
+    write("Menu Impedimentos"),nl,
+    write("1. Cadastro de Impedimento"), nl,
+    write("2. Buscar Impedimento"), nl,
+    write("3. Listagem de Impedimentos"), nl,
+    write("4. Deletar Impedimento"), nl,
+    lerNumero(Numero),
+    menuImpedimento(Numero),
+    menu(99).
+ 
+%Menu de impedimento para cadastrar impedimento
+menuImpedimento(1):-
+    write("Cadastro de Impedimentos"), nl,
+    write("1. Cadastro de Medicamento"), nl,
+    write("2. Cadastro de Doenca"), nl,
+    lerNumero(Opcao),
+    cadastroImpedimento(Opcao, Impedimento),
+    salvaImpedimento(Impedimento),
+    menu(99).
+
+%Menu de impedimetno para buscar impedimento
+menuImpedimento(2):-
+    listaImpedimentos(ListaImpedimentos),
+    write("Buscar Impedimento"), nl,
+    write("Medicamento -> Id = Composto"), nl,
+    write("Doenca -> Id = Cid"), nl,
+    write("Id: "), lerString(Id), nl,
+    buscaImpedimento(Id, ListaImpedimentos, Impedimento),
+    write(Impedimento), nl,
+    menu(99).
+
+%Menu de impedimento para listar os impedimentos
+menuImpedimento(3):-
+    listaImpedimentos(ListaImpedimentos),
+    write("Listagem de Impedimentos: "), nl,
+    listarImpedimentos(ListaImpedimentos), nl,
+    menu(99).
+
+%Menu de impedimento para apagar impedimento
+menuImpedimento(4):-
+    write("Deletar Impedimento"), nl,
+    write("Medicamento -> Id = Composto"), nl,
+    write("Doenca -> Id = Cid"), nl,
+    write("Id: "), lerString(Id), nl,
+    removeImpedimento(Id),
+    menu(99).
+
+menuImpedimento(N):-
+    tty_clear,    
+    write("Opção Inválida"),
+    nl,
+    menuImpedimento(99).
+
+
+%Cadastro de impedimento:
+%Cadastro de medicamento
+cadastroImpedimento(1, Impedimento):-
+    tty_clear,
+    write("Cadastro de Medicamento"), nl,
+    write("Função: "), lerString(Funcao), nl,
+    write("Composto: "), lerString(Composto), nl,
+    write("tempo de Suspencao (em dias): "), lerNumero(Tempo), nl,
+    constroiMedicamento(Funcao, Composto, Tempo, Impedimento).
+
+%Cadastro doenca
+cadastroImpedimento(2, Impedimento):-
+    tty_clear,
+    write("Cadastro de Doenca"), nl,
+    write("Cid: "), lerString(Cid), nl,
+    write("tempo de Suspencao (em dias): "), lerNumero(Tempo), nl,
+    constroiDoenca(Cid, Tempo, Impedimento).
+
+cadastroImpedimento(N, Impedimento):-
+    tty_clear,    
+    write("Opção Inválida"),
+    nl,
+    menuImpedimento(99).
+
+%Main
 main:-
     letreiroInicial,
     lerString(A),  
@@ -81,8 +164,7 @@ menu(4):-
 %Menu(5) Invoca o Controle de Impedimentos
 menu(5):-
     tty_clear,
-    write("Controle de Impedimentos"),
-    nl,
+    menuImpedimento(99),
     menu(99).
 
 %Menu(6) Invoca o Controle de Agenda de Coleta de Sangue
@@ -159,3 +241,19 @@ removeEnfermeiro(Enfermeiro):-
 %cria a lista dinamica de enfermeiro
 listaEnfermeiros([]).
 :-dynamic listaEnfermeiros/1.
+
+%salva um impedimento na nova lista de impedimentos
+salvaImpedimento(Impedimento):-
+    retract(listaImpedimentos(Lista)),
+    append(Lista,[Impedimento],NovaLista),
+    assert(listaImpedimentos(NovaLista)).
+
+%remove um impedimento e faz a nova lista sem o impedimento que foi removido
+removeImpedimento(Impedimento):-
+    retract(listaImpedimentos(Lista)),
+    removerImpedimento(Lista,Impedimento,NovaLista),
+    assert(listaImpedimentos(NovaLista)).
+
+%cria a lista dinamica de impedimentos
+listaImpedimentos([]).
+:-dynamic listaImpedimentos/1.
