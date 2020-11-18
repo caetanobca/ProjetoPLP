@@ -12,7 +12,7 @@ getEnfermeiroTelefone(enfermeiro(_,_,_,Telefone), Telefone).
 
 %buscando enfermeiros
 
-buscaEnfermeiro(NomeEnfermeiro,[],Result):- Result = "Não encontrado".
+buscaEnfermeiro(NomeEnfermeiro,[],Result):- Result = "Enfermeiro não encontrado".
 buscaEnfermeiro(NomeEnfermeiro,[Head|Tail], Result):- getEnfermeiroNome(Head,Nome), string_upper(Nome, NomeUpper), string_upper(NomeEnfermeiro, NomeEnfermeiroUpper),
             (NomeUpper = NomeEnfermeiroUpper -> Result = Head; buscaEnfermeiro(NomeEnfermeiro,Tail,Result)).
 
@@ -25,7 +25,7 @@ enfermeirosToString(enfermeiro(Nome,Endereco,Idade,Telefone), Result):- string_c
                     string_concat(Parte2, Endereco, Parte3),string_concat(Parte3, " Idade: ", Parte4), string_concat(Parte4, Idade, Parte5), 
                     string_concat(Parte5, " Telefone: ", Parte6), string_concat(Parte6, Telefone, Result).
 
-existeEnfermeiro(Nome,ListaEnfermeiro):- buscaEnfermeiro(Nome,ListaEnfermeiro,Result), \+(Result = "Não encontrado").
+existeEnfermeiro(Nome,ListaEnfermeiro):- buscaEnfermeiro(Nome,ListaEnfermeiro,Result), \+(Result = "Enfermeiro não encontrado").
 removerEnfermeiro(ListaEnfermeiro,Nome,Result):- buscaEnfermeiro(Nome,ListaEnfermeiro,Enfermeiro), delete(ListaEnfermeiro,Enfermeiro,Result).
 
 

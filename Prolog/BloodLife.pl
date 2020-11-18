@@ -14,18 +14,34 @@ menuEnfermeiro(99):-
     menu(99).
 
 menuEnfermeiro(1):-
-    listaEnfermeiros(ListaEnfermeiros),
-    write("Cadastrar Enfermeiro"),
+    listaEnfermeiros(ListaEnfermeiros),    
+    write("Você irá cadastrar um Enfermeiro(a): "),
+    nl,
+    write("Insira o nome do Enfermeiro(a): "),
+    lerString(Nome),
+    write("Insira o endereço do Enfermeiro(a): "),
+    lerString(Endereco),
+    write("Insira a idade do Enfermeiro(a): "),
+    lerString(Idade),
+    write("Insira o telefone do Enfermeiro(a): "),
+    lerString(Telefone),
+    constroiEnfermeiro(Nome,Endereco,Idade,Telefone,Enfermeiro),
+    salvaEnfermeiro(Enfermeiro),
+    write("Enfermeiro(a) cadastrad(a)"),
     menu(99).
 
 menuEnfermeiro(2):-
     listaEnfermeiros(ListaEnfermeiros),
-    write("Buscar Enfermeiro"),
+    write("Insira o nome do(a) Enfermeiro(a) que você deseja"),
+    lerString(Nome),
+    buscaEnfermeiro(Nome,ListaEnfermeiros,Enfermeiro),
+    write(Enfermeiro),    
     menu(99).
 
 menuEnfermeiro(3):-
     listaEnfermeiros(ListaEnfermeiros),
-    write("Listagem de Enfermeiros"),
+    listarEnfermeiros(ListaEnfermeiros),
+    lerString(A),
     menu(99).
 
 menuEnfermeiro(4):-
