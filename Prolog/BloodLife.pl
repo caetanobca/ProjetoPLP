@@ -119,6 +119,82 @@ menuImpedimento(N):-
     menuImpedimento(99).
 
 
+menuDoador(99):-
+    tty_clear,
+    write("Menu Doador"),nl,
+    write("1. Cadastro de Doadores"), nl,
+    write("2. Buscar Doadores"), nl,
+    write("3. Listagem de Doadores"), nl,
+    write("4. Mostrar ficha tecnica do Doador(a)"), nl,
+    write("5. Mostrar historico de doação do Doador(a)"), nl,
+    lerNumero(Numero),
+    menuDoador(Numero).
+    %menu(99).
+
+menuDoador(1):-
+    listaDoadores(ListaDoadores),    
+    write("Você irá cadastrar um Doador(a): "),
+    nl,
+    write("Insira o nome do Doador(a): "),
+    lerString(Nome),
+    write("Insira o endereço do Doador(a): "),
+    lerString(Endereco),
+    write("Insira a idade do Doador(a): "),
+    lerString(Idade),
+    write("Insira o telefone do Doador(a): "),
+    lerString(Telefone),
+    write("Insira o Tipo Sanguineo do Doador(a): "),
+    lerString(TipSanguineo),
+    write("Insira o Impedimento do Doador(a): "),
+    lerString(ImpedimentoStr),
+    write("Insira o telefone do Doador(a): "),
+    lerString(Telefone),
+    write("Insira o telefone do Doador(a): "),
+    lerString(Telefone),
+    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doacoes,Doador),
+    salvaDoador(Doador),
+    write("Doador(a) cadastrad(a)"),
+    menu(99).
+
+menuDoador(2):-
+    listaDoadores(ListaDoadores),
+    write("Insira o nome do(a) Doador(a) que você deseja"),
+    lerString(Nome),
+    buscaDoador(Nome,ListaDoadores,Doador),
+    write(Doador),    
+    menu(99).
+
+menuDoador(3):-
+    listaDoadores(ListaDoadores),
+    listarDoadores(ListaDoadores),
+    lerString(A),
+    menu(99).
+
+menuDoador(4):-
+    listaDoadores(ListaDoadores),
+    write("Insira o nome do(a) Doador(a) que você deseja ver a ficha medica"),
+    lerString(Nome),
+    buscaDoador(Nome,ListaDoadores,Doador),
+    getDoadorImpedimentoStr(Doador, ImpedimentoStr),
+    write(ImpedimentoStr),
+    menu(99).
+
+menuDoador(5):-
+    listaDoadores(ListaDoadores),
+    write("Insira o nome do(a) Doador(a) que você deseja ver o historico de doeções"),
+    lerString(Nome),
+    buscaDoador(Nome,ListaDoadores,Doador),
+    getDoadorDoacoes(Doador, Doacoes)
+    write(Doacoes),
+    menu(99).
+
+menuDoador(N):-
+    tty_clear,    
+    write("Opção Inválida"),
+    nl,
+    menuDoador(99).
+
+
 %Cadastro de impedimento:
 %Cadastro de medicamento
 cadastroImpedimento(1, Impedimento):-
