@@ -8,7 +8,7 @@
 ---
 ### Grupo:
 ---
-Arthur Brito (https://github.com/arturbs)
+Artur Brito (https://github.com/arturbs)
 Caetano Albuquerque (https://github.com/caetanobca)
 Caio Davi (https://github.com/caiodavic)
 Fernando Lisboa (https://github.com/fernando-ccufcg)
