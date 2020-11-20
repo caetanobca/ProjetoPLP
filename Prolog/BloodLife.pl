@@ -72,6 +72,7 @@ menuImpedimento(99):-
     write("3. Listagem de Impedimentos"), nl,
     write("4. Deletar Impedimento"), nl,
     lerNumero(Numero),
+    tty_clear,
     menuImpedimento(Numero),
     menu(99).
  
@@ -93,14 +94,18 @@ menuImpedimento(2):-
     write("Doenca -> Id = Cid"), nl,
     write("Id: "), lerString(Id), nl,
     buscaImpedimento(Id, ListaImpedimentos, Impedimento),
-    write(Impedimento), nl,
+    write(Impedimento), nl, nl,
+    write("Pressione enter para continuar"), nl,
+    lerString(Wait),    
     menu(99).
 
 %Menu de impedimento para listar os impedimentos
 menuImpedimento(3):-
     listaImpedimentos(ListaImpedimentos),
     write("Listagem de Impedimentos: "), nl,
-    listarImpedimentos(ListaImpedimentos), nl,
+    listarImpedimentos(ListaImpedimentos), nl, nl, 
+    write("Pressione enter para continuar"), nl,
+    lerString(Wait), 
     menu(99).
 
 %Menu de impedimento para apagar impedimento
@@ -114,8 +119,9 @@ menuImpedimento(4):-
 
 menuImpedimento(N):-
     tty_clear,    
-    write("Opção Inválida"),
-    nl,
+    write("Opção Inválida"), nl, nl,
+    write("Pressione enter para continuar"), nl,
+    lerString(Wait), 
     menuImpedimento(99).
 
 
@@ -184,7 +190,7 @@ menuDoador(5):-
     write("Insira o nome do(a) Doador(a) que você deseja ver o historico de doeções"),
     lerString(Nome),
     buscaDoador(Nome,ListaDoadores,Doador),
-    getDoadorDoacoes(Doador, Doacoes)
+    getDoadorDoacoes(Doador, Doacoes),
     write(Doacoes),
     menu(99).
 
