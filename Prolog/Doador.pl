@@ -1,9 +1,6 @@
 constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doacoes,doador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doacoes)).
 
-
 %salvaDoador(Doador,Lista,Result):- append(Lista,[Doador],Result).
-
-  
 
 /*get dados de Doador*/
 getDoadorNome(doador(Nome,_,_,_,_,_,_,_), Nome).
@@ -36,3 +33,9 @@ doadoresToString(doador(Nome,Endereco,Idade,Telefone), Result):- string_concat("
 existeDoador(Nome,ListaDoador):- buscaDoador(Nome,ListaDoador,Result), \+(Result = "Doador não encontrado").
 removerDoador(ListaDoador,Nome,Result):- buscaDoador(Nome,ListaDoador,Doador), delete(ListaDoador,Doador,Result).
 
+
+
+%mensagem De Agradecimento Individual 
+
+
+%mensagem Pedido Doacao 
