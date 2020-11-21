@@ -1,4 +1,5 @@
 :- include('Enfermeiros.pl').
+:- include('Recebedores.pl')
 :- include('Impedimentos.pl').
 :- include('Doador.pl').
 :- initialization(main).
@@ -62,6 +63,66 @@ menuEnfermeiro(N):-
     nl,
     menuEnfermeiro(99).
 
+/*-----------------------------------------------------------------*/
+menuRecebedor(99):-
+    tty_clear,
+    write("Menu Recebedores"),nl,
+    write("1. Cadastro de Recebedores"), nl,
+    write("2. Buscar Recebedores"), nl,
+    write("3. Listar Recebedores"), nl,
+    lerNumero(Numero),
+    menuRecebedor(Numero).
+    %menu(99).
+
+menuRecebedor(1):-
+    listaRecebedores(ListaRecebedores),    
+    write("Você irá cadastrar um Recebedor(a): "),
+    nl,
+    write("Insira o nome do Recebedor(a): "),
+    lerString(Nome),
+    write("Insira o endereço do Recebedor(a): "),
+    lerString(Endereco),
+    write("Insira a idade do Recebedor(a): "),
+    lerString(Idade),
+    write("Insira o telefone do Recebedor(a): "),
+    lerString(Telefone),
+    write("Insira o Numero de Bolsas de Sangue requisitadas pelo Recebedor(a): "),
+    lerString(Telefone),
+    write("Insira a ficha médica do Recebedor(a): "),
+    lerString(Telefone),
+    constroiRecebedor(Nome,Endereco,Idade,Telefone,NumDeBolsas,FichaMedica,Recebedor),
+    salvaRecebedor(Recebedor),
+    write("Recebedor(a) cadastrado(a)"),
+    menu(99).
+
+menuRecebedor(2):-
+    listaRecebedors(ListaRecebedores),
+    write("Insira o nome do(a) Recebedor(a) que você deseja procurar"),
+    lerString(Nome),
+    buscaRecebedor(Nome,ListaRecebedors,Recebedor),
+    write(Recebedor),    
+    menu(99).
+
+menuRecebedor(3):-
+    listaRecebedores(ListaRecebedores),
+    listarRecebedores(ListaRecebedores),
+    lerString(A),
+    menu(99).
+
+/*
+menuRecebedor(4):-
+    listaRecebedores(ListaRecebedors),
+    write("Adicionar escala de Recebedors"),
+    menu(99).
+*/
+
+menuRecebedor(N):-
+    tty_clear,    
+    write("Opção Inválida"),
+    nl,
+    menuRecebedor(99).
+
+/*-----------------------------------------------------------------*/
 
 %Menu de Impedimentos
 menuImpedimento(99):-
@@ -314,7 +375,7 @@ lerNumero(Numero):- read_line_to_codes(user_input, E), atom_string(E,X), atom_nu
 letreiroInicial:-
     tty_clear,
     write(
-"    _                       _   
+"   _                       _   
    |_) |  _   _   _| |  o _|_ _ 
    |_) | (_) (_) (_| |_ |  | (/_"  ).
 
@@ -334,6 +395,25 @@ removeEnfermeiro(Enfermeiro):-
 %cria a lista dinamica de enfermeiro
 listaEnfermeiros([]).
 :-dynamic listaEnfermeiros/1.
+
+
+/*-----------------------------------------------------------------*/
+%salva um recebedor na nova lista de recebedores
+salvaRecebedor(Recebedor):-
+    retract(listaRecebedores(Lista)),
+    append(Lista,[Recebedor],NovaLista),
+    assert(listaRecebedores(NovaLista)).
+
+%remove um recebedor e faz a nova lista sem o recebedor que foi removido
+removeRecebedor(Recebedor):-
+    retract(listaRecebedores(Lista)),
+    removerRecebedor(Lista,Recebedor,NovaLista),
+    assert(listaRecebedores(NovaLista)).
+
+%cria a lista dinamica de recebedor
+listaRecebedors([]).
+:-dynamic listaRecebedores/1.
+/*-----------------------------------------------------------------*/
 
 %salva um impedimento na nova lista de impedimentos
 salvaImpedimento(Impedimento):-

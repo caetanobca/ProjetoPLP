@@ -15,7 +15,7 @@ buscaRecebedor(NomeRecebedor,[],Result):- Result = "Não encontrado".
 buscaRecebedor(NomeRecebedor,[Head|Tail], Result):- getRecebedorNome(Head,Nome), string_upper(Nome, NomeUpper), string_upper(NomeRecebedor, NomeRecebedorUpper),
             (NomeUpper = NomeRecebedorUpper -> Result = Head; buscaRecebedor(NomeRecebedor,Tail,Result)).
 
-/*listar todos os Recebedores*/
+%listar todos os Recebedores
 listarRecebedores([]):-nl.
 listarRecebedores([Head|Tail]):- recebedoresToString(Head,RecebedoresString), write(RecebedoresString), nl, listarRecebedores(Tail).
 
