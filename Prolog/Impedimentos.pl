@@ -6,6 +6,11 @@ constroiMedicamento(Funcao, Composto, TempoSuspencao, medicamento(Funcao, Compos
 getImpedimentoId(doenca(Cid,_), Cid).
 getImpedimentoId(medicamento(_,Composto,_), Composto).
 
+%Retorna os valores dos impedimentos
+getTempoSuspencao(doenca(_,TempoSuspencao), TempoSuspencao).
+getTempoSuspencao(medicamento(_,_,TempoSuspencao), TempoSuspencao).
+getFuncao(medicamento(Funcao,_,_), Funcao).
+
 %Retorna a qtd de dias que determinado impedimento deixa um doador impossibilitado de doar
 getDiasImpedidos(doenca(_,TempoSuspencao), TempoSuspencao).
 getDiasImpedidos(medicamento(_,_,TempoSuspencao), TempoSuspencao).
@@ -13,7 +18,7 @@ getDiasImpedidos(medicamento(_,_,TempoSuspencao), TempoSuspencao).
 %Busca um impedimento e caso nao ache retorna a string "Nao encontrado"
 buscaImpedimento(IdImpedimento,[], Result):- Result = "Não encontrado".
 buscaImpedimento(IdImpedimento, [Head|Tail], Result):- getImpedimentoId(Head, Id), string_upper(Id, IdUpper), string_upper(IdImpedimento, IdImpedimentoUpper), 
-                    (IdUpper = IdImpedimentoUpper -> impedimentoToString(Head,Result); buscaImpedimento(IdImpedimento, Tail, Result)).  
+                    (IdUpper = IdImpedimentoUpper -> Result = Head; buscaImpedimento(IdImpedimento, Tail, Result)).  
 
 
 %Lista todos os impedimentos cadastrados no sistema
@@ -42,6 +47,14 @@ impedimentoToStringSimples(doenca(Cid, TempoSuspencao), Result):- string_concat(
 impedimentoToStringSimples(medicamento(Funcao, Composto, TempoSuspencao), Result):- string_concat("Medicamento: >Função: ", Funcao, Parte1), 
                 string_concat(Parte1, " >Composto: ", Parte2), string_concat(Parte2, Composto, Parte3), string_concat(Parte3, " >Tempo de Suspenção: ", Parte4), 
                 string_concat(Parte4, TempoSuspencao, Parte5), string_concat(Parte5, " dia(s)", Result).
+
+%Gera uma representação textual dos impedimentos que sera usada para a persistencia de dados
+impedimentoSalvaLista([], Result):- Result = ''. 
+impedimentoSalvaLista([Head|Tail], Result):- impedimentoSalva(Head, ImpedimentoStr), impedimentoSalvaLista(Tail, ResultNovo), append(ImpedimentoStr, ResultNovo, Result).
+
+impedimentoSalva(doenca(Cid, TempoSuspencao), Result):- string_concat(Cid, ' ', Parte1), string_concat(Parte1, TempoSuspencao, Result).
+impedimentoSalva(medicamento(Funcao, Composto, TempoSuspencao), Result):- string_concat(Funcao, ' ', Parte1), string_concat(Parte1, Composto, Parte2), 
+                string_concat(Parte2, ' ', Parte3), string_concat(Parte3, TempoSuspencao, Result).
 
 
 
