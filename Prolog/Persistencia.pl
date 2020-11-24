@@ -1,13 +1,15 @@
 
 
 %Salvar os impedimentos em um arquivo txt.
-cadastrarImpedimento([]).
-cadastrarImpedimento([Head|Tail]):-
+cadastrarImpedimento(ListaImpedimentos):-
     open('dados/Impedimento.txt', append, Stream),
-    impedimentoSalva(Head, ImpedimentoStr), 
-    write(Stream, ImpedimentoStr), nl(Stream),
-    close(Stream),
-    cadastrarImpedimento(Tail).
+    todosImpedimentoSalva(ListaImpedimentos, String), 
+    write(Stream, String),
+    close(Stream).
+
+todosImpedimentoSalva([], Result):- Result = "\n".
+todosImpedimentoSalva([Head|Tail], Result):- impedimentoSalva(Head, ImpedimentoStr), todosImpedimentoSalva(Tail, ResultNovo), 
+                    string_concat(ImpedimentoStr, "\n", Parte1),  string_concat(Parte1, ResultNovo, Result).
 
 impedimentoSalva(doenca(Cid, TempoSuspencao), Result):- string_concat(Cid, ' ', Parte1), string_concat(Parte1, TempoSuspencao, Result).
 impedimentoSalva(medicamento(Funcao, Composto, TempoSuspencao), Result):- string_concat(Funcao, ' ', Parte1), string_concat(Parte1, Composto, Parte2), 
