@@ -3,7 +3,9 @@
 :- include('Impedimentos.pl').
 :- include('Estoque.pl').
 :- include('Doador.pl').
+:- include('Persistencia.pl').
 :- initialization(main).
+
 
 menuEnfermeiro(99):-    
     tty_clear,    
@@ -14,8 +16,8 @@ menuEnfermeiro(99):-
     write("5. Adicionar escala de Enfermeiros"), nl,
     write("6. Visualizar escala de Enfermeiros"), nl,
     lerNumero(Numero),
-    menuEnfermeiro(Numero).
-    %menu(99).
+    menuEnfermeiro(Numero),
+    menu(99).
 
 menuEnfermeiro(1):-
     listaEnfermeiros(ListaEnfermeiros),    
@@ -31,8 +33,7 @@ menuEnfermeiro(1):-
     lerString(Telefone),
     constroiEnfermeiro(Nome,Endereco,Idade,Telefone,Enfermeiro),
     salvaEnfermeiro(Enfermeiro),
-    write("Enfermeiro(a) cadastrad(a)"),      
-    salvaListaEnfermeiros(),
+    write("Enfermeiro(a) cadastrad(a)"),          
     lerString(A),
     menu(99).
 
@@ -64,7 +65,7 @@ menuEnfermeiro(N):-
     tty_clear,    
     write("Opção Inválida"),
     nl,
-    menuEnfermeiro(99).
+    menu(99).
 
 /*-----------------------------------------------------------------*/
 menuRecebedor(99):-
@@ -74,8 +75,8 @@ menuRecebedor(99):-
     write("2. Buscar Recebedores"), nl,
     write("3. Listar Recebedores"), nl,
     lerNumero(Numero),
-    menuRecebedor(Numero).
-    %menu(99).
+    menuRecebedor(Numero),
+    menu(99).
 
 menuRecebedor(1):-
     listaRecebedores(ListaRecebedores),    
@@ -120,10 +121,10 @@ menuRecebedor(4):-
 */
 
 menuRecebedor(N):-
-    tty_clear,    
+    tty_clear,
     write("Opção Inválida"),
     nl,
-    menuRecebedor(99).
+    menu(99).
 
 /*-----------------------------------------------------------------*/
 
@@ -166,7 +167,7 @@ menuImpedimento(2):-
 %Menu de impedimento para listar os impedimentos
 menuImpedimento(3):-
     listaImpedimentos(ListaImpedimentos),
-    write("Listagem de Impedimentos: "), nl,
+    write("Listagem de Impedimentos: "), nl,    
     listarImpedimentos(ListaImpedimentos), nl, nl, 
     write("Pressione enter para continuar"), nl,
     lerString(Wait), 
@@ -184,9 +185,9 @@ menuImpedimento(4):-
 menuImpedimento(N):-
     tty_clear,    
     write("Opção Inválida"), nl, nl,
-    write("Pressione enter para continuar"), nl,
+    write("Pressione enter para condfewfwfetinuar"), nl,
     lerString(Wait), 
-    menuImpedimento(99).
+    menu(99).
 
 
 menuDoador(99):-
@@ -198,8 +199,8 @@ menuDoador(99):-
     write("4. Mostrar ficha tecnica do Doador(a)"), nl,
     write("5. Mostrar historico de doação do Doador(a)"), nl,
     lerNumero(Numero),
-    menuDoador(Numero).
-    %menu(99).
+    menuDoador(Numero),
+    menu(99).
 
 menuDoador(1):-
     listaDoadores(ListaDoadores),    
@@ -262,7 +263,7 @@ menuDoador(N):-
     tty_clear,    
     write("Opção Inválida"),
     nl,
-    menuDoador(99).
+    menu(99).
 
 
 %Cadastro de impedimento:
@@ -287,7 +288,7 @@ cadastroImpedimento(N, Impedimento):-
     tty_clear,    
     write("Opção Inválida"),
     nl,
-    menuImpedimento(99).
+    menu(99).
 
 
 % Menu de Estoque
@@ -297,8 +298,9 @@ menuEstoque(99):-
     write("2. Registrar Retirada"), nl,
     write("3. Listar Estoque"), nl,
     lerNumero(Numero),
-    menuEstoque(Numero).
+    menuEstoque(Numero),
     menu(99).
+
 
 %Menu de Estoque para cadastro de nova doação
 menuEstoque(1):-
@@ -325,18 +327,18 @@ menuEstoque(1.2,NomeDoador):-
     listaDoadores(ListaDoadores),
     (existeDoador(NomeDoador, ListaDoadores) -> true; write("Doador nao encontrado"), false),
     buscaDoador(NomeDoador,ListaDoadores,Doador),
-    getDoadorTipSanguineo(Doador, TipSanguineo).
+    getDoadorTipSanguineo(Doador, TipSanguineo),
     constroiBolsa(TipSanguineo,450,NovaBolsa),
     salvaEstoque(NovaBolsa),
     write("Bolsa cadastrada"),
     menu(99).
-    
+  
 %Menu de Estoque para cadastro de retirada de bolsa
 menuEstoque(2):-
     write("Qual o nome do recebedor (digite anon para anonimo)? "),
     lerString(NomeRecebedor),
     string_upper(NomeRecebedor, NomeRecebedorUpper),
-    (NomeRecebedorUpper = "ANON" -> menuEstoque(2.1); menuEstoque(2.2)).
+    (NomeRecebedorUpper = "ANON" -> menuEstoque(2.1); menuEstoque(2.2)),
     menu(99).
 
 %Menu de Estoque para cadastro de retirada de bolsa para anonimo
@@ -348,7 +350,7 @@ menuEstoque(2.1):-
     validaTipo(TipoSanguineoUpper),
     write("Quantas bolsas serao necessarias? "),
     lerString(NumBolsas),
-    %(verificaQtdBolsas(ListaEstoque,NumBolsas,TipoSanguineoUpper) -> true; write("Nao ha bolsas suficientes disponiveis"), false),
+    (verificaQtdBolsas(ListaEstoque,NumBolsas,TipoSanguineoUpper) -> true; write("Nao ha bolsas suficientes disponiveis"), false),
     removeEstoque(TipoSanguineoUpper,NumBolsas),
     write("Bolsas Retiradas com sucesso!"),
     menu(99).
@@ -357,7 +359,8 @@ menuEstoque(2.1):-
 %Menu de Estoque para cadastro de retirada de bolsa para recebedor ja cadastrado
 %TODO JUNTAR C RECEBEDOR
 menuEstoque(2.2):-
-    write("ainda nao implementado").
+    write("ainda nao implementado"),
+    menu(99).
 
 
 %Imprime a visao geral do Estoque disponivel
@@ -373,13 +376,15 @@ menuEstoque(N):-
     nl,
     menu(99).
 
-
 %Main
 main:-
+    carregaEnfermeiros(), 
+    carregaImpedimentos(),   
     letreiroInicial,
-    lerString(A),  
+    lerString(A),
     menu(99),
     halt.
+
 
 %Menu(1) Invoca o Controle de Recebedores
 menu(1):- 
@@ -392,6 +397,7 @@ menu(1):-
 menu(2):-    
     tty_clear,
     write("Controle de Estoque de Bolsas de Sangue"),
+    menuEstoque(99),
     nl,
     menu(99).
 
@@ -404,7 +410,8 @@ menu(3):-
 
 %Menu(4) Invoca o Controle de Enfermeiros
 menu(4):-
-    tty_clear,    
+    tty_clear,
+    write("Controle de Enfermeiros"),       
     menuEnfermeiro(99),
     nl,
     menu(99).
@@ -430,15 +437,24 @@ menu(7):-
     nl,
     menu(99).
 
-%Menu(8) Encerra o programa
+%Menu(8) Salva os dados
 menu(8):-
     tty_clear,
-    write("Encerrando."),
+    salvarDados(),
+    write("Dados Salvos!"),
+    menu(99).   
+
+%Menu(9) Encerra o programa
+menu(9):-
+    tty_clear,
+    salvarDados(),
+    write("Encerrando.").
     halt.
+    
 
 %Menu(99) Menu Inicial
-menu(99):-
-    tty_clear,
+menu(99):-    
+    %tty_clear,    
     nl,        
     write("Escolha a opção:"), nl,
     write("1. Controle de Recebedores"), nl,
@@ -448,17 +464,19 @@ menu(99):-
     write("5. Controle de Impedimentos"), nl,
     write("6. Agendar Coleta de sangue"), nl,
     write("7. Dashboard"), nl,    
-    write("8. Sair"),nl,    
+    write("8. Salvar Dados"), nl,    
+    write("9. Sair"), nl,   
     lerNumero(Numero),
     menu(Numero).
 
 %Menu(N) Quando o usuario passa uma entrada invalida, chama novamente o menu inicial 
 menu(N):-
-    tty_clear,    
-    write("Opção Inválida"),
-    nl,
+    tty_clear,
+    write("Opção InválidaMeu"),nl, nl,
+    write("Pressione enter para continuar"), nl,
+    lerString(Wait), 
     menu(99).
-    
+
 % Le uma String e converte em atomo  
 lerString(X):- read_line_to_codes(user_input, E), atom_string(E,X).
 
@@ -473,6 +491,11 @@ letreiroInicial:-
    |_) |  _   _   _| |  o _|_ _ 
    |_) | (_) (_) (_| |_ |  | (/_"  ).
 
+
+
+/*--------------------------------------------------------------------------
+    Predicados responsaveis por lidar com as listas de forma dinamicas
+---------------------------------------------------------------------------*/
 
 %salva um enfermeiro na nova lista de enfermeiros
 salvaEnfermeiro(Enfermeiro):-
@@ -490,24 +513,12 @@ removeEnfermeiro(Enfermeiro):-
 listaEnfermeiros([]).
 :-dynamic listaEnfermeiros/1.
 
-salvaListaEnfermeiros():-
-    listaEnfermeiros(ListaEnfermeiros),     
-    open("Enfermeiros.txt", append, ArquivoEnfermeiros),    
-    escreveTodosEnfermeiros(ListaEnfermeiros,String),
-    write(String),
-    write(ArquivoEnfermeiros,String),
-    close(ArquivoEnfermeiros). 
-
-escreveTodosEnfermeiros([],String).
-escreveTodosEnfermeiros([H|T],String):-
-    escreveEnfermeiro(H,String),
-    escreveTodosEnfermeiros(T,String).
-
-escreveEnfermeiro(enfermeiro(Nome,Endereco,Idade,Telefone),String):-
-    string_concat(Nome, ",", Parte1), string_concat(Parte1, Endereco, Parte2),
-    string_concat(Parte2, ",", Parte3),string_concat(Parte3, Idade, Parte4), string_concat(Parte4, ",", Parte5), 
-    string_concat(Parte5, Telefone, Parte6), string_concat(Parte6, "\n", String).
-
+%carrega a lista salva com a persistencia de arquivo
+carregaEnfermeiros():-
+    iniciaEnfermeiros(ListaEnfermeiros),
+    retract(listaEnfermeiros(Lista)),
+    append(Lista,ListaEnfermeiros,NovaLista),
+    assert(listaEnfermeiros(NovaLista)).
 
 /*-----------------------------------------------------------------*/
 %salva um recebedor na nova lista de recebedores
@@ -542,6 +553,12 @@ removeImpedimento(Impedimento):-
 %cria a lista dinamica de impedimentos
 listaImpedimentos([]).
 :-dynamic listaImpedimentos/1.
+
+carregaImpedimentos():-
+    iniciaImpedimento(ListaImpedimentos),
+    retract(listaImpedimentos(Lista)),
+    append(Lista,ListaImpedimentos,NovaLista),
+    assert(listaImpedimentos(NovaLista)).
 
 %salva um doador na nova lista de doadores
 salvaDoador(Doador):-
@@ -579,3 +596,9 @@ listaEstoque([]).
 %verifica se o tipo sanguineo eh valido, se nao for, informa o usuario e volta ao menu 
 %TODO ver se nao tem uma forma melhor de fazer isso! 
 validaTipo(Tipo):- (member(Tipo,["O-","O+","A-","A+","B-","B+","AB-","AB+"]) -> true; write("Tipo invalido"), menu(99)).
+
+salvarDados():-
+    listaEnfermeiros(ListaEnfermeiros),
+    listaImpedimentos(ListaImpedimentos),
+    salvaListaImpedimentos(ListaImpedimentos),
+    salvaListaEnfermeiros(ListaEnfermeiros).
