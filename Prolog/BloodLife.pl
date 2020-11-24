@@ -1,11 +1,11 @@
 :- include('Enfermeiros.pl').
-:- include('Recebedores.pl')
+:- include('Recebedores.pl').
 :- include('Impedimentos.pl').
 :- include('Doador.pl').
 :- initialization(main).
 
-menuEnfermeiro(99):-
-    tty_clear,
+menuEnfermeiro(99):-    
+    tty_clear,    
     write("Menu Enfermeiros"),nl,
     write("1. Cadastro de Enfermeiros"), nl,
     write("2. Buscar Enfermeiros"), nl,
@@ -30,7 +30,9 @@ menuEnfermeiro(1):-
     lerString(Telefone),
     constroiEnfermeiro(Nome,Endereco,Idade,Telefone,Enfermeiro),
     salvaEnfermeiro(Enfermeiro),
-    write("Enfermeiro(a) cadastrad(a)"),
+    write("Enfermeiro(a) cadastrad(a)"),      
+    salvaListaEnfermeiros(),
+    lerString(A),
     menu(99).
 
 menuEnfermeiro(2):-
@@ -360,7 +362,7 @@ menu(99):-
     write("5. Controle de Impedimentos"), nl,
     write("6. Agendar Coleta de sangue"), nl,
     write("7. Dashboard"), nl,    
-    write("8. Sair"),nl,
+    write("8. Sair"),nl,    
     lerNumero(Numero),
     menu(Numero).
 
@@ -381,7 +383,7 @@ lerNumero(Numero):- read_line_to_codes(user_input, E), atom_string(E,X), atom_nu
 letreiroInicial:-
     tty_clear,
     write(
-"   _                       _   
+"    _                       _   
    |_) |  _   _   _| |  o _|_ _ 
    |_) | (_) (_) (_| |_ |  | (/_"  ).
 
@@ -402,6 +404,24 @@ removeEnfermeiro(Enfermeiro):-
 listaEnfermeiros([]).
 :-dynamic listaEnfermeiros/1.
 
+salvaListaEnfermeiros():-
+    listaEnfermeiros(ListaEnfermeiros),     
+    open("Enfermeiros.txt", append, ArquivoEnfermeiros),    
+    escreveTodosEnfermeiros(ListaEnfermeiros,String),
+    write(String),
+    write(ArquivoEnfermeiros,String),
+    close(ArquivoEnfermeiros). 
+
+escreveTodosEnfermeiros([],String).
+escreveTodosEnfermeiros([H|T],String):-
+    escreveEnfermeiro(H,String),
+    escreveTodosEnfermeiros(T,String).
+
+escreveEnfermeiro(enfermeiro(Nome,Endereco,Idade,Telefone),String):-
+    string_concat(Nome, ",", Parte1), string_concat(Parte1, Endereco, Parte2),
+    string_concat(Parte2, ",", Parte3),string_concat(Parte3, Idade, Parte4), string_concat(Parte4, ",", Parte5), 
+    string_concat(Parte5, Telefone, Parte6), string_concat(Parte6, "\n", String).
+
 
 /*-----------------------------------------------------------------*/
 %salva um recebedor na nova lista de recebedores
@@ -413,7 +433,7 @@ salvaRecebedor(Recebedor):-
 %remove um recebedor e faz a nova lista sem o recebedor que foi removido
 removeRecebedor(Recebedor):-
     retract(listaRecebedores(Lista)),
-    removerRecebedor(Lista,Recebedor,NovaLista),
+    %removerRecebedor(Lista,Recebedor,NovaLista),
     assert(listaRecebedores(NovaLista)).
 
 %cria a lista dinamica de recebedor
