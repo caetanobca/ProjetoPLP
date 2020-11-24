@@ -11,7 +11,7 @@
 Artur Brito (https://github.com/arturbs)
 Caetano Albuquerque (https://github.com/caetanobca)
 Caio Davi (https://github.com/caiodavic)
-Fernando Lisboa (https://github.com/fernando-ccufcg)
+Fernando Lisboa (https://github.com/fernandollisboa)
 Lukas do Nascimento (https://github.com/lukassn)
 
 ---

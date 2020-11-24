@@ -1,6 +1,7 @@
 :- include('Enfermeiros.pl').
 :- include('Recebedores.pl')
 :- include('Impedimentos.pl').
+:- include('Estoque.pl').
 :- include('Doador.pl').
 :- initialization(main).
 
@@ -286,6 +287,91 @@ cadastroImpedimento(N, Impedimento):-
     nl,
     menuImpedimento(99).
 
+
+% Menu de Estoque
+menuEstoque(99):-
+    write("Menu Estoque"),nl,
+    write("1. Registrar Doacao"), nl,
+    write("2. Registrar Retirada"), nl,
+    write("3. Listar Estoque"), nl,
+    lerNumero(Numero),
+    menuEstoque(Numero).
+    menu(99).
+
+%Menu de Estoque para cadastro de nova doação
+menuEstoque(1):-
+    write("Qual o nome do doador (digite anon para anonimo)? "),
+    lerString(NomeDoador),
+    string_upper(NomeDoador, NomeDoadorUpper),
+    (NomeDoadorUpper = "ANON" -> menuEstoque(1.1); menuEstoque(1.2,NomeDoadorUpper)).
+
+%Menu de Estoque para cadastro de nova doação anonima
+menuEstoque(1.1):-
+    listaEstoque(ListaEstoque),
+    write("Insira o Tipo Sanguineo do Doador: "),
+    lerString(TipoSanguineo),
+    string_upper(TipoSanguineo, TipoSanguineoUpper),
+    constroiBolsa(TipoSanguineoUpper,450,NovaBolsa),
+    salvaEstoque(NovaBolsa),
+    write("Bolsa cadastrada"),
+    menu(99).
+
+%Menu de Estoque para cadastro de nova doação com Doador ja cadastrado
+%TODO IMPEDIMENTOS!
+menuEstoque(1.2,NomeDoador):-
+    listaEstoque(ListaEstoque),
+    listaDoadores(ListaDoadores),
+    (existeDoador(NomeDoador, ListaDoadores) -> true; write("Doador nao encontrado"), false),
+    buscaDoador(NomeDoador,ListaDoadores,Doador),
+    getDoadorTipSanguineo(Doador, TipSanguineo).
+    constroiBolsa(TipSanguineo,450,NovaBolsa),
+    salvaEstoque(NovaBolsa),
+    write("Bolsa cadastrada"),
+    menu(99).
+    
+%Menu de Estoque para cadastro de retirada de bolsa
+menuEstoque(2):-
+    write("Qual o nome do recebedor (digite anon para anonimo)? "),
+    lerString(NomeRecebedor),
+    string_upper(NomeRecebedor, NomeRecebedorUpper),
+    (NomeRecebedorUpper = "ANON" -> menuEstoque(2.1); menuEstoque(2.2)).
+    menu(99).
+
+%Menu de Estoque para cadastro de retirada de bolsa para anonimo
+menuEstoque(2.1):-
+    listaEstoque(ListaEstoque),
+    write("Insira o Tipo Sanguineo do Recebedor anonimo: "),
+    lerString(TipoSanguineo),
+    string_upper(TipoSanguineo, TipoSanguineoUpper),
+    validaTipo(TipoSanguineoUpper),
+    write("Quantas bolsas serao necessarias? "),
+    lerString(NumBolsas),
+    %(verificaQtdBolsas(ListaEstoque,NumBolsas,TipoSanguineoUpper) -> true; write("Nao ha bolsas suficientes disponiveis"), false),
+    removeEstoque(TipoSanguineoUpper,NumBolsas),
+    write("Bolsas Retiradas com sucesso!"),
+    menu(99).
+
+
+%Menu de Estoque para cadastro de retirada de bolsa para recebedor ja cadastrado
+%TODO JUNTAR C RECEBEDOR
+menuEstoque(2.2):-
+    write("ainda nao implementado").
+
+
+%Imprime a visao geral do Estoque disponivel
+menuEstoque(3):-
+    listaEstoque(ListaEstoque),
+    listaVisaoGeralEstoque(ListaEstoque,0),
+    menu(99).    
+
+%Se o usuario digitar uma opcao invalida, ele sera informado e voltara para o menu principal
+menuEstoque(N):-
+    tty_clear,    
+    write("Opcao Invalida!"),
+    nl,
+    menu(99).
+
+
 %Main
 main:-
     letreiroInicial,
@@ -452,3 +538,24 @@ removeDoador(Doador):-
 %cria a lista dinamica de doador
 listaDoadores([]).
 :-dynamic listaDoadores/1.
+
+%salva uma nova bolsa na lista de estoque
+salvaEstoque(Bolsa):-
+    retract(listaEstoque(Lista)),
+    append(Lista,[Bolsa],NovaLista),
+    assert(listaEstoque(NovaLista)).
+
+%remove um certo numero de bolsas no estoque
+removeEstoque(TipoSanguineo,Qtd):-
+    retract(listaEstoque(Lista)),
+    removeBolsa(TipoSanguineo,Lista,Qtd,NovaLista),
+    assert(listaEstoque(NovaLista)).    
+
+
+%cria a lista dinamica do estoque
+listaEstoque([]).
+:-dynamic listaEstoque/1.
+
+%verifica se o tipo sanguineo eh valido, se nao for, informa o usuario e volta ao menu 
+%TODO ver se nao tem uma forma melhor de fazer isso! 
+validaTipo(Tipo):- (member(Tipo,["O-","O+","A-","A+","B-","B+","AB-","AB+"]) -> true; write("Tipo invalido"), menu(99)).
