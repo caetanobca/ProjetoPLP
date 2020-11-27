@@ -133,8 +133,7 @@ escreveDoador(doador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,Ul
     string_concat(Parte2, ",", Parte3),string_concat(Parte3, Idade, Parte4), string_concat(Parte4, ",", Parte5), 
     string_concat(Parte5, Telefone, Parte6), string_concat(Parte6, ",", Parte7), string_concat(Parte7, TipSanguineo, Parte8), 
     string_concat(Parte8, ",", Parte9), string_concat(Parte9, ImpedimentoStr, Parte10), string_concat(Parte10, ",", Parte11),
-    string_concat(Parte11, UltimoDiaImpedido, Parte12), string_concat(Parte12, ",", Parte13), string_concat(Parte13, Doacoes, Parte14),
-    string_concat(Parte14, ",", Parte15), string_concat(Parte15, "\n", String).
+    string_concat(Parte11, UltimoDiaImpedido, Parte12), string_concat(Parte12, "\n", String).
 
 iniciaDoadores(ListaDoadores) :-
     open('dados/Doadores.txt', read, Stream),
@@ -151,8 +150,7 @@ resgataDoador([H|T], Lista):-
     nth0(4, H, TipSanguineo),
     nth0(5, H, ImpedimentoStr),
     nth0(6, H, UltimoDiaImpedido),
-    nth0(7, H, Doacoes),
-    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doacoes,doador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doacoes)),
+    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,doador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido)),
     resgataDoador(T, ListaNova),
     append([Doador], ListaNova, Lista). 
    
