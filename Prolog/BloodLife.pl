@@ -538,6 +538,30 @@ listaRecebedors([]).
 :-dynamic listaRecebedores/1.
 /*-----------------------------------------------------------------*/
 
+%salva um doador na nova lista de doadores
+salvaDoador(Doador):-
+    retract(listaDoadores(Lista)),
+    append(Lista,[Doador],NovaLista),
+    assert(listaDoadores(NovaLista)).
+
+%remove um doador e faz a nova lista sem o doador que foi removido
+removeDoador(Doador):-
+    retract(listaDoadores(Lista)),
+    removerDoador(Lista,Doador,NovaLista),
+    assert(listaDoadores(NovaLista)).
+
+%cria a lista dinamica de doador
+listaDoadores([]).
+:-dynamic listaDoadores/1.
+
+%carrega a lista salva com a persistencia de arquivo
+carregaDoadores():-
+    iniciaDoadores(ListaDoadores),
+    retract(listaDoadores(Lista)),
+    append(Lista,ListaDoadores,NovaLista),
+    assert(listaDoadores(NovaLista)).
+/*-----------------------------------------------------------------*/
+
 %salva um impedimento na nova lista de impedimentos
 salvaImpedimento(Impedimento):-
     retract(listaImpedimentos(Lista)),
