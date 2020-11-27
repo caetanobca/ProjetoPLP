@@ -32,12 +32,15 @@ buscaBolsasPorTipo(TipoProcurado,[H|T],QtdAteEntao, QtdSomada):-
                     (TipoSanguineoUpper = TipoProcuradoUpper -> succ(QtdAteEntao,NewQtdBolsas), buscaBolsasPorTipo(TipoProcurado,T,NewQtdBolsas, QtdSomada); buscaBolsasPorTipo(TipoProcurado,T, QtdAteEntao, QtdSomada)).
 
 %verifica se ha bolsas suficientes para retirada
-verificaQtdBolsas([],_,_,_):- false.
-verificaQtdBolsas(_,X,X,_).
-verificaQtdBolsas([H|T],QtdNecessaria, QtdEncontrada, TipoProcurado):-
+verificaQtdBolsas([],X,_,Result):-dif(X,0),Result is -1.
+verificaQtdBolsas(_,0,_,Result):-Result is 1.
+verificaQtdBolsas([H|T],QtdNecessaria,TipoProcurado,Result):-
                     getBolsaTipo(H,TipoSanguineo), 
                     string_upper(TipoSanguineo, TipoSanguineoUpper), 
-                    (TipoSanguineoUpper = TipoProcurado -> succ(QtdEncontrada,AttQtd), verificaQtdBolsas(T,QtdNecessaria,AttQtd ,TipoProcurado); verificaQtdBolsas(T,QtdNecessaria, QtdEncontrada,TipoProcurado)).
+                    string_upper(TipoProcurado, TipoProcuradoUpper),
+                    (TipoSanguineoUpper = TipoProcuradoUpper -> NewQtd is QtdNecessaria - 1, 
+                    verificaQtdBolsas(T,NewQtd,TipoProcurado,Result);
+                    verificaQtdBolsas(T,QtdNecessaria,TipoProcurado,Result)).
 
 
 %retorna os tipos validos
@@ -55,12 +58,11 @@ removeBolsa(TipoProcurado, Lista,Qtd, Result):-
                   buscaBolsa(TipoProcurado, Lista, Bolsa), 
                   delete_one(Bolsa,Lista, NewLista),
                   NewQtd is Qtd-1, 
-                  write(NewQtd),
                   nl,
                   removeBolsa(TipoProcurado,NewLista,NewQtd,Result).
 
 
-%Busca uma bolsa (sera q pega todas?)
+%Busca a primeira bolsa equivalente na lista
 buscaBolsa(TipoProcurado,[], Result):- Result:- false.
 buscaBolsa(TipoProcurado, [Head|Tail], Result):- getBolsaTipo(Head, Tipo), 
                     string_upper(Tipo, TipoSanguineoUpper), 

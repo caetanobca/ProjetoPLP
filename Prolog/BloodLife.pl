@@ -322,10 +322,10 @@ menuEstoque(11):-
 %Menu de Estoque para cadastro de nova doação com Doador ja cadastrado
 %TODO IMPEDIMENTOS! TODO Testar quando Doador tiver pronto!
 menuEstoque(12,NomeDoador):-
-    %tty_clear, TODO 
+    tty_clear,  
     listaEstoque(ListaEstoque),
     listaDoadores(ListaDoadores),
-    (existeDoador(NomeDoador, ListaDoadores) -> true; write("Doador nao encontrado"), false),
+    (existeDoador(NomeDoador, ListaDoadores) -> true; write("Doador nao encontrado"), menu(99)),
     buscaDoador(NomeDoador,ListaDoadores,Doador),
     getDoadorTipSanguineo(Doador, TipSanguineo),
     constroiBolsa(TipSanguineo,450,NovaBolsa),
@@ -335,16 +335,16 @@ menuEstoque(12,NomeDoador):-
   
 %Menu de Estoque para cadastro de retirada de bolsa
 menuEstoque(2):-
-    %tty_clear, TODO 
+    tty_clear, 
     write("Qual o nome do recebedor (digite anon para anonimo)? "),
     lerString(NomeRecebedor),
     string_upper(NomeRecebedor, NomeRecebedorUpper),
-    (NomeRecebedorUpper = "ANON" -> menuEstoque(21); menuEstoque(22)),
+    (NomeRecebedorUpper = "ANON" -> menuEstoque(21); write("ainda nao implementado")), %TODO
     menu(99).
 
 %Menu de Estoque para cadastro de retirada de bolsa para anonimo
 menuEstoque(21):-
-    %tty_clear, TODO 
+    tty_clear,
     listaEstoque(ListaEstoque),
     write("Insira o Tipo Sanguineo do Recebedor anonimo: "),
     lerString(TipoSanguineo),
@@ -352,29 +352,35 @@ menuEstoque(21):-
     validaTipo(TipoSanguineoUpper),
     write("Quantas bolsas serao necessarias? "),
     lerNumero(NumBolsas),
-    (verificaQtdBolsas(ListaEstoque,NumBolsas,0,TipoSanguineoUpper) -> true; write("Nao ha bolsas suficientes disponiveis"), write("queijo")),
+    verificaQtdBolsas(ListaEstoque,NumBolsas,TipoSanguineoUpper,Result),
+    (Result = -1 ->  write("Nao ha bolsas suficientes disponiveis!"),nl, menu(99); true), 
     removeEstoque(TipoSanguineoUpper,NumBolsas),
     write("Bolsas Retiradas com sucesso!"),
     menu(99).
 
 
 %Menu de Estoque para cadastro de retirada de bolsa para recebedor ja cadastrado
-%TODO JUNTAR C RECEBEDOR
-menuEstoque(22):-
-    write("ainda nao implementado"),
+menuEstoque(22,NomeRecebedor):-
+    tty_clear,
+    listaEstoque(ListaEstoque),
+    listaRecebedores(ListaRecebedores),
+    (existeRecebedor(NomeRecebedor, ListaRecebedores) -> true; write("Recebedor nao encontrado"), menu(99)),
+    buscaRecebedor(NomeRecebedor,ListaRecebedores,Recebedor),
+    %Recebedor nao tem tipo sanguineo????
+    write("not yet implemented"),
     menu(99).
 
 
 %Imprime a visao geral do Estoque disponivel
 menuEstoque(3):-
-    %tty_clear, TODO 
+    tty_clear, 
     listaEstoque(ListaEstoque),
     listaVisaoGeralEstoque(ListaEstoque,0),
     menu(99).    
 
 %Se o usuario digitar uma opcao invalida, ele sera informado e voltara para o menu principal
 menuEstoque(N):-
-    %tty_clear,    
+    tty_clear,    
     write("Opcao Invalida!"),
     write(N),
     nl,
@@ -399,9 +405,9 @@ menu(1):-
     nl,   
     menu(99).
 
-%Menu(2) Invoca o Controle de Estoque de Bolsas de Sangue %TODO descomentar o tty_clear
+%Menu(2) Invoca o Controle de Estoque de Bolsas de Sangue 
 menu(2):-    
-    %tty_clear, 
+    tty_clear, 
     write("Controle de Estoque de Bolsas de Sangue"),
     menuEstoque(99),
     nl,
@@ -443,9 +449,9 @@ menu(7):-
     nl,
     menu(99).
 
-%Menu(8) Salva os dados %TODO tirar o negoco do tty clear
+%Menu(8) Salva os dados 
 menu(8):-
-    %tty_clear,
+    tty_clear,
     salvarDados(),
     write("Dados Salvos!"),
     menu(99).   
@@ -623,12 +629,8 @@ salvaEstoque(Bolsa):-
 
 %remove um certo numero de bolsas no estoque
 removeEstoque(TipoSanguineo,Qtd):-
-    write("leo1"),
     retract(listaEstoque(Lista)),
-    write("leo2"),
     removeBolsa(TipoSanguineo,Lista,Qtd,NovaLista),
-    %ttyflush,
-    write("leo3"),
     assert(listaEstoque(NovaLista)).    
 
 
