@@ -32,12 +32,15 @@ buscaBolsasPorTipo(TipoProcurado,[H|T],QtdAteEntao, QtdSomada):-
                     (TipoSanguineoUpper = TipoProcuradoUpper -> succ(QtdAteEntao,NewQtdBolsas), buscaBolsasPorTipo(TipoProcurado,T,NewQtdBolsas, QtdSomada); buscaBolsasPorTipo(TipoProcurado,T, QtdAteEntao, QtdSomada)).
 
 %verifica se ha bolsas suficientes para retirada
-verificaQtdBolsas([],_,_):- false.
-verificaQtdBolsas(_,0,_).
-verificaQtdBolsas([H|T],QtdNecessaria, TipoProcurado):-
+verificaQtdBolsas([],X,_,Result):-dif(X,0),Result is -1.
+verificaQtdBolsas(_,0,_,Result):-Result is 1.
+verificaQtdBolsas([H|T],QtdNecessaria,TipoProcurado,Result):-
                     getBolsaTipo(H,TipoSanguineo), 
                     string_upper(TipoSanguineo, TipoSanguineoUpper), 
-                    (TipoSanguineoUpper = TipoProcurado -> AttQtd is QtdNecessaria - 1, verificaQtdBolsas(T,AttQtd, TipoProcurado); verificaQtdBolsas(T,QtdNecessaria, TipoProcuradoUpper)).
+                    string_upper(TipoProcurado, TipoProcuradoUpper),
+                    (TipoSanguineoUpper = TipoProcuradoUpper -> NewQtd is QtdNecessaria - 1, 
+                    verificaQtdBolsas(T,NewQtd,TipoProcurado,Result);
+                    verificaQtdBolsas(T,QtdNecessaria,TipoProcurado,Result)).
 
 
 %retorna os tipos validos
@@ -46,19 +49,34 @@ tipos(["O-","O+","A-","A+","B-","B+","AB-","AB+"]).
 %multiplica a quantidade de bolsas pelo volume padrao (450 ml)
 bolsasToMl(QtdSomada,QtdSomadaMl):- QtdSomadaMl is QtdSomada*450.
 
-%remove uma (ou algumas) bolsa(s) do estoque de determinado tipo
-removeBolsa(_,Lista,0,Result):- clone(List,Result).
-removeBolsa(TipoProcurado,[Head|Tail],QtdBolsas,Result):- 
-                getBolsaTipo(Head,TipoSanguineo), 
-                (TipoSanguineoUpper = TipoProcuradoUpper -> delete_one(Lista, Bolsa, NovaLista), 
-                NewQtd is QtdBolsas-1, removeBolsa(TipoProcurado,NovaLista,NewQtd, Result);
-                removeBolsa(TipoProcurado,Tail,QtdBolsas,Result)).
 
 
-%remove apenas o primeiro elemento igual encontrado
-delete_one(X,[X|T],T):-!.
-delete_one(X,[Y|T],[Y|T1]):-delete_one(X,T,T1).
+removeBolsa(TipoProcurado, Lista,1, Result):- 
+                  buscaBolsa(TipoProcurado, Lista, Bolsa), 
+                  delete_one(Bolsa,Lista, Result).
+removeBolsa(TipoProcurado, Lista,Qtd, Result):- 
+                  buscaBolsa(TipoProcurado, Lista, Bolsa), 
+                  delete_one(Bolsa,Lista, NewLista),
+                  NewQtd is Qtd-1, 
+                  nl,
+                  removeBolsa(TipoProcurado,NewLista,NewQtd,Result).
 
-%copia a lista
-clone([],[]).
-clone([H|T],[H|Z]):- clone(T,Z).
+
+%Busca a primeira bolsa equivalente na lista
+buscaBolsa(TipoProcurado,[], Result):- Result:- false.
+buscaBolsa(TipoProcurado, [Head|Tail], Result):- getBolsaTipo(Head, Tipo), 
+                    string_upper(Tipo, TipoSanguineoUpper), 
+                    string_upper(TipoProcurado, TipoProcuradoUpper), 
+                    (TipoSanguineoUpper = TipoProcuradoUpper -> Result = Head; buscaBolsa(TipoProcurado, Tail, Result)).  
+
+
+%deleta somenta a primeira ocorrrencia do elemento na lista
+delete_one(_, [], []).
+delete_one(Term, [Term|Tail], Tail).
+delete_one(Term, [Head|Tail], [Head|Result]) :-
+  delete_one(Term, Tail, Result).
+
+
+
+
+
