@@ -218,12 +218,7 @@ menuDoador(1):-
     write("Insira o Tipo Sanguineo do Doador(a): "),
     lerString(TipSanguineo),
     write("Insira o Impedimento do Doador(a): "),
-    lerString(ImpedimentoStr),
-    write("Insira o telefone do Doador(a): "),
-    lerString(Telefone),
-    write("Insira o telefone do Doador(a): "),
-    lerString(Telefone),
-    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doador),
+    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,Doador),
     salvaDoador(Doador),
     write("Doador(a) cadastrad(a)"),
     menu(99).
@@ -247,7 +242,7 @@ menuDoador(4):-
     write("Insira o nome do(a) Doador(a) que você deseja adicionar um impedimento na ficha medica"),
     lerString(Nome),
     buscaDoador(Nome,ListaDoadores,Doador),
-    /* falta fazer/
+    /* falta fazer*/
     menu(99).
 
 menuDoador(5):-
@@ -392,7 +387,7 @@ main:-
     carregaEnfermeiros(), 
     carregaImpedimentos(), 
     carregaEstoque(),
-    carregaDoadores().  
+    carregaDoadores(),  
     letreiroInicial,
     lerString(A),
     menu(99),
@@ -461,7 +456,7 @@ menu(8):-
 menu(9):-
     tty_clear,
     salvarDados(),
-    write("Encerrando.").
+    write("Encerrando."),
     halt.
     
 

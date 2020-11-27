@@ -63,7 +63,7 @@ removeBolsa(TipoProcurado, Lista,Qtd, Result):-
 
 
 %Busca a primeira bolsa equivalente na lista
-buscaBolsa(TipoProcurado,[], Result):- Result:- false.
+buscaBolsa(TipoProcurado,[], Result):- Result = false.
 buscaBolsa(TipoProcurado, [Head|Tail], Result):- getBolsaTipo(Head, Tipo), 
                     string_upper(Tipo, TipoSanguineoUpper), 
                     string_upper(TipoProcurado, TipoProcuradoUpper), 
