@@ -1,5 +1,6 @@
 :- include("Enfermeiros.pl").
 :- include("Impedimentos.pl").
+:- include("Doador.pl").
 
 %Salvar os impedimentos em um arquivo txt.
 salvaListaImpedimentos(ListaImpedimentos):-
@@ -78,7 +79,50 @@ resgataEnfermeiro([H|T], Lista):-
     constroiEnfermeiro(Nome,Endereco,Idade,Telefone,Enfermeiro),
     resgataEnfermeiro(T, ListaNova),
     append([Enfermeiro], ListaNova, Lista). 
-   
+
+
+%Salvar Doador em um txt.
+salvaListaDoadores(ListaDoadores):-        
+    open('dados/Doadores.txt', write, ArquivoDoadores),    
+    escreveTodosDoadores(ListaDoadores,String),   
+    write(String),
+    write(ArquivoDoadores,String),
+    close(ArquivoDoadores). 
+
+escreveTodosDoadores([],String):- String = ''.
+escreveTodosDoadores([H|T],String):-
+    escreveDoador(H,DoadorString),    
+    escreveTodosDoadores(T,StringProx),
+    string_concat(DoadorString,StringProx,String).
+
+
+escreveDoador(doador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doacoes),String):-
+    string_concat(Nome, ",", Parte1), string_concat(Parte1, Endereco, Parte2),
+    string_concat(Parte2, ",", Parte3),string_concat(Parte3, Idade, Parte4), string_concat(Parte4, ",", Parte5), 
+    string_concat(Parte5, Telefone, Parte6), string_concat(Parte6, ",", Parte7), string_concat(Parte7, TipSanguineo, Parte8), 
+    string_concat(Parte8, ",", Parte9), string_concat(Parte9, ImpedimentoStr, Parte10), string_concat(Parte10, ",", Parte11),
+    string_concat(Parte11, UltimoDiaImpedido, Parte12), string_concat(Parte12, ",", Parte13), string_concat(Parte13, Doacoes, Parte14),
+    string_concat(Parte14, ",", Parte15), string_concat(Parte15, "\n", String).
+
+iniciaDoadores(ListaDoadores) :-
+    open('dados/Doadores.txt', read, Stream),
+    read_file(Stream,ListaDoadoresStr),    
+    resgataDoador(ListaDoadoresStr, ListaDoadores),     
+    close(Stream).
+
+resgataDoador([],_).
+resgataDoador([H|T], Lista):-    
+    nth0(0, H, Nome),
+    nth0(1, H, Endereco),
+    nth0(2, H, Idade),
+    nth0(3, H, Telefone),
+    nth0(4, H, TipSanguineo),
+    nth0(5, H, ImpedimentoStr),
+    nth0(6, H, UltimoDiaImpedido),
+    nth0(7, H, Doacoes),
+    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doacoes,doador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doacoes)),
+    resgataDoador(T, ListaNova),
+    append([Doador], ListaNova, Lista). 
    
 read_file(Stream,[]) :-
     at_end_of_stream(Stream).
