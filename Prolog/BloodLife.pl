@@ -151,7 +151,7 @@ menuImpedimento(1):-
     salvaImpedimento(Impedimento),
     menu(99).
 
-%Menu de impedimetno para buscar impedimento
+%Menu de impedimento para buscar impedimento
 menuImpedimento(2):-
     listaImpedimentos(ListaImpedimentos),
     write("Buscar Impedimento"), nl,
@@ -188,7 +188,6 @@ menuImpedimento(N):-
     write("Pressione enter para condfewfwfetinuar"), nl,
     lerString(Wait), 
     menu(99).
-
 
 menuDoador(99):-
     tty_clear,
@@ -307,10 +306,10 @@ menuEstoque(1):-
     write("Qual o nome do doador (digite anon para anonimo)? "),
     lerString(NomeDoador),
     string_upper(NomeDoador, NomeDoadorUpper),
-    (NomeDoadorUpper = "ANON" -> menuEstoque(1.1); menuEstoque(1.2,NomeDoadorUpper)).
+    (NomeDoadorUpper = "ANON" -> menuEstoque(11); menuEstoque(12,NomeDoadorUpper)).
 
 %Menu de Estoque para cadastro de nova doação anonima
-menuEstoque(1.1):-
+menuEstoque(11):-
     listaEstoque(ListaEstoque),
     write("Insira o Tipo Sanguineo do Doador: "),
     lerString(TipoSanguineo),
@@ -321,8 +320,9 @@ menuEstoque(1.1):-
     menu(99).
 
 %Menu de Estoque para cadastro de nova doação com Doador ja cadastrado
-%TODO IMPEDIMENTOS!
-menuEstoque(1.2,NomeDoador):-
+%TODO IMPEDIMENTOS! TODO Testar quando Doador tiver pronto!
+menuEstoque(12,NomeDoador):-
+    %tty_clear, TODO 
     listaEstoque(ListaEstoque),
     listaDoadores(ListaDoadores),
     (existeDoador(NomeDoador, ListaDoadores) -> true; write("Doador nao encontrado"), false),
@@ -335,22 +335,24 @@ menuEstoque(1.2,NomeDoador):-
   
 %Menu de Estoque para cadastro de retirada de bolsa
 menuEstoque(2):-
+    %tty_clear, TODO 
     write("Qual o nome do recebedor (digite anon para anonimo)? "),
     lerString(NomeRecebedor),
     string_upper(NomeRecebedor, NomeRecebedorUpper),
-    (NomeRecebedorUpper = "ANON" -> menuEstoque(2.1); menuEstoque(2.2)),
+    (NomeRecebedorUpper = "ANON" -> menuEstoque(21); menuEstoque(22)),
     menu(99).
 
 %Menu de Estoque para cadastro de retirada de bolsa para anonimo
-menuEstoque(2.1):-
+menuEstoque(21):-
+    %tty_clear, TODO 
     listaEstoque(ListaEstoque),
     write("Insira o Tipo Sanguineo do Recebedor anonimo: "),
     lerString(TipoSanguineo),
     string_upper(TipoSanguineo, TipoSanguineoUpper),
     validaTipo(TipoSanguineoUpper),
     write("Quantas bolsas serao necessarias? "),
-    lerString(NumBolsas),
-    (verificaQtdBolsas(ListaEstoque,NumBolsas,TipoSanguineoUpper) -> true; write("Nao ha bolsas suficientes disponiveis"), false),
+    lerNumero(NumBolsas),
+    (verificaQtdBolsas(ListaEstoque,NumBolsas,0,TipoSanguineoUpper) -> true; write("Nao ha bolsas suficientes disponiveis"), write("queijo")),
     removeEstoque(TipoSanguineoUpper,NumBolsas),
     write("Bolsas Retiradas com sucesso!"),
     menu(99).
@@ -358,28 +360,32 @@ menuEstoque(2.1):-
 
 %Menu de Estoque para cadastro de retirada de bolsa para recebedor ja cadastrado
 %TODO JUNTAR C RECEBEDOR
-menuEstoque(2.2):-
+menuEstoque(22):-
     write("ainda nao implementado"),
     menu(99).
 
 
 %Imprime a visao geral do Estoque disponivel
 menuEstoque(3):-
+    %tty_clear, TODO 
     listaEstoque(ListaEstoque),
     listaVisaoGeralEstoque(ListaEstoque,0),
     menu(99).    
 
 %Se o usuario digitar uma opcao invalida, ele sera informado e voltara para o menu principal
 menuEstoque(N):-
-    tty_clear,    
+    %tty_clear,    
     write("Opcao Invalida!"),
+    write(N),
     nl,
     menu(99).
 
 %Main
 main:-
     carregaEnfermeiros(), 
-    carregaImpedimentos(),   
+    carregaImpedimentos(), 
+    carregaEstoque(),
+    carregaDoadores().  
     letreiroInicial,
     lerString(A),
     menu(99),
@@ -393,9 +399,9 @@ menu(1):-
     nl,   
     menu(99).
 
-%Menu(2) Invoca o Controle de Estoque de Bolsas de Sangue
+%Menu(2) Invoca o Controle de Estoque de Bolsas de Sangue %TODO descomentar o tty_clear
 menu(2):-    
-    tty_clear,
+    %tty_clear, 
     write("Controle de Estoque de Bolsas de Sangue"),
     menuEstoque(99),
     nl,
@@ -437,9 +443,9 @@ menu(7):-
     nl,
     menu(99).
 
-%Menu(8) Salva os dados
+%Menu(8) Salva os dados %TODO tirar o negoco do tty clear
 menu(8):-
-    tty_clear,
+    %tty_clear,
     salvarDados(),
     write("Dados Salvos!"),
     menu(99).   
@@ -455,6 +461,7 @@ menu(9):-
 %Menu(99) Menu Inicial
 menu(99):-    
     %tty_clear,    
+    ttyflush,
     nl,        
     write("Escolha a opção:"), nl,
     write("1. Controle de Recebedores"), nl,
@@ -480,7 +487,7 @@ menu(N):-
 % Le uma String e converte em atomo  
 lerString(X):- read_line_to_codes(user_input, E), atom_string(E,X).
 
-% Le um numero e converte em atomo 
+% Le um numero e converte em atomo +
 lerNumero(Numero):- read_line_to_codes(user_input, E), atom_string(E,X), atom_number(X,Numero).
 
 %Exibe o letreiro inicial
@@ -584,6 +591,14 @@ carregaImpedimentos():-
     append(Lista,ListaImpedimentos,NovaLista),
     assert(listaImpedimentos(NovaLista)).
 
+
+carregaEstoque():-
+    iniciaEstoque(ListaEstoque),
+    retract(listaEstoque(Lista)),
+    append(Lista,ListaEstoque,NovaLista),
+    assert(listaEstoque(NovaLista)).
+
+
 %salva um doador na nova lista de doadores
 salvaDoador(Doador):-
     retract(listaDoadores(Lista)),
@@ -608,8 +623,12 @@ salvaEstoque(Bolsa):-
 
 %remove um certo numero de bolsas no estoque
 removeEstoque(TipoSanguineo,Qtd):-
+    write("leo1"),
     retract(listaEstoque(Lista)),
+    write("leo2"),
     removeBolsa(TipoSanguineo,Lista,Qtd,NovaLista),
+    %ttyflush,
+    write("leo3"),
     assert(listaEstoque(NovaLista)).    
 
 
@@ -624,5 +643,7 @@ validaTipo(Tipo):- (member(Tipo,["O-","O+","A-","A+","B-","B+","AB-","AB+"]) -> 
 salvarDados():-
     listaEnfermeiros(ListaEnfermeiros),
     listaImpedimentos(ListaImpedimentos),
+    listaEstoque(ListaEstoque),
     salvaListaImpedimentos(ListaImpedimentos),
-    salvaListaEnfermeiros(ListaEnfermeiros).
+    salvaListaEnfermeiros(ListaEnfermeiros),
+    salvaListaEstoque(ListaEstoque).

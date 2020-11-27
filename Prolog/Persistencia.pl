@@ -42,6 +42,38 @@ resgataImpedimento([H|T], Lista) :-
     append([Impedimento], ListaNova, Lista)).
     
 
+%Salvar Estoque em um txt.    
+salvaListaEstoque(ListaEstoque):-
+    open('dados/Estoque.txt', write, ArquivoEstoque),    
+    escreveTodoEstoque(ListaEstoque,String),   
+    write(ArquivoEstoque,String),
+    close(ArquivoEstoque). 
+
+escreveTodoEstoque([],String):- String = ''.
+escreveTodoEstoque([H|T],String):-
+    escreveBolsa(H,BolsaStr),    
+    escreveTodoEstoque(T,StringProx),
+    string_concat(BolsaStr,StringProx,String).
+
+escreveBolsa(bolsa(TipoSanguineo,QtdSangue),Result):- 
+    string_concat(TipoSanguineo, ",", Parte1),
+    string_concat(Parte1,QtdSangue, Parte2), 
+    string_concat(Parte2, "\n", Result).
+
+
+iniciaEstoque(ListaEstoque) :-
+    open('dados/Estoque.txt', read, Stream),
+    read_file(Stream,ListaEstoqueStr),    
+    resgataEstoque(ListaEstoqueStr, ListaEstoque),     
+    close(Stream).    
+
+resgataEstoque([],_).
+resgataEstoque([H|T], Lista):-    
+    nth0(0, H, TipoSanguineo),
+    nth0(1, H, QtdSangue),
+    constroiBolsa(TipoSanguineo,QtdSangue,Bolsa),
+    resgataEstoque(T, ListaNova),
+    append([Bolsa], ListaNova, Lista). 
 
 
 %Salvar Enfermeiros em um txt.
