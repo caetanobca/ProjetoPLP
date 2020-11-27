@@ -189,14 +189,16 @@ menuImpedimento(N):-
     lerString(Wait), 
     menu(99).
 
+/*-----------------------------------------------------------------*/
+
 menuDoador(99):-
     tty_clear,
     write("Menu Doador"),nl,
     write("1. Cadastro de Doadores"), nl,
     write("2. Buscar Doadores"), nl,
     write("3. Listagem de Doadores"), nl,
-    write("4. Mostrar ficha tecnica do Doador(a)"), nl,
-    write("5. Mostrar historico de doação do Doador(a)"), nl,
+    write("4. Cadastrar impedimento em Doador(a)"), nl,
+    write("5. Mostrar ficha tecnica do Doador(a)"), nl,
     lerNumero(Numero),
     menuDoador(Numero),
     menu(99).
@@ -221,7 +223,7 @@ menuDoador(1):-
     lerString(Telefone),
     write("Insira o telefone do Doador(a): "),
     lerString(Telefone),
-    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doacoes,Doador),
+    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doador),
     salvaDoador(Doador),
     write("Doador(a) cadastrad(a)"),
     menu(99).
@@ -242,20 +244,19 @@ menuDoador(3):-
 
 menuDoador(4):-
     listaDoadores(ListaDoadores),
+    write("Insira o nome do(a) Doador(a) que você deseja adicionar um impedimento na ficha medica"),
+    lerString(Nome),
+    buscaDoador(Nome,ListaDoadores,Doador),
+    /* falta fazer/
+    menu(99).
+
+menuDoador(5):-
+    listaDoadores(ListaDoadores),
     write("Insira o nome do(a) Doador(a) que você deseja ver a ficha medica"),
     lerString(Nome),
     buscaDoador(Nome,ListaDoadores,Doador),
     getDoadorImpedimentoStr(Doador, ImpedimentoStr),
     write(ImpedimentoStr),
-    menu(99).
-
-menuDoador(5):-
-    listaDoadores(ListaDoadores),
-    write("Insira o nome do(a) Doador(a) que você deseja ver o historico de doeções"),
-    lerString(Nome),
-    buscaDoador(Nome,ListaDoadores,Doador),
-    getDoadorDoacoes(Doador, Doacoes),
-    write(Doacoes),
     menu(99).
 
 menuDoador(N):-
