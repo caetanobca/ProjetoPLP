@@ -1,4 +1,4 @@
-constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,doador(Nome,Endereco,Idade,Telefone,TipSanguineo,"",UltimoDiaImpedido)).
+constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,doador(Nome,Endereco,Idade,Telefone,TipSanguineo,"","12/01/1998")).
 
 %salvaDoador(Doador,Lista,Result):- append(Lista,[Doador],Result).
 
