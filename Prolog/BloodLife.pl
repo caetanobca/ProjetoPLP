@@ -84,26 +84,23 @@ menuRecebedor(1):-
     nl,
     write("Insira o nome do Recebedor(a): "),
     lerString(Nome),
-    write("Insira o endereço do Recebedor(a): "),
-    lerString(Endereco),
     write("Insira a idade do Recebedor(a): "),
     lerString(Idade),
-    write("Insira o telefone do Recebedor(a): "),
-    lerString(Telefone),
     write("Insira o Numero de Bolsas de Sangue requisitadas pelo Recebedor(a): "),
-    lerString(Telefone),
-    write("Insira a ficha médica do Recebedor(a): "),
-    lerString(Telefone),
-    constroiRecebedor(Nome,Endereco,Idade,Telefone,NumDeBolsas,FichaMedica,Recebedor),
+    lerString(NumDeBolsas),
+    write("Insira o Tipo Sanguineo Recebedor(a): "),
+    lerString(TipoSanguineo),
+    validaTipo(TipoSanguineo),
+    constroiRecebedor(Nome,Idade,NumDeBolsas,TipoSanguineo,Recebedor),
     salvaRecebedor(Recebedor),
     write("Recebedor(a) cadastrado(a)"),
     menu(99).
 
 menuRecebedor(2):-
-    listaRecebedors(ListaRecebedores),
+    listaRecebedores(ListaRecebedores), 
     write("Insira o nome do(a) Recebedor(a) que você deseja procurar"),
     lerString(Nome),
-    buscaRecebedor(Nome,ListaRecebedors,Recebedor),
+    buscaRecebedor(Nome,ListaRecebedores,Recebedor),
     write(Recebedor),    
     menu(99).
 
@@ -113,16 +110,10 @@ menuRecebedor(3):-
     lerString(A),
     menu(99).
 
-/*
-menuRecebedor(4):-
-    listaRecebedores(ListaRecebedors),
-    write("Adicionar escala de Recebedors"),
-    menu(99).
-*/
 
 menuRecebedor(N):-
     tty_clear,
-    write("Opção Inválida"),
+    write("Opção Invalida"),
     nl,
     menu(99).
 
@@ -349,7 +340,7 @@ menuEstoque(21):-
     write("Quantas bolsas serao necessarias? "),
     lerNumero(NumBolsas),
     verificaQtdBolsas(ListaEstoque,NumBolsas,TipoSanguineoUpper,Result),
-    (Result = -1 ->  write("Nao ha bolsas suficientes disponiveis!"),nl, menu(99); true), 
+    (Result = -1 ->  write("Não há bolsas suficientes disponíveis!"),nl, menu(99); true), 
     removeEstoque(TipoSanguineoUpper,NumBolsas),
     write("Bolsas Retiradas com sucesso!"),
     menu(99).
@@ -362,10 +353,13 @@ menuEstoque(22,NomeRecebedor):-
     listaRecebedores(ListaRecebedores),
     (existeRecebedor(NomeRecebedor, ListaRecebedores) -> true; write("Recebedor nao encontrado"), menu(99)),
     buscaRecebedor(NomeRecebedor,ListaRecebedores,Recebedor),
-    %Recebedor nao tem tipo sanguineo????
-    write("not yet implemented"),
+    getRecebedorTipoSanguineo(Recebedor,TipoSanguineo),
+    write("Quantas bolsas serão necessarias? "),
+    lerNumero(NumBolsas),
+    (Result = -1 ->  write("Não há bolsas suficientes disponíveis!"),nl, menu(99); true), 
+    removeEstoque(TipoSanguineoUpper,NumBolsas),
+    write("Bolsas Retiradas com sucesso!"),
     menu(99).
-
 
 %Imprime a visao geral do Estoque disponivel
 menuEstoque(3):-
@@ -377,7 +371,7 @@ menuEstoque(3):-
 %Se o usuario digitar uma opcao invalida, ele sera informado e voltara para o menu principal
 menuEstoque(N):-
     tty_clear,    
-    write("Opcao Invalida!"),
+    write("Opção Inválida!"),
     write(N),
     nl,
     menu(99).
@@ -388,6 +382,7 @@ main:-
     carregaImpedimentos(), 
     carregaEstoque(),
     carregaDoadores(),  
+    carregaRecebedores(),
     letreiroInicial,
     lerString(A),
     menu(99),
@@ -481,7 +476,7 @@ menu(99):-
 %Menu(N) Quando o usuario passa uma entrada invalida, chama novamente o menu inicial 
 menu(N):-
     tty_clear,
-    write("Opção InválidaMeu"),nl, nl,
+    write("Opção Inválida"),nl, nl,
     write("Pressione enter para continuar"), nl,
     lerString(Wait), 
     menu(99).
@@ -537,13 +532,16 @@ salvaRecebedor(Recebedor):-
     assert(listaRecebedores(NovaLista)).
 
 %remove um recebedor e faz a nova lista sem o recebedor que foi removido
+/* TODO remover a funcao se nao for usar
 removeRecebedor(Recebedor):-
     retract(listaRecebedores(Lista)),
-    %removerRecebedor(Lista,Recebedor,NovaLista),
+    removerRecebedor(Lista,Recebedor,NovaLista),
     assert(listaRecebedores(NovaLista)).
+*/
+
 
 %cria a lista dinamica de recebedor
-listaRecebedors([]).
+listaRecebedores([]).
 :-dynamic listaRecebedores/1.
 /*-----------------------------------------------------------------*/
 
@@ -594,6 +592,13 @@ carregaImpedimentos():-
     assert(listaImpedimentos(NovaLista)).
 
 
+carregaRecebedores():-
+    iniciaRecebedores(ListaRecebedores),
+    retract(listaRecebedores(Lista)),
+    append(Lista,ListaRecebedores,NovaLista),
+    assert(listaEstoque(NovaLista)).
+
+
 carregaEstoque():-
     iniciaEstoque(ListaEstoque),
     retract(listaEstoque(Lista)),
@@ -642,6 +647,8 @@ salvarDados():-
     listaEnfermeiros(ListaEnfermeiros),
     listaImpedimentos(ListaImpedimentos),
     listaEstoque(ListaEstoque),
+    listaRecebedores(ListaRecebedores),
     salvaListaImpedimentos(ListaImpedimentos),
     salvaListaEnfermeiros(ListaEnfermeiros),
-    salvaListaEstoque(ListaEstoque).
+    salvaListaEstoque(ListaEstoque),
+    salvaListaRecebedores(ListaRecebedores).

@@ -1,6 +1,11 @@
 :- include("Enfermeiros.pl").
 :- include("Impedimentos.pl").
 :- include("Doador.pl").
+:- include("Estoque.pl").
+:- include("Recebedor.pl").
+
+
+/*Persistência de impedimento*/
 
 %Salvar os impedimentos em um arquivo txt.
 salvaListaImpedimentos(ListaImpedimentos):-
@@ -42,6 +47,8 @@ resgataImpedimento([H|T], Lista) :-
     append([Impedimento], ListaNova, Lista)).
     
 
+/*Persistência de estoque*/
+
 %Salvar Estoque em um txt.    
 salvaListaEstoque(ListaEstoque):-
     open('dados/Estoque.txt', write, ArquivoEstoque),    
@@ -75,6 +82,8 @@ resgataEstoque([H|T], Lista):-
     resgataEstoque(T, ListaNova),
     append([Bolsa], ListaNova, Lista). 
 
+
+/*Persistência de enfermeiros*/
 
 %Salvar Enfermeiros em um txt.
 salvaListaEnfermeiros(ListaEnfermeiros):-        
@@ -113,6 +122,8 @@ resgataEnfermeiro([H|T], Lista):-
     append([Enfermeiro], ListaNova, Lista). 
 
 
+/*Persistência de doador*/
+
 %Salvar Doador em um txt.
 salvaListaDoadores(ListaDoadores):-        
     open('dados/Doadores.txt', write, ArquivoDoadores),    
@@ -150,9 +161,49 @@ resgataDoador([H|T], Lista):-
     nth0(4, H, TipSanguineo),
     nth0(5, H, ImpedimentoStr),
     nth0(6, H, UltimoDiaImpedido),
-    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,doador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido)),
+    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doador),
     resgataDoador(T, ListaNova),
     append([Doador], ListaNova, Lista). 
+
+    /*Persistência de recebedor*/
+
+%Salvar Recebedor em um txt.
+salvaListaRecebedores(ListaRecebedores):-        
+    open('dados/Recebedores.txt', write, ArquivoRecebedores),    
+    escreveTodosRecebedores(ListaRecebedores,String),   
+    write(String),
+    write(ArquivoRecebedores,String),
+    close(ArquivoRecebedores). 
+
+escreveTodosRecebedores([],String):- String = ''.
+escreveTodosRecebedores([H|T],String):-
+    escreveRecebedor(H,RecebedorString),    
+    escreveTodosRecebedores(T,StringProx),
+    string_concat(RecebedorString,StringProx,String).
+
+
+escreveRecebedor(recebedor(Nome,Endereco,Idade,Telefone),String):-
+    string_concat(Nome, ",", Parte1), string_concat(Parte1, Idade, Parte2),
+    string_concat(Parte2, ",", Parte3),string_concat(Parte3, NumDeBolsas, Parte4), string_concat(Parte4, ",", Parte5), 
+    string_concat(Parte5, TipoSanguineo, Parte6), string_concat(Parte6, "\n", String).
+
+iniciaRecebedores(ListaRecebedores) :-
+    open('dados/Recebedores.txt', read, Stream),
+    read_file(Stream,ListaRecebedoresStr),    
+    resgataRecebedor(ListaRecebedoresStr, ListaRecebedores),     
+    close(Stream).
+
+resgataRecebedor([],_).
+resgataRecebedor([H|T], Lista):-    
+    nth0(0, H, Nome),
+    nth0(1, H, Idade),
+    nth0(2, H, NumBolsas),
+    nth0(3, H, TipoSanguineo),
+    constroiRecebedor(Nome,Idade,NumDeBolsas,TipoSanguineo,Recebedor),
+    resgataRecebedor(T, ListaNova),
+    append([Recebedor], ListaNova, Lista). 
+
+    /*leitura*/
    
 read_file(Stream,[]) :-
     at_end_of_stream(Stream).
