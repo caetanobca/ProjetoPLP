@@ -1,5 +1,5 @@
+%Predicado que deve ser chamado no BloodLife que recebe a qtd de sangue atual do estoque e encontra o estado do estoque
 verificaEstoque(QtdSangueHoje, Estado):-
-
     get_time(Stamp),
     stamp_date_time(Stamp, DateTime, local),
     date_time_value(day, DateTime, Dia),
@@ -55,7 +55,6 @@ read_file(Stream,[X|L]) :-
     read_line_to_string(Stream, String),
     atomic_list_concat(X,",", String),
     read_file(Stream,L), !.
-
 
 map(_,[],[]).
 
