@@ -2,7 +2,7 @@
 :- include("Impedimentos.pl").
 :- include("Doador.pl").
 :- include("Estoque.pl").
-:- include("Recebedor.pl").
+:- include("Recebedores.pl").
 
 
 /*Persistência de impedimento*/
@@ -11,7 +11,6 @@
 salvaListaImpedimentos(ListaImpedimentos):-
     open('dados/Impedimento.txt', write, Stream),
     escreveTodosImpedimentos(ListaImpedimentos, String),
-    write(String), 
     write(Stream, String),
     close(Stream).
 
@@ -171,7 +170,6 @@ resgataDoador([H|T], Lista):-
 salvaListaRecebedores(ListaRecebedores):-        
     open('dados/Recebedores.txt', write, ArquivoRecebedores),    
     escreveTodosRecebedores(ListaRecebedores,String),   
-    write(String),
     write(ArquivoRecebedores,String),
     close(ArquivoRecebedores). 
 
@@ -182,10 +180,13 @@ escreveTodosRecebedores([H|T],String):-
     string_concat(RecebedorString,StringProx,String).
 
 
-escreveRecebedor(recebedor(Nome,Endereco,Idade,Telefone),String):-
-    string_concat(Nome, ",", Parte1), string_concat(Parte1, Idade, Parte2),
-    string_concat(Parte2, ",", Parte3),string_concat(Parte3, NumDeBolsas, Parte4), string_concat(Parte4, ",", Parte5), 
-    string_concat(Parte5, TipoSanguineo, Parte6), string_concat(Parte6, "\n", String).
+escreveRecebedor(recebedor(Nome,Idade,Endereco,NumDeBolsas,TipoSanguineo,Hospital), Result):-
+    string_concat(Nome,",", Parte1), string_concat(Parte1, Idade, Parte2), string_concat(Parte2, ",", Parte3), 
+    string_concat(Parte3, Endereco, Parte4), string_concat(Parte4, ",", Parte5), 
+    string_concat(Parte5, NumDeBolsas, Parte6),string_concat(Parte6, ",", Parte7),
+    string_concat(Parte7, TipoSanguineo, Parte8), string_concat(Parte8, ",", Parte9),
+    string_concat(Parte9, Hospital, Parte10), string_concat(Parte10, "\n", Result).
+
 
 iniciaRecebedores(ListaRecebedores) :-
     open('dados/Recebedores.txt', read, Stream),
@@ -197,9 +198,11 @@ resgataRecebedor([],_).
 resgataRecebedor([H|T], Lista):-    
     nth0(0, H, Nome),
     nth0(1, H, Idade),
-    nth0(2, H, NumBolsas),
-    nth0(3, H, TipoSanguineo),
-    constroiRecebedor(Nome,Idade,NumDeBolsas,TipoSanguineo,Recebedor),
+    nth0(2, H, Endereco),
+    nth0(3, H, NumDeBolsas),
+    nth0(4, H, TipoSanguineo),
+    nth0(5, H, Hospital),
+    constroiRecebedor(Nome,Idade,Endereco,NumDeBolsas,TipoSanguineo,Hospital, Recebedor),
     resgataRecebedor(T, ListaNova),
     append([Recebedor], ListaNova, Lista). 
 
@@ -218,7 +221,6 @@ read_file(Stream,[X|L]) :-
 map(_,[],[]).
 
 map(Predicado,[H|T],[NH|NT]):-
-    %Function=..[FunctionName,H,NH],
     call(Predicado, H, NH),
     map(Predicado,T,NT).
  

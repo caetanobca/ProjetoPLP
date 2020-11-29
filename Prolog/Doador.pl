@@ -13,7 +13,7 @@ getDoadorUltimoDiaImpedido(doador(_,_,_,_,_,_,UltimoDiaImpedido), UltimoDiaImped
 
 %buscando Doadores
 
-buscaDoador(NomeDoador,[],Result):- Result = "Doador não encontrado".
+buscaDoador(_,[],Result):- Result = "Doador não encontrado".
 buscaDoador(NomeDoador,[Head|Tail], Result):- getDoadorNome(Head,Nome), string_upper(Nome, NomeUpper), string_upper(NomeDoador, NomeDoadorUpper),
             (NomeUpper = NomeDoadorUpper -> Result = Head; buscaDoador(NomeDoador,Tail,Result)).
 

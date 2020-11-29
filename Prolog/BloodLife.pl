@@ -4,6 +4,7 @@
 :- include('Estoque.pl').
 :- include('Doador.pl').
 :- include('Persistencia.pl').
+:- include('HistoricoDoEstoque.pl').
 :- initialization(main).
 
 
@@ -21,8 +22,7 @@ menuEnfermeiro(99):-
 
 menuEnfermeiro(1):-
     listaEnfermeiros(ListaEnfermeiros),    
-    write("Você irá cadastrar um Enfermeiro(a): "),
-    nl,
+    write("Você irá cadastrar um Enfermeiro(a): "),nl,
     write("Insira o nome do Enfermeiro(a): "),
     lerString(Nome),
     write("Insira o endereço do Enfermeiro(a): "),
@@ -78,43 +78,44 @@ menuRecebedor(99):-
     menuRecebedor(Numero),
     menu(99).
 
-menuRecebedor(1):-
-    listaRecebedores(ListaRecebedores),    
-    write("Você irá cadastrar um Recebedor(a): "),
-    nl,
-    write("Insira o nome do Recebedor(a): "),
-    lerString(Nome),
-    write("Insira a idade do Recebedor(a): "),
-    lerString(Idade),
-    write("Insira o Numero de Bolsas de Sangue requisitadas pelo Recebedor(a): "),
-    lerString(NumDeBolsas),
-    write("Insira o Tipo Sanguineo Recebedor(a): "),
-    lerString(TipoSanguineo),
-    validaTipo(TipoSanguineo),
-    constroiRecebedor(Nome,Idade,NumDeBolsas,TipoSanguineo,Recebedor),
+menuRecebedor(1):-   
+    write("Você irá cadastrar um Recebedor(a): "),nl,
+    write("Nome do Paciente: "), lerString(Nome),
+    write("Idade do Paciente: "), lerString(Idade),
+    write("Endereço do Paciente: "), lerString(Endereco),
+    write("Numero de bolsas requisitadas para o Paciente: "), lerNumero(NumDeBolsas),
+    write("Tipo sanguíneo do Paciente: "), lerString(TipoSanguineo), validaTipo(TipoSanguineo),
+    write("Hospital no qual o paciente esta internado: "), lerString(Hospital),
+    constroiRecebedor(Nome, Idade, Endereco, NumDeBolsas, TipoSanguineo, Hospital, Recebedor),
     salvaRecebedor(Recebedor),
-    write("Recebedor(a) cadastrado(a)"),
+    write("Paciente cadastrado(a)."), nl,
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 menuRecebedor(2):-
     listaRecebedores(ListaRecebedores), 
-    write("Insira o nome do(a) Recebedor(a) que você deseja procurar"),
-    lerString(Nome),
-    buscaRecebedor(Nome,ListaRecebedores,Recebedor),
-    write(Recebedor),    
+    write("Insira o nome do paciente que você deseja procurar: "), lerString(Nome),
+    buscaRecebedor(Nome, ListaRecebedores, Recebedor),
+    (existeRecebedor(Nome, ListaRecebedores) -> (recebedoreString(Recebedor, RecebedorStr),
+    write(RecebedorStr)); write(Recebedor)),nl,
+    write("Pressione enter para continuar."),
+    lerString(_),    
     menu(99).
 
 menuRecebedor(3):-
     listaRecebedores(ListaRecebedores),
-    listarRecebedores(ListaRecebedores),
-    lerString(A),
+    listarRecebedores(ListaRecebedores), nl,
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 
 menuRecebedor(N):-
     tty_clear,
-    write("Opção Invalida"),
-    nl,
+    write("Opção Invalida"), nl,
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 /*-----------------------------------------------------------------*/
@@ -161,7 +162,7 @@ menuImpedimento(3):-
     write("Listagem de Impedimentos: "), nl,    
     listarImpedimentos(ListaImpedimentos), nl, nl, 
     write("Pressione enter para continuar"), nl,
-    lerString(Wait), 
+    lerString(_), 
     menu(99).
 
 %Menu de impedimento para apagar impedimento
@@ -176,8 +177,32 @@ menuImpedimento(4):-
 menuImpedimento(N):-
     tty_clear,    
     write("Opção Inválida"), nl, nl,
-    write("Pressione enter para condfewfwfetinuar"), nl,
+    write("Pressione enter para continuar"), nl,
     lerString(Wait), 
+    menu(99).
+
+%Cadastro de impedimento:
+%Cadastro de medicamento
+cadastroImpedimento(1, Impedimento):-
+    tty_clear,
+    write("Cadastro de Medicamento"), nl,
+    write("Função: "), lerString(Funcao), nl,
+    write("Composto: "), lerString(Composto), nl,
+    write("tempo de Suspencao (em dias): "), lerNumero(Tempo), nl,
+    constroiMedicamento(Funcao, Composto, Tempo, Impedimento).
+
+%Cadastro doenca
+cadastroImpedimento(2, Impedimento):-
+    tty_clear,
+    write("Cadastro de Doenca"), nl,
+    write("Cid: "), lerString(Cid), nl,
+    write("tempo de Suspencao (em dias): "), lerNumero(Tempo), nl,
+    constroiDoenca(Cid, Tempo, Impedimento).
+
+cadastroImpedimento(N, Impedimento):-
+    tty_clear,    
+    write("Opção Inválida"),
+    nl,
     menu(99).
 
 /*-----------------------------------------------------------------*/
@@ -246,31 +271,6 @@ menuDoador(5):-
     menu(99).
 
 menuDoador(N):-
-    tty_clear,    
-    write("Opção Inválida"),
-    nl,
-    menu(99).
-
-
-%Cadastro de impedimento:
-%Cadastro de medicamento
-cadastroImpedimento(1, Impedimento):-
-    tty_clear,
-    write("Cadastro de Medicamento"), nl,
-    write("Função: "), lerString(Funcao), nl,
-    write("Composto: "), lerString(Composto), nl,
-    write("tempo de Suspencao (em dias): "), lerNumero(Tempo), nl,
-    constroiMedicamento(Funcao, Composto, Tempo, Impedimento).
-
-%Cadastro doenca
-cadastroImpedimento(2, Impedimento):-
-    tty_clear,
-    write("Cadastro de Doenca"), nl,
-    write("Cid: "), lerString(Cid), nl,
-    write("tempo de Suspencao (em dias): "), lerNumero(Tempo), nl,
-    constroiDoenca(Cid, Tempo, Impedimento).
-
-cadastroImpedimento(N, Impedimento):-
     tty_clear,    
     write("Opção Inválida"),
     nl,
@@ -392,8 +392,7 @@ main:-
 %Menu(1) Invoca o Controle de Recebedores
 menu(1):- 
     tty_clear,
-    write("Controle de Recebedores"),
-    nl,   
+    menuRecebedor(99),
     menu(99).
 
 %Menu(2) Invoca o Controle de Estoque de Bolsas de Sangue 
@@ -578,7 +577,7 @@ salvaImpedimento(Impedimento):-
 %remove um impedimento e faz a nova lista sem o impedimento que foi removido
 removeImpedimento(Impedimento):-
     retract(listaImpedimentos(Lista)),
-    removerImpedimento(Lista,Impedimento,NovaLista),
+    removerImpedimento(Impedimento,Lista,NovaLista),
     assert(listaImpedimentos(NovaLista)).
 
 %cria a lista dinamica de impedimentos
@@ -638,6 +637,11 @@ removeEstoque(TipoSanguineo,Qtd):-
 %cria a lista dinamica do estoque
 listaEstoque([]).
 :-dynamic listaEstoque/1.
+
+%HistoricoDoEstoque
+historico(Estado):-
+    %PegarQuantidadeDeSangue
+    verificaEstoque(QtdSangue, Estado). 
 
 %verifica se o tipo sanguineo eh valido, se nao for, informa o usuario e volta ao menu 
 %TODO ver se nao tem uma forma melhor de fazer isso! 
