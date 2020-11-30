@@ -33,7 +33,7 @@ menuEnfermeiro(1):-
     lerString(Telefone),
     constroiEnfermeiro(Nome,Endereco,Idade,Telefone,Enfermeiro),
     salvaEnfermeiro(Enfermeiro),
-    write("Enfermeiro(a) cadastrad(a)"),          
+    write("Enfermeiro(a) cadastrad(a)"), nl,       
     write("Pressione enter para continuar."),
     lerString(_),
     menu(99).
@@ -69,7 +69,7 @@ menuEnfermeiro(4):-
 
 menuEnfermeiro(5):-
     listaEnfermeiros(ListaEnfermeiros),
-    listaEscala(ListaEscala),listarEscala(ListaEscala),   
+    listaEscala(ListaEscala),write(ListaEscala), nl,   
     write("Visualizar escala de Enfermeiros"),
     lerString(Nome),    
    
@@ -545,6 +545,7 @@ carregaEnfermeiros():-
 %salva a escala de enfermeiros
 salvaEscala(DiaEnfermeiro):-
     retract(listaEscala(Lista)),
+    removerEscala(DiaEnfermeiro,Lista,ListaTemp),
     append(Lista,[DiaEnfermeiro],NovaLista),
     assert(listaEscala(NovaLista)).
 
