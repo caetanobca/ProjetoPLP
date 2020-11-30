@@ -17,17 +17,17 @@ salvaListaImpedimentos(ListaImpedimentos):-
 escreveTodosImpedimentos([], Result):- Result = ''.
 escreveTodosImpedimentos([Head|Tail], Result):- 
     escreveImpedimento(Head, ImpedimentoStr), escreveTodosImpedimentos(Tail, ResultNovo), 
-    string_concat(ImpedimentoStr, '\n', Parte1),  string_concat(Parte1, ResultNovo, Result).
+    string_concat(ImpedimentoStr, "\n", Parte1),  string_concat(Parte1, ResultNovo, Result).
 
 escreveImpedimento(medicamento(Funcao, Composto, TempoSuspencao), Result):- 
-    string_concat(Funcao, ',', Parte1), string_concat(Parte1, Composto, Parte2), 
-    string_concat(Parte2, ',', Parte3), string_concat(Parte3, TempoSuspencao, Result).
+    string_concat(Funcao, ",", Parte1), string_concat(Parte1, Composto, Parte2), 
+    string_concat(Parte2, ",", Parte3), string_concat(Parte3, TempoSuspencao, Result).
 escreveImpedimento(doenca(Cid, TempoSuspencao), Result):- 
-    string_concat(Cid, ',', Parte1), string_concat(Parte1, TempoSuspencao, Result).
+    string_concat(Cid, ",", Parte1), string_concat(Parte1, TempoSuspencao, Result).
 
 iniciaImpedimento(ListaImpedimentos):-
     open('dados/Impedimento.txt', read, Stream),
-    read_file(Stream,ListaImpedimentosStr),
+    read_file(Stream,ListaImpedimentosStr), !,
     resgataImpedimento(ListaImpedimentosStr, ListaImpedimentos),   
     close(Stream).
 
@@ -160,7 +160,7 @@ resgataDoador([H|T], Lista):-
     nth0(4, H, TipSanguineo),
     nth0(5, H, ImpedimentoStr),
     nth0(6, H, UltimoDiaImpedido),
-    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doador),
+    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,Doador),
     resgataDoador(T, ListaNova),
     append([Doador], ListaNova, Lista). 
 
@@ -206,6 +206,36 @@ resgataRecebedor([H|T], Lista):-
     resgataRecebedor(T, ListaNova),
     append([Recebedor], ListaNova, Lista). 
 
+
+%Metodo que inicializa o historico de estoque
+iniciaHistorico(Dia, Mes, QtdMl, QtdMlAnoPassado):-
+    open('dados/HistoricoEstoque.txt', read, StreamRead),
+    read_file(StreamRead,HistoricoEstoqueStr),  
+    close(StreamRead),
+    open('dados/HistoricoEstoque.txt', write, StreamWrite),
+    resgataHisorico(HistoricoEstoqueStr, Dia, Mes, QtdMl, QtdMlAnoPassado, StreamWrite),
+    close(StreamWrite).
+    
+%Metodo que resgata e atualiza o valor do historico do estoque
+resgataHisorico([], Dia, Mes, QtdMl, _, StreamWrite):- escreveHistorico(Dia, Mes, QtdMl, String), write(StreamWrite, String).
+resgataHisorico([H|T], Dia, Mes, QtdMl, QtdMlAnoPassado, StreamWrite):-    
+    nth0(0, H, DiaAntigo),
+    nth0(1, H, MesAntigo),
+    nth0(2, H, QtdMlAntigo),
+    
+    string_concat(DiaAntigo, MesAntigo, DataAntiga),
+    string_concat(Dia, Mes, Data),
+    
+    (DataAntiga = Data ->(QtdMlAnoPassado = QtdMlAntigo); 
+    (escreveHistorico(DiaAntigo, MesAntigo, QtdMlAntigo, String), write(StreamWrite, String))),
+    resgataHisorico(T, Dia, Mes, QtdMl, QtdMlAnoPassado, StreamWrite),
+    (var(QtdMlAnoPassado) -> QtdMlAnoPassado = -1; QtdMlAnoPassado = QtdMlAnoPassado).
+
+%Escreve o historico do estoque de uma forma simples para salvar no txt
+escreveHistorico(Dia, Mes, QtdMl, Result):-
+    string_concat(Dia,",", Parte1), string_concat(Parte1, Mes, Parte2), string_concat(Parte2, ",", Parte3), 
+    string_concat(Parte3, QtdMl, Parte4), string_concat(Parte4, "\n", Result).
+
     /*leitura*/
    
 read_file(Stream,[]) :-
@@ -215,7 +245,7 @@ read_file(Stream,[X|L]) :-
     \+ at_end_of_stream(Stream),
     read_line_to_string(Stream, String),
     atomic_list_concat(X,",", String),
-    read_file(Stream,L), !.
+    read_file(Stream,L),!.
 
 
 map(_,[],[]).
@@ -223,6 +253,3 @@ map(_,[],[]).
 map(Predicado,[H|T],[NH|NT]):-
     call(Predicado, H, NH),
     map(Predicado,T,NT).
- 
- 
- 

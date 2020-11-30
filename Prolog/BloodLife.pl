@@ -14,8 +14,8 @@ menuEnfermeiro(99):-
     write("1. Cadastro de Enfermeiros"), nl,
     write("2. Buscar Enfermeiros"), nl,
     write("3. Listagem de Enfermeiros"), nl,
-    write("5. Adicionar escala de Enfermeiros"), nl,
-    write("6. Visualizar escala de Enfermeiros"), nl,
+    write("4. Adicionar escala de Enfermeiros"), nl,
+    write("5. Visualizar escala de Enfermeiros"), nl,
     lerNumero(Numero),
     menuEnfermeiro(Numero),
     menu(99).
@@ -34,12 +34,13 @@ menuEnfermeiro(1):-
     constroiEnfermeiro(Nome,Endereco,Idade,Telefone,Enfermeiro),
     salvaEnfermeiro(Enfermeiro),
     write("Enfermeiro(a) cadastrad(a)"),          
-    lerString(A),
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 menuEnfermeiro(2):-
     listaEnfermeiros(ListaEnfermeiros),
-    write("Insira o nome do(a) Enfermeiro(a) que você deseja"),
+    write("Insira o nome do(a) Enfermeiro(a) que você deseja: "),
     lerString(Nome),
     buscaEnfermeiro(Nome,ListaEnfermeiros,Enfermeiro),
     write(Enfermeiro),    
@@ -48,23 +49,38 @@ menuEnfermeiro(2):-
 menuEnfermeiro(3):-
     listaEnfermeiros(ListaEnfermeiros),
     listarEnfermeiros(ListaEnfermeiros),
-    lerString(A),
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 menuEnfermeiro(4):-
     listaEnfermeiros(ListaEnfermeiros),
-    write("Adicionar escala de Enfermeiros"),
+    write("Insira a Data: "),
+    lerString(Data),
+    write("Insira o nome do Enfermeiro: "),
+    lerString(Nome),    
+    listaEnfermeiros(ListaEnfermeiros),       
+    buscaEnfermeiro(Nome,ListaEnfermeiros,Enfermeiro), 
+    listaEscala(ListaEscala),      
+    ((Enfermeiro \= "Enfermeiro não encontrado")-> 
+    (adicionaEscala(Data,Enfermeiro,ListaEscala,Result), salvaEscala(Result)); write("Enfermeiro não cadastrado")), 
     menu(99).
+
 
 menuEnfermeiro(5):-
     listaEnfermeiros(ListaEnfermeiros),
+    listaEscala(ListaEscala),listarEscala(ListaEscala),   
     write("Visualizar escala de Enfermeiros"),
+    lerString(Nome),    
+   
+    
     menu(99).
 
 menuEnfermeiro(N):-
     tty_clear,    
-    write("Opção Inválida"),
-    nl,
+    write("Opção "), write(N), write(" Inválida"),nl,
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 /*-----------------------------------------------------------------*/
@@ -113,7 +129,7 @@ menuRecebedor(3):-
 
 menuRecebedor(N):-
     tty_clear,
-    write("Opção Invalida"), nl,
+    write("Opção "), write(N), write(" Inválida"),nl,
     write("Pressione enter para continuar."),
     lerString(_),
     menu(99).
@@ -176,9 +192,9 @@ menuImpedimento(4):-
 
 menuImpedimento(N):-
     tty_clear,    
-    write("Opção Inválida"), nl, nl,
-    write("Pressione enter para continuar"), nl,
-    lerString(Wait), 
+    write("Opção "), write(N), write(" Inválida"),nl,
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 %Cadastro de impedimento:
@@ -201,8 +217,9 @@ cadastroImpedimento(2, Impedimento):-
 
 cadastroImpedimento(N, Impedimento):-
     tty_clear,    
-    write("Opção Inválida"),
-    nl,
+    write("Opção "), write(N), write(" Inválida"),nl,
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 /*-----------------------------------------------------------------*/
@@ -272,8 +289,9 @@ menuDoador(5):-
 
 menuDoador(N):-
     tty_clear,    
-    write("Opção Inválida"),
-    nl,
+    write("Opção "), write(N), write(" Inválida"),nl,
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 
@@ -371,9 +389,9 @@ menuEstoque(3):-
 %Se o usuario digitar uma opcao invalida, ele sera informado e voltara para o menu principal
 menuEstoque(N):-
     tty_clear,    
-    write("Opção Inválida!"),
-    write(N),
-    nl,
+    write("Opção "), write(N), write(" Inválida"),nl,
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 %Main
@@ -382,7 +400,7 @@ main:-
     carregaImpedimentos(), 
     carregaEstoque(),
     carregaDoadores(),  
-    carregaRecebedores(),
+    %carregaRecebedores(),
     letreiroInicial,
     lerString(A),
     menu(99),
@@ -475,9 +493,9 @@ menu(99):-
 %Menu(N) Quando o usuario passa uma entrada invalida, chama novamente o menu inicial 
 menu(N):-
     tty_clear,
-    write("Opção Inválida"),nl, nl,
-    write("Pressione enter para continuar"), nl,
-    lerString(Wait), 
+    write("Opção "), write(N), write(" Inválida"),nl,
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 % Le uma String e converte em atomo  
@@ -523,6 +541,29 @@ carregaEnfermeiros():-
     append(Lista,ListaEnfermeiros,NovaLista),
     assert(listaEnfermeiros(NovaLista)).
 
+%--------------------------------------------------
+%salva a escala de enfermeiros
+salvaEscala(DiaEnfermeiro):-
+    retract(listaEscala(Lista)),
+    append(Lista,[DiaEnfermeiro],NovaLista),
+    assert(listaEscala(NovaLista)).
+
+%remove uma escala e faz a nova lista sem a escala que foi removido
+removeEscala(DiaEnfermeiro):-
+    retract(listaEscala(Lista)),
+    removerEnfermeiro(Lista,DiaEnfermeiro,NovaLista),
+    assert(listaEnfermeiros(NovaLista)).
+
+%cria a lista dinamica de escala
+listaEscala([]).
+:-dynamic listaEscala/1.
+
+%carrega a lista salva com a persistencia de arquivo
+/*carregaEnfermeiros():-
+    iniciaEnfermeiros(ListaEnfermeiros),
+    retract(listaEnfermeiros(Lista)),
+    append(Lista,ListaEnfermeiros,NovaLista),
+    assert(listaEnfermeiros(NovaLista)).*/
 /*-----------------------------------------------------------------*/
 %salva um recebedor na nova lista de recebedores
 salvaRecebedor(Recebedor):-
@@ -591,11 +632,11 @@ carregaImpedimentos():-
     assert(listaImpedimentos(NovaLista)).
 
 
-carregaRecebedores():-
+/*carregaRecebedores():-
     iniciaRecebedores(ListaRecebedores),
     retract(listaRecebedores(Lista)),
     append(Lista,ListaRecebedores,NovaLista),
-    assert(listaEstoque(NovaLista)).
+    assert(listaEstoque(NovaLista)).*/
 
 
 carregaEstoque():-

@@ -22,7 +22,7 @@ listarDoadores([]):-nl.
 listarDoadores([Head|Tail]):- doadoresToString(Head,DoadoresString), write(DoadoresString), nl, listarDoadores(Tail).
 
 %toString Doadores
-doadoresToString(doador(Nome,Endereco,Idade,Telefone), Result):- string_concat("Nome: ", Nome, Parte1), string_concat(Parte1, " Endereço: ", Parte2),
+doadoresToString(doador(Nome,Endereco,Idade,Telefone, TipSanguineo, ImpedimentoStr, UltimoDiaImpedido), Result):- string_concat("Nome: ", Nome, Parte1), string_concat(Parte1, " Endereço: ", Parte2),
                     string_concat(Parte2, Endereco, Parte3),string_concat(Parte3, " Idade: ", Parte4), string_concat(Parte4, Idade, Parte5), 
                     string_concat(Parte5, " Telefone: ", Parte6), string_concat(Parte6, Telefone, Parte7), string_concat(Parte7, " Tipo Sanguineo: ", Parte8),
                     string_concat(Parte8, TipSanguineo, Parte9), string_concat(Parte9, " Impedimentos: ", Parte10), string_concat(Parte10, ImpedimentoStr, Parte11),
