@@ -39,7 +39,7 @@ existeDoador(Nome,ListaDoador):- buscaDoador(Nome,ListaDoador,Result), \+(Result
 removerDoador(ListaDoador,Nome,Result):- buscaDoador(Nome,ListaDoador,Doador), delete(ListaDoador,Doador,Result).
 
 %Metodo que vai Adiciona o ultimo dia impedido
-adicionaImpedimento(Doador, novoImpedimento, result) :- getDoadorImpedimentoStr(Doador, ImpedimentoStr), string_concat(ImpedimentoStr, "// ", parte1),
+adicionaImpedimento(Doador, novoImpedimento, result):- getDoadorImpedimentoStr(Doador, ImpedimentoStr), string_concat(ImpedimentoStr, "// ", parte1),
 string_concat(parte1, novoImpedimento, final), getUltimoDiaImpedido(NovoImpedimento, StampAtual, NovoStamp),
 result = constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo, TodosImpedimentos, NovoStamp,Doador).
 

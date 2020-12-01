@@ -64,7 +64,11 @@ menuEnfermeiro(4):-
     buscaEnfermeiro(Nome,ListaEnfermeiros,Enfermeiro), 
     listaEscala(ListaEscala),      
     ((Enfermeiro \= "Enfermeiro não encontrado")-> 
-    (adicionaEscala(Data,Enfermeiro,ListaEscala,Result), salvaEscala(Result)); write("Enfermeiro não cadastrado")), 
+    (adicionaEscala(Data,Enfermeiro,ListaEscala,Result), salvaEscala(Result), write("Enfermeiro escalado"))
+    ; write("Enfermeiro não cadastrado")), 
+
+    nl, write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 
@@ -261,7 +265,7 @@ menuDoador(1):-
 
 menuDoador(2):-
     listaDoadores(ListaDoadores),
-    write("Insira o nome do(a) Doador(a) que você deseja"),
+    write("Insira o nome do(a) Doador(a) que você deseja: "),
     lerString(Nome),
     buscaDoador(Nome,ListaDoadores,Doador),
     write(Doador),    
@@ -276,7 +280,7 @@ menuDoador(3):-
 
 menuDoador(4):-
     listaDoadores(ListaDoadores),
-    write("Insira o nome do(a) Doador(a) que você deseja adicionar um impedimento na ficha medica"),
+    write("Insira o nome do(a) Doador(a) que você deseja adicionar um impedimento na ficha medica: "),
     lerString(Nome),
     buscaDoador(Nome,ListaDoadores,Doador),
     /* falta fazer*/
@@ -284,11 +288,14 @@ menuDoador(4):-
 
 menuDoador(5):-
     listaDoadores(ListaDoadores),
-    write("Insira o nome do(a) Doador(a) que você deseja ver a ficha medica"),
+    write("Insira o nome do(a) Doador(a) que você deseja ver a ficha medica: "),
     lerString(Nome),
     buscaDoador(Nome,ListaDoadores,Doador),
     getDoadorImpedimentoStr(Doador, ImpedimentoStr),
     write(ImpedimentoStr),
+
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 menuDoador(N):-
