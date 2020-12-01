@@ -51,14 +51,14 @@ indiceData([_|Tail], Data, Indice):-
     Indice is Indice1+1.
 
 removerEscala(DiaEnfermeiro,ListaEscala,Result):-
-    nth0(0, DiaEnfermeiro, DiaMes), 
-    pegaData(DiaMes,ListaEscala,ExisteData),
+    nth0(0, DiaEnfermeiro, DiaMes), string_upper(DiaMes, DiaMesStr),
+    pegaData(DiaMesStr,ListaEscala,ExisteData),
     ((ExisteData \= -1) -> (pegaEscala(DiaMes, ListaEscala, EscalaRemove), 
     delete(ListaEscala,EscalaRemove,Result)); Result = ListaEscala).
 
 pegaEscala(DiaMes,[Head|Tail],Result):-
-    nth0(0,Head,Data), 
-    (Data = DiaMes -> Result = Head; pegaEscala(DiaMes,Tail,Result)).
+    nth0(0,Head,Data), string_upper(Data, DataStr), string_upper(DiaMes, DiaMesStr),
+    (DataStr = DiaMesStr -> Result = Head; pegaEscala(DiaMes,Tail,Result)).
 
 visualizaEscalaData(ListaEscala,Data):-
     pegaEscala(Data, ListaEscala, EscalaData),   
