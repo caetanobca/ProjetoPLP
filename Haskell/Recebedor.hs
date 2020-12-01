@@ -12,7 +12,7 @@ module Recebedor where
     adicionaRecebedor nome endereco idade telefone numDeBolsas tipoSanguineo hospital fichaMedica = (Recebedor {nome = nome, endereco = endereco, idade = idade, telefone = telefone, numDeBolsas = numDeBolsas, tipoSanguineo = tipoSanguineo, hospital = hospital, fichaMedica = fichaMedica})
 
     encontraRecebedorString :: String -> [Recebedor] -> String
-    encontraRecebedorString procurado [] = "Recebedores: \n"
+    encontraRecebedorString procurado [] = ""
     encontraRecebedorString procurado (h:t)
         |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = show h ++ encontraRecebedorString procurado t
         |otherwise = encontraRecebedorString procurado t
@@ -31,7 +31,7 @@ module Recebedor where
         where procurado = Recebedor.encontraRecebedor procurado []
     -}
     todosOsRecebedores :: [Recebedor] -> String
-    todosOsRecebedores [] = " "
+    todosOsRecebedores [] = ""
     todosOsRecebedores (h:t) = "Nome " ++ nome h ++ " " ++ "Endereco" ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
         ++ "Telefone: " ++ telefone h ++ " " ++ "Quantidade de Bolsas de Sangue Necessárias: " ++ show (numDeBolsas h) ++ " " ++ "Tipo Sanguineo: " ++ tipoSanguineo h ++ " " ++ "Hospital: " ++ hospital h ++ "\n" ++ todosOsRecebedores t
 
@@ -41,67 +41,35 @@ module Recebedor where
         |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = True
         |otherwise = recebedorCadastrado procurado t
 
+    recebedorFichaMedicaString :: String -> [Recebedor.Recebedor]-> String
+    recebedorFichaMedicaString procurado [] = ""
+    recebedorFichaMedicaString procurado (h:t)
+        |procurado == nome h = "Ficha médica de " ++ procurado ++ "\n" ++ FichaMedica.imprimeFichaMedica (fichaMedica h)
+        |otherwise = recebedorFichaMedicaString procurado t        
 
+    recebedorToString :: String -> [Recebedor.Recebedor] -> String
+    recebedorToString procurado [] = ""
+    recebedorToString procurado (h:t)
+        |procurado == nome h = "Nome: " ++ nome h ++ "\n" ++ "Endereço: " ++  endereco h ++ "\n" ++ "Idade: " ++ show (idade h) ++ "\n" ++ "Telefone: " ++ telefone h ++ "\n" ++ "Número de Bolsas: " ++ (show (numDeBolsas h)) ++ "\n" ++ "Tipo Sanguíneo: " ++  tipoSanguineo h ++ "\n"
+        |otherwise = recebedorToString procurado t 
+    
+    
     toUpperCase :: String -> String
     toUpperCase entrada = [toUpper x | x <- entrada]
-
-{-
-    cadastrarRecebedor :: IO()
-    cadastrarRecebedor = do
-        nome <- prompt "Digite o nome do(a) Recebedor(a) "
-        endereco <- prompt "Digite o endereço do(a) Recebedor(a) "
-        input <- prompt "Digite a idade do(a) Recebedor(a) "
-        let idade = read input
-        telefone <- prompt "Digite o telefone do(a) Recebedor(a) "
-        input <- prompt "Digite a quantidade de bolsas de sangue que o(a) Recebedor(a) precisa "
-        let quantidade = read input
-        tipo <- prompt "Tipo Sanguineo: "
-        hospital <- prompt "Hospital internado: "
-        --------------------------------------------------------------------------------------------
-        -- cadastrar ficha medica 
-        
-        sexo <- prompt "Sexo Feminino (1) Masculino (2) "
-        dataNascimento <- prompt "Data de nascimento: "
-        pai <- prompt "Nome do pai: "
-        mae <- prompt "Nome da mãe: "
-        acompanhamentoMedico <- prompt "Tem acompanhamento médico ou psicológico? NAO (1) Sim (2) "
-        let acompanhamentoMedicoBool = False
-        
-        if (acompanhamentoMedico == "1") then do 
-            let acompanhamentoMedicoBool = False 
-            putStr "" 
-            else if (acompanhamentoMedico == "2") then do 
-                let acompanhamentoMedicoBool = True 
-                putStr ""
-                else do 
-                    let acompanhamentoMedicoBool = False 
-                    putStr ""
-        
-        condicaoFisica <- prompt "Tem alguma condição que exige atenção especial ou restrição a atividade física? NAO (1) Sim (2) "
-        let condicaoFisicaBool = False
-        if (condicaoFisica == "1") then do 
-            let condicaoFisicaBool = False 
-            putStr "" 
-            else if (condicaoFisica == "2") then do 
-                let condicaoFisicaBool = True 
-                putStr "" 
-                else do 
-                    let condicaoFisicaBool = False
-                    putStr " " 
-
-        alergias <- prompt "Tem alergia a algum medicamento/alimento/material? "
-        let ficha = adicionaFichaMedica sexo dataNascimento pai mae acompanhamentoMedicoBool condicaoFisicaBool alergias
-        ---------------------------------------------------------------------------------------------
-        let recebedor = adicionaRecebedor nome endereco idade telefone quantidade tipo hospital ficha
-        putStr "Recebedor Cadastrado"
--}
-
 
     prompt :: String -> IO String
     prompt text = do
         putStr text
         hFlush stdout
         getLine
+
+    {- Função que retorna o recebedor se ele tiver cadastrado. Se não, retorna um Recebedor com atributos vazios
+    -}
+    encontraRecebedor :: String -> [Recebedor] ->  Recebedor
+    encontraRecebedor procurado [] = (Recebedor "" "" 0 "" 0 "" "" (FichaMedica "" "" "" "" "" "" ""))
+    encontraRecebedor procurado (h:t)
+        |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = h
+        |otherwise = encontraRecebedor procurado t
 
     -- Ainda falta implementar Ficha de Dados Medicos, estou pensando em fazer um outro objeto Ficha para usar aqui será que é uma boa
 

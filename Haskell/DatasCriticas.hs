@@ -16,36 +16,41 @@ module DatasCriticas where
     verificaHoje :: [Bolsa.Bolsa] -> IO()
     verificaHoje estoqueHoje = do
         carregaEstoqueMes <- iniciaEstoqueMes
-        putStr (show carregaEstoqueMes)
 
         today <- toGregorian <$> (utctDay <$> getCurrentTime)
         let mes = (show (getMes today))
 
         let estoqueMes = getEstoqueMes mes carregaEstoqueMes
-        if(estoqueMes /= Nothing) then do
-            let mlAnterior = (read (show estoqueMes)) :: Int
-            let mlHoje = Estoque.totalSangue estoqueHoje
+        if(estoqueMes /= 0) then do
+            let mlAnterior = (read (show estoqueMes) :: Float)
+            let mlHoje = (read (show (Estoque.totalSangue estoqueHoje)) ::Float)
             salvaEstoqueMes
-            if(mlAnterior > mlHoje)then do 
-            putStr ("ESTOQUE BAIXO -CHAMAR METODO QUE AVISA DOADORES-")
+            if ((mlAnterior * 0.50) >= mlHoje) then do
+                putStrLn("ESTOQUE EM ESTADO CRITICO SOLICITAR DOACOES")
+            else if ((mlAnterior * 0.90) >= mlHoje)then do
+                putStrLn ("ESTOQUE ABAIXO DA MEDIA")
+            else if((mlAnterior * 1.10) >= mlHoje )then do 
+                putStrLn("ESTOQUE NA MEDIA")
+            else if((mlAnterior * 1.50) >= mlHoje )then do 
+                putStrLn("ESTOQUE ACIMA DA MEDIA")
             else do
-            putStr ("ESTOQUE OK -TALVEZ N FAZER NADA-") 
+                putStrLn("ESTOQUE EM OTIMAS CONDICOES")
 
         else do
             let mlAnterior = 0
             let mlHoje = Estoque.totalSangue estoqueHoje
             salvaEstoqueMes
             if(mlAnterior > mlHoje)then do 
-            putStr ("ESTOQUE BAIXO -CHAMAR METODO QUE AVISA DOADORES-")
+            putStrLn ("SEM HISTORICO DE ESTOQUE")
             else do
-            putStr ("ESTOQUE OK -TALVEZ N FAZER NADA-")                   
+            return ()                   
 
         
 
-    getEstoqueMes :: String -> Map String String -> Maybe String
+    getEstoqueMes :: String -> Map String String -> Int
     getEstoqueMes mes estoqueMes
-        |member mes estoqueMes == False = Nothing
-        |member mes estoqueMes == True = Map.lookup mes estoqueMes
+        |member mes estoqueMes == False = 0
+        |member mes estoqueMes == True = (read (estoqueMes ! mes) :: Int)
 
     salvaEstoqueMes :: IO()
     salvaEstoqueMes = do 

@@ -6,6 +6,7 @@ import qualified Estoque as Estoque
 import qualified Bolsa as Bolsa
 import qualified Doador as Doador
 import qualified Agenda as Agenda
+import qualified FichaMedica as FichaMedica
 import Data.Map as Map
 import System.IO
 import Data.Time
@@ -21,9 +22,9 @@ main = do
 
 opcoes :: String
 opcoes = ("BloodLife\n1. Cadastro de Recebedores\n2. Controle de Estoque de Bolsas de Sangue\n" ++
- "3. Cadastro de doadores\n4. Cadastro de Enfermeiros\n" ++
- "5. Cadastro de impedimentos\n6. Agendamento de coleta com doadores\n" ++ 
- "7. Agendamento de coleta com enfermeiros\n8. Dashboards\n9. Sair\n")
+ "3. Cadastro de doadores\n4. Controle de Enfermeiros\n" ++
+ "5. Controle de impedimentos\n6. Coleta de sangue\n" ++ 
+ "7. Dashboards\n8. Sair\n")
 
 
 menuInicial :: IO()
@@ -33,7 +34,8 @@ menuInicial  = do
     input <- getLine 
 
     if input == "1" then do
-        cadastroDeRecebedor
+        listaRecebedores <- carregaRecebedores
+        cadastroDeRecebedor listaRecebedores
         putStrLn (" ")
     else if input == "2" then do        
         listaEstoque <- carregaEstoque
@@ -54,10 +56,8 @@ menuInicial  = do
         listaDoadores <- carregaDoadores
         agendaDoacao listaAgenda listaEnfermeiros listaDoadores
     else if input == "7" then do
-        putStrLn ("IMPLEMENTAR AGENDAMENTO DE COLETA COM ENFERMEIRO")
-    else if input == "8" then do
         putStrLn ("IMPLEMENTAR DASHBOARD")
-    else if input == "9" then do
+    else if input == "8" then do
         putStrLn ("Encerrando")
     else do
        putStrLn("Entrada invalida")
@@ -195,15 +195,23 @@ impedimentos listaImpedimentos = do
             putStrLn("Deletar Medicamento\n" ++
                     "Composto: ")
             input <- getLine
-            let composto = input            
-            Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento "MEDICAMENTO" composto listaImpedimentos) listaImpedimentos)
+            let composto = input
+            if ((Impedimento.existeImpedimento "MEDICAMENTO" composto listaImpedimentos)) then do
+                Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento "MEDICAMENTO" composto listaImpedimentos) listaImpedimentos)
+                putStrLn ("Medicamento deletado")
+            else do
+                putStrLn ("Medicamento não encontrado")
             menuInicial
         else if (tipo == "2") then do
             putStrLn("Deletar Doenca\n" ++
                     "CID: ")
             input <- getLine
-            let cid = input            
-            Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento "DOENCA" cid listaImpedimentos) listaImpedimentos)
+            let cid = input
+            if ((Impedimento.existeImpedimento "DOENCA" cid listaImpedimentos)) then do            
+                Auxiliar.rescreverImpedimento (Impedimento.removeImpedimetno(Impedimento.buscaImpedimento "DOENCA" cid listaImpedimentos) listaImpedimentos)
+                putStrLn ("Doença deletado")
+            else do
+                putStrLn ("Doença não encontrado")
             menuInicial
         else do
             putStrLn("Entrada Invalida")
@@ -233,36 +241,44 @@ enfermeiros listaEnfermeiros mapaEscala = do
         putStrLn ("Insira o telefone do Enfermeiro(a)")
         telefone <- getLine
         Auxiliar.escreverEnfermeiros(Enfermeiro.adicionaEnfermeiro nome endereco (read(idade)) telefone)                    
-        main
+        menuInicial
     else if(tipo == "2") then do
         putStrLn("Insira o nome do(a) Enfermeiro(a) que você deseja")
-        nome <- getLine          
-        putStrLn (Enfermeiro.encontraEnfermeiroString nome listaEnfermeiros)
-        main
+        nome <- getLine
+        if (Enfermeiro.enfermeiroCadastrado nome listaEnfermeiros) then do          
+            putStrLn (Enfermeiro.encontraEnfermeiroString nome listaEnfermeiros)
+        else do
+            putStrLn ("Enfermeiro não encontrado")
+        menuInicial
     else if(tipo == "3") then do        
         putStrLn (Enfermeiro.todosOsEnfermeiros listaEnfermeiros)
-        main
+        menuInicial
     else if(tipo == "4") then do       
        putStrLn (Enfermeiro.visualizaEnfermeiros listaEnfermeiros )
-       main
+       menuInicial
     else if(tipo == "5") then do
         putStrLn("Insira a data")
         diaMesAno <- getLine
         putStrLn("Insira o nome do Enfermeiro")
-        enfermeiro <- getLine              
-        Auxiliar.rescreverEscala (Enfermeiro.organizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala enfermeiro listaEnfermeiros)
-        main
+        enfermeiro <- getLine 
+        if (Enfermeiro.enfermeiroCadastrado enfermeiro listaEnfermeiros) then do             
+            Auxiliar.rescreverEscala (Enfermeiro.organizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala enfermeiro listaEnfermeiros)
+            putStrLn("Enfermeiro alocado na escala com sucesso")
+        else do 
+            putStrLn ("Enfermeiro não encontrada")
+        menuInicial
     else if(tipo == "6") then do
         putStrLn("Insira a data")
         diaMesAno <- getLine                    
         if((Enfermeiro.visualizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala) == Nothing) then do 
-        putStrLn("Data não encontrada")
-        main
+            putStrLn("Data não encontrada")
+            menuInicial
         else do
-        putStrLn (show (Enfermeiro.visualizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala))
-        main   
+            putStrLn (show (Enfermeiro.visualizaEscala (Auxiliar.stringEmData diaMesAno) mapaEscala))
+            menuInicial   
     else do
         putStrLn ("Ainda não implementado")
+        menuInicial
 
 estoque ::[Bolsa.Bolsa] -> IO()
 estoque listaEstoque = do
@@ -270,68 +286,89 @@ estoque listaEstoque = do
                             se tiver mais de 10000 ml por tipo sanguineo é dado um aviso de sobra de sangue
     -}
     putStrLn(Estoque.mensagemDeAviso listaEstoque 0)
-    putStr ("1. Adicionar Bolsa de Sangue\n" ++
+    putStr ("1. Adicionar Doação de Sangue\n" ++
             "2. Retirar Bolsa de Sangue\n" ++
             "3. Visão Geral do Estoque\n" ++
             "4. Listar Todas as Bolsas\n" ++
             "5. Listar Bolsas por Tipo\n")
     tipo <- getLine
     if(tipo == "1")then do
-        putStrLn("Tipo Sanguineo: ")          
-        typeSanguineo <- getLine
-        let tipoSanguineo = typeSanguineo
-        if((elem (toUpperCase tipoSanguineo) tipos) == False) then do
-            putStrLn("Tipo Inválido\n")
-        else do   
-            putStrLn("Quantidade de sangue (em ml): ")
-            input <- getLine 
-            let qtdSangue = read input :: Int
-            if(qtdSangue > 450) then do
-                putStrLn("Não há como doar mais que 450 ml por pessoa!\n")
+        putStrLn("Qual o nome do Doador? (digite anon para anônimo)")          
+        nomeDoador <- getLine
+        if((toUpperCase nomeDoador) /= "ANON") then do
+            listaDoadores <- carregaDoadores
+            let doador = Doador.encontraDoador nomeDoador listaDoadores
+            if(Doador.tipSanguineo doador == "") then do
+                putStrLn("Doador não encontrado\n")
+                menuInicial
+            else do
+                diaHoje <- getToday
+                if(Doador.isImpedido doador diaHoje) then do
+                    putStrLn ("Doador impedido")
+                    menuInicial
+                else do
+                    let tipoSanguineo = Doador.tipSanguineo doador
+                    putStrLn("Doador encontrado!")
+                    -- tem que verificar os impedimentos do Doador
+                    today <- hoje
+                    let adicionaDoacao = Doador.adicionaDoacao nomeDoador listaDoadores ("Doação realizada dia " ++ show (getDia today) ++ "/" ++ show(getMes today) ++  "/" ++ show (getAno today))
+                    putStrLn("Uma Bolsa de 450 ml do tipo " ++ (Doador.tipSanguineo doador) ++ " foi cadastrada no estoque!\n")
+                    Auxiliar.escreverEstoque([Estoque.adicionaBolsa tipoSanguineo 450])       
+                    Auxiliar.rescreverDoador(Doador.registraImpedimento (Doador.nome doador) listaDoadores (Impedimento.Doenca "DOENCA" "Realizou doação" 60))       
+                    menuInicial
+        else do
+            putStrLn("Qual o tipo sanguineo do doador anônimo?")
+            tipoSanguineo <- getLine
+            if((elem (toUpperCase tipoSanguineo) tipos) == False) then do
+                putStrLn("Tipo Inválido\n")
+                menuInicial
             else do    
-                Auxiliar.escreverEstoque([Estoque.adicionaBolsa tipoSanguineo qtdSangue])    
-                putStrLn("Bolsa cadastrada!\n")
-        main
+                putStrLn("Uma Bolsa de 450 ml do tipo " ++ tipoSanguineo ++ " foi cadastrada no estoque!\n")
+                Auxiliar.escreverEstoque([Estoque.adicionaBolsa tipoSanguineo 450]) 
+                menuInicial  
+
     else if(tipo == "2") then do
-        putStrLn("Tipo Sanguineo:: ")
-        input <- getLine
-        let tipo = input
-        putStrLn("Quantidade de sangue: ")
-        input <- getLine 
-        let qtdSangue = read input :: Int
-        let bolsaComSangueDisponivel = Estoque.verificaEstoque tipo qtdSangue listaEstoque
-        if(bolsaComSangueDisponivel /= Nothing) then do
-            putStrLn("Sangue retirado com sucesso! ")
-            Auxiliar.reescreveEstoque(Estoque.removeBolsa bolsaComSangueDisponivel listaEstoque)
- --           if(qtdSangue < Bolsa.qtdSangue bolsaComSangueDisponivel) then do
- --               let qtdSangueRestante = ((Bolsa.qtdSangue bolsaComSangueDisponivel) - qtdSangue )
- --               Auxiliar.escreverEstoque([Estoque.adicionaBolsa (Bolsa.tipoSanguineo bolsaComSangueDisponivel) qtdSangueRestante ])             
- --               putStrLn(Estoque.bolsaRetiradaToString bolsaComSangueDisponivel qtdSangue)
- --           else do
-            putStrLn(Estoque.bolsaRetiradaToString bolsaComSangueDisponivel 0)
-            main
-        else do 
-            putStr ("Não há bolsas disponiveis :(\n")
-        main
+        putStrLn("Qual o nome do Recebedor? (digite anon para anônimo)")          
+        nomeRecebedor <- getLine
+        if((toUpperCase nomeRecebedor) /= "ANON") then do
+            listaRecebedores <- carregaRecebedores
+            let recebedor = Recebedor.encontraRecebedor nomeRecebedor listaRecebedores
+            if(Recebedor.tipoSanguineo recebedor == "") then do
+                putStrLn("Recebedor não encontrado\n")
+                menuInicial
+            else do
+                let tipoSanguineo = Recebedor.tipoSanguineo recebedor
+                putStrLn("Recebedor encontrado!")
+                putStrLn("Quantas bolsas serão necessárias?")
+                numBolsas <- getLine
+                let bolsasDisponiveis = Estoque.verificaQtdBolsas (read numBolsas) tipoSanguineo listaEstoque
+                if((Bolsa.qtdSangue (bolsasDisponiveis!!0)) == (-1)) then do    
+                    putStrLn("Não há bolsas suficiente disponíveis")
+                    menuInicial                
+                else do
+
+                    menuInicial
+        else do
+            menuInicial
     else if(tipo == "3") then do
         putStrLn("\nVisão Geral Do Estoque:")
         putStrLn(Estoque.visaoGeralEstoque listaEstoque)
-        main                                
+        menuInicial                                
     else if(tipo == "4") then do
         let estoque = Estoque.listaTodasAsBolsas listaEstoque
         putStrLn estoque
-        main
+        menuInicial
     else if(tipo == "5") then do
         putStrLn("Tipo Sanguineo: ")
         input <- getLine
         let tipoSanguineo = input
         if((elem (toUpperCase tipoSanguineo) tipos) == False) then do
             putStrLn("Tipo Inválido!\n")
-            main
+            menuInicial
         else do    
             let estoque = Estoque.listaBolsasPorTipo tipoSanguineo listaEstoque
             putStrLn estoque
-            main
+            menuInicial
     else do
         putStrLn ("Entrada Inválida!\n")
         main
@@ -378,29 +415,8 @@ agendaDoacao agenda listaEnfermeiros listaDoadores = do
             Auxiliar.rescreverAgendaLocal (Agenda.agendaDoacaoLocal (Auxiliar.stringEmData diaMesAno) agenda doador enfermeiro doadorEndereco)
             menuInicial
                    
-carregaAgenda :: IO(Map Day String)
-carregaAgenda = Auxiliar.iniciaAgendaLocal
-
-carregaEnfermeiros ::  IO([Enfermeiro.Enfermeiro])
-carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
-
-carregaEscala :: IO(Map Day String)
-carregaEscala = Auxiliar.iniciaEscala
-
-carregaEstoque ::  IO([Bolsa.Bolsa])
-carregaEstoque = Auxiliar.iniciaEstoque
-
-carregaImpedimentos :: IO([Impedimento.Impedimento])
-carregaImpedimentos = Auxiliar.iniciaImpedimentos
-
-carregaRecebedores :: [Recebedor.Recebedor]
-carregaRecebedores = Auxiliar.iniciaRecebedores
-
-carregaDoadores :: IO([Doador.Doador])
-carregaDoadores = Auxiliar.iniciaDoador
-
-cadastroDeRecebedor :: IO()
-cadastroDeRecebedor = do
+cadastroDeRecebedor :: [Recebedor.Recebedor] -> IO()
+cadastroDeRecebedor listaRecebedores = do
     putStr (
         "1. Cadastro de Recebedor\n" ++
         "2. Buscar Recebedor\n" ++
@@ -413,72 +429,65 @@ cadastroDeRecebedor = do
     if (input == "1") then do
         nome <- prompt "Digite o nome do(a) Recebedor(a) "
         endereco <- prompt "Digite o endereço do(a) Recebedor(a) "
-        age <- prompt "Digite a idade do(a) Recebedor(a) "
+        age <- prompt "Digite a idade do(a) Recebedor(a): "
         let idade = read age
-        telefone <- prompt "Digite o telefone do(a) Recebedor(a) "
-        qtd <- prompt "Digite a quantidade de bolsas de sangue que o(a) Recebedor(a) precisa "
+        telefone <- prompt "Digite o telefone do(a) Recebedor(a): "
+        qtd <- prompt "Digite a quantidade de bolsas de sangue que o(a) Recebedor(a) precisa: "
         let quantidade = read qtd
         tipo <- prompt "Tipo Sanguineo: "
+        if((elem (toUpperCase tipo) tipos) == False) then do
+            putStrLn("Tipo Inválido\n")
+            cadastroDeRecebedor listaRecebedores
+        else do
         hospital <- prompt "Hospital internado: "
         --------------------------------------------------------------------------------------------
         -- cadastrar ficha medica 
         
-        sexo <- prompt "Sexo Feminino (f) Masculino (m) "
+        sexo <- prompt "Sexo Feminino (f) Masculino (m): "
         dataNascimento <- prompt "Data de nascimento: "
         pai <- prompt "Nome do pai: "
         mae <- prompt "Nome da mãe: "
-        acompanhamentoMedico <- prompt "Tem acompanhamento médico ou psicológico? NAO (n) Sim (s) "
-        
-        {-
-        let acompanhamentoMedicoBool = False
-        
-        if (acompanhamentoMedico == "1") then do 
-            let acompanhamentoMedicoBool = False 
-            putStr "" 
-            else if (acompanhamentoMedico == "2") then do 
-                let acompanhamentoMedicoBool = True 
-                putStr ""
-                else do 
-                    let acompanhamentoMedicoBool = False 
-                    putStr ""
-        -}
-        condicaoFisica <- prompt "Tem alguma condição que exige atenção especial ou restrição a atividade física? NAO (n) Sim (s) "
+        acompanhamentoMedico <- prompt "Tem acompanhamento médico ou psicológico? NAO (n) Sim (s): "
+        condicaoFisica <- prompt "Tem alguma condição que exige atenção especial ou restrição a atividade física? NAO (n) Sim (s): "
         alergias <- prompt "Tem alergia a algum medicamento/alimento/material? "
-        let ficha = adicionaFichaMedica sexo dataNascimento pai mae acompanhamentoMedicoBool condicaoFisicaBool alergias
+        let ficha = FichaMedica.adicionaFichaMedica sexo dataNascimento pai mae acompanhamentoMedico condicaoFisica alergias
         ---------------------------------------------------------------------------------------------
-        let recebedor = adicionaRecebedor nome endereco idade telefone quantidade tipo hospital ficha
+        Auxiliar.escreverRecebedores(Recebedor.adicionaRecebedor nome endereco idade telefone quantidade tipo hospital ficha)
         putStr "Recebedor Cadastrado"
-
+        menuInicial
 
     else if (input == "2") then do
         nome <- prompt "Digite o nome do recebedor: "
-        let recebedor = Recebedor.recebedorCadastrado nome carregaRecebedores
+        let recebedor = Recebedor.recebedorCadastrado nome listaRecebedores
         if (recebedor == True) then do
             verFicha <- prompt "Visualizar:\n(1) Ficha Médica do recebedor\n(2) Ficha de Dados\n(3) Sair \n"
             putStrLn "\n"
             if (verFicha == "1") then do
-                putStrLn "IMPLEMENTAR FICHA MEDICA toString"
-            else do --putStr Recebedor.imprimeRecebedor nome carregaRecebedores
-                putStr "IMPLEMENTAR RECEBEDOR TO STRING"
+                let fichaMedica = Recebedor.recebedorFichaMedicaString nome listaRecebedores 
+                putStr fichaMedica 
+
+            else do
+                let recebe = Recebedor.recebedorToString nome listaRecebedores
+                putStr recebe
             
         else do 
-            cadastrarNovo <- prompt "Recebedor não cadastrado\nCadastrar um novo Recebedor(a)?\n(1) SIM\n(2) NÃO\n"
-            if (cadastrarNovo == "1") then do menuInicial else do putStr ""
+            putStr "Recebedor não cadastrado\n"
+            menuInicial
 
-        -- se o recebedor já for cadastrado imprime os dados senao cadastra novo
+        menuInicial
+        
 
     else if (input == "3") then do
-        let listaRecebedores = Recebedor.todosOsRecebedores carregaRecebedores
-        putStr ("\n" ++ listaRecebedores)
+        let showListaRecebedores = Recebedor.todosOsRecebedores listaRecebedores
+        putStr ("\n" ++ showListaRecebedores)
+        menuInicial
 
-{-
     else if (input == "4") then do
-        putStr("Digite o nome do recebedor: ")
-        nome <- getLine
-        fichaRecebedor = Recebedor.fichaDeDadosRecebedor nome
+        nome <- prompt "Digite o nome do recebedor: "
+        let fichaRecebedor = Recebedor.recebedorFichaMedicaString nome listaRecebedores
+        putStr (fichaRecebedor ++ "\n")
     
--}
-    else putStr ("Entrada Inválida xxxx")
+    else putStr ("Entrada Inválida")
 
 prompt :: String -> IO String
 prompt text = do
@@ -494,20 +503,51 @@ verificaDataCritica :: IO()
 verificaDataCritica = do
     today <- hoje
     listaEstoque <- carregaEstoque
-    if((today) == 1) then do
+    if((getDia today) == 1) then do
         DatasCriticas.verificaHoje listaEstoque
     else do
         return()       
     
-
+getAno :: (a, b, c) -> a
+getAno (y, _, _) = y
+getMes :: (a, b, c) -> b
+getMes (_, y, _) = y
 getDia :: (a, b, c) -> c
 getDia (_, _, y) = y
 
-hoje :: IO(Int)
+getToday :: IO(Day)
+getToday = do
+    today <- (utctDay <$> getCurrentTime)    
+    return (today)
+
+hoje :: IO((Integer, Int, Int))
 hoje = do
-    today <- toGregorian <$> (utctDay <$> getCurrentTime)
-    return (getDia today)
+    today <- toGregorian <$> (utctDay <$> getCurrentTime)    
+    return (today)
 
 
 toUpperCase :: String -> String
-toUpperCase entrada = [toUpper x | x <- entrada]    
+toUpperCase entrada = [toUpper x | x <- entrada]
+
+carregaAgenda :: IO(Map Day String)
+carregaAgenda = Auxiliar.iniciaAgendaLocal
+
+carregaEnfermeiros ::  IO([Enfermeiro.Enfermeiro])
+carregaEnfermeiros = Auxiliar.iniciaEnfermeiros
+
+carregaEscala :: IO(Map Day String)
+carregaEscala = Auxiliar.iniciaEscala
+
+carregaEstoque ::  IO([Bolsa.Bolsa])
+carregaEstoque = Auxiliar.iniciaEstoque
+
+carregaImpedimentos :: IO([Impedimento.Impedimento])
+carregaImpedimentos = Auxiliar.iniciaImpedimentos
+
+carregaRecebedores :: IO([Recebedor.Recebedor])
+carregaRecebedores = Auxiliar.iniciaRecebedores
+
+carregaDoadores :: IO([Doador.Doador])
+carregaDoadores = Auxiliar.iniciaDoador
+
+

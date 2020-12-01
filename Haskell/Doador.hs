@@ -84,11 +84,16 @@ module Doador where
     registraImpedimento doador (h:t) impedimento
         |isInfixOf (toUpperCase doador) (toUpperCase (nome h)) == True = ((Doador(nome h) (endereco h) (idade h) (telefone h) (tipSanguineo h) (impedimentoStr h ++ "--" ++ impedimentoAsString) (Impedimento.ultimoDiaImpedido impedimento (Doador.ultimoDiaImpedido h) ) (doacoes h)) : t ) 
         |otherwise = (h: registraImpedimento doador t impedimento)
-        where impedimentoAsString = Impedimento.impedimentoToString impedimento
+        where impedimentoAsString = Impedimento.impedimentoImprime impedimento
 
     adicionaDoacao :: String -> [Doador] -> String -> [Doador]
     adicionaDoacao doador [] doacao = []
     adicionaDoacao doador (h:t) doacao
         |isInfixOf (toUpperCase doador) (toUpperCase (nome h)) == True = ((Doador(nome h) (endereco h) (idade h) (telefone h) (tipSanguineo h) (impedimentoStr h) (Doador.ultimoDiaImpedido h) (doacoes h ++ "--" ++doacao)) : t ) 
         |otherwise = (h: adicionaDoacao doador t doacao)
-    
+
+    isImpedido :: Doador -> Day -> Bool
+    isImpedido doador diaDoacao  
+        |(Doador.ultimoDiaImpedido doador) > diaDoacao = True
+        |otherwise = False
+
