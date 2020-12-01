@@ -5,6 +5,7 @@
 :- include('Doador.pl').
 :- include('Persistencia.pl').
 :- include('HistoricoDoEstoque.pl').
+:- include('Agenda.pl').
 :- initialization(main).
 
 
@@ -68,12 +69,14 @@ menuEnfermeiro(4):-
 
 
 menuEnfermeiro(5):-
-    listaEnfermeiros(ListaEnfermeiros),
-    listaEscala(ListaEscala),write(ListaEscala), nl,   
-    write("Visualizar escala de Enfermeiros"),
-    lerString(Nome),    
-   
-    
+    listaEscala(ListaEscala),   
+    write("Visualizar escala de Enfermeiros"), nl,
+    write("Insira a data: "), lerString(Data),   
+    pegaData(Data, ListaEscala, Result),     
+    (Result \= -1 -> visualizaEscalaData(ListaEscala,Data); write("Sem escalas para essa data")),
+
+    nl, write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 menuEnfermeiro(N):-
@@ -237,7 +240,6 @@ menuDoador(99):-
     menu(99).
 
 menuDoador(1):-
-    listaDoadores(ListaDoadores),    
     write("Você irá cadastrar um Doador(a): "),
     nl,
     write("Insira o nome do Doador(a): "),
@@ -250,8 +252,9 @@ menuDoador(1):-
     lerString(Telefone),
     write("Insira o Tipo Sanguineo do Doador(a): "),
     lerString(TipSanguineo),
-    write("Insira o Impedimento do Doador(a): "),
-    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,Doador),
+    validaTipo(TipSanguineo),
+    getOntem(Ontem), 
+    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo, "", Ontem,Doador),    
     salvaDoador(Doador),
     write("Doador(a) cadastrad(a)"),
     menu(99).
@@ -267,7 +270,8 @@ menuDoador(2):-
 menuDoador(3):-
     listaDoadores(ListaDoadores),
     listarDoadores(ListaDoadores),
-    lerString(A),
+    write("Pressione enter para continuar."),
+    lerString(_),
     menu(99).
 
 menuDoador(4):-
@@ -387,12 +391,77 @@ menuEstoque(3):-
     menu(99).    
 
 %Se o usuario digitar uma opcao invalida, ele sera informado e voltara para o menu principal
-menuEstoque(N):-
+menuAgenda(99):-    
+    tty_clear,    
+    write("Menu Agendamento"),nl,
+    write("1. Agendar coleta no Hemocentro"), nl,
+    write("2. Agendar coleta em domicílio"), nl,
+    write("3. Visualizar agenda de doações"), nl,
+    lerNumero(Numero),
+    menuAgenda(Numero),
+    menu(99).
+
+menuAgenda(1):-
+    listaEnfermeiros(ListaEnfermeiros),
+    listaDoadores(ListaDoadores),
+    listaAgenda(ListaAgenda),
+
+    write("Agendar coleta no Hemocentro"),nl,
+    write("Insira a data: "), lerString(Data),
+    write("Insira o nome do Doador(a): "), lerString(DoadorNome),
+    write("Insira o nome do Enfermeiro(a): "), lerString(EnfermeiroNome),
+   
+    buscaEnfermeiro(EnfermeiroNome,ListaEnfermeiros,Enfermeiro), 
+    buscaDoador(DoadorNome,ListaDoadores,Doador),
+    ((Enfermeiro \= "Enfermeiro não encontrado")->(
+    (Doador \= "Doador não encontrado")-> (adicionaAgendaHemocentro(Data, Doador, Enfermeiro, ListaAgenda, AgendaNova))
+    ; write("Doador não cadastrado")); write("Enfermeiro não cadastrado")), 
+    salvaAgenda(AgendaNova),
+    
+    nl, write("Pressione enter para continuar."),
+    lerString(_),
+    menu(99).
+
+menuAgenda(2):-
+    listaEnfermeiros(ListaEnfermeiros),
+    listaDoadores(ListaDoadores),
+    listaAgenda(ListaAgenda),
+
+    write("Agendar coleta em domicílio"),nl,
+    write("Insira a data: "), lerString(Data),
+    write("Insira o nome do Doador(a): "), lerString(DoadorNome),
+    write("Insira o nome do Enfermeiro(a): "), lerString(EnfermeiroNome),
+   
+    buscaEnfermeiro(EnfermeiroNome,ListaEnfermeiros,Enfermeiro), 
+    buscaDoador(DoadorNome,ListaDoadores,Doador),
+    ((Enfermeiro \= "Enfermeiro não encontrado")->(
+    (Doador \= "Doador não encontrado")-> (adicionaAgendaDomicilio(Data, Doador, Enfermeiro, ListaAgenda, AgendaNova))
+    ; write("Doador não cadastrado")); write("Enfermeiro não cadastrado")), 
+    salvaAgenda(AgendaNova),
+
+    nl, write("Pressione enter para continuar."),
+    lerString(_),
+    menu(99).
+
+menuAgenda(3):-
+    listaAgenda(ListaAgenda),
+
+    write("Visualizar agenda de doação"),nl,
+    write("Insira a data: "), lerString(Data),    
+    pegaData(Data, ListaAgenda, Result),
+    (Result \= -1 -> visualizaAgenda(ListaAgenda,Data); write("Sem agendamentos para essa data")),
+
+    nl, write("Pressione enter para continuar."),
+    lerString(_),
+    menu(99).
+
+menuAgenda(N):-
     tty_clear,    
     write("Opção "), write(N), write(" Inválida"),nl,
     write("Pressione enter para continuar."),
     lerString(_),
     menu(99).
+
 
 %Main
 main:-
@@ -400,9 +469,11 @@ main:-
     carregaImpedimentos(), 
     carregaEstoque(),
     carregaDoadores(),  
-    %carregaRecebedores(),
+    carregaRecebedores(),
+    carregaEscala(),
+    carregaAgenda(),
     letreiroInicial,
-    lerString(A),
+    lerString(_),
     menu(99),
     halt.
 
@@ -424,7 +495,7 @@ menu(2):-
 %Menu(3) Invoca o Controle de Doadores  
 menu(3):-
     tty_clear,
-    write("Controle de Doadores"),
+    menuDoador(99),
     nl,    
     menu(99).
 
@@ -445,7 +516,7 @@ menu(5):-
 %Menu(6) Invoca o Controle de Agenda de Coleta de Sangue
 menu(6):-
     tty_clear,
-    write("Agendar Coleta de sangue"),
+    menuAgenda(99),
     nl,
     menu(99).
 
@@ -459,9 +530,11 @@ menu(7):-
 
 %Menu(8) Salva os dados 
 menu(8):-
-    tty_clear,
     salvarDados(),
-    write("Dados Salvos!"),
+    tty_clear,
+    write("Dados Salvos!"), nl,
+    write("Pressione enter para continuar."), 
+    lerString(_),
     menu(99).   
 
 %Menu(9) Encerra o programa
@@ -524,12 +597,6 @@ salvaEnfermeiro(Enfermeiro):-
     append(Lista,[Enfermeiro],NovaLista),
     assert(listaEnfermeiros(NovaLista)).
 
-%remove um enfermeiro e faz a nova lista sem o enfermeiro que foi removido
-removeEnfermeiro(Enfermeiro):-
-    retract(listaEnfermeiros(Lista)),
-    removerEnfermeiro(Lista,Enfermeiro,NovaLista),
-    assert(listaEnfermeiros(NovaLista)).
-
 %cria a lista dinamica de enfermeiro
 listaEnfermeiros([]).
 :-dynamic listaEnfermeiros/1.
@@ -546,26 +613,23 @@ carregaEnfermeiros():-
 salvaEscala(DiaEnfermeiro):-
     retract(listaEscala(Lista)),
     removerEscala(DiaEnfermeiro,Lista,ListaTemp),
-    append(Lista,[DiaEnfermeiro],NovaLista),
+    append(ListaTemp,[DiaEnfermeiro],NovaLista),
     assert(listaEscala(NovaLista)).
-
-%remove uma escala e faz a nova lista sem a escala que foi removido
-removeEscala(DiaEnfermeiro):-
-    retract(listaEscala(Lista)),
-    removerEnfermeiro(Lista,DiaEnfermeiro,NovaLista),
-    assert(listaEnfermeiros(NovaLista)).
 
 %cria a lista dinamica de escala
 listaEscala([]).
 :-dynamic listaEscala/1.
 
 %carrega a lista salva com a persistencia de arquivo
-/*carregaEnfermeiros():-
-    iniciaEnfermeiros(ListaEnfermeiros),
-    retract(listaEnfermeiros(Lista)),
-    append(Lista,ListaEnfermeiros,NovaLista),
-    assert(listaEnfermeiros(NovaLista)).*/
+carregaEscala():-
+    iniciaEscala(ListaEscala),
+    retract(listaEscala(Lista)),
+    append(Lista,ListaEscala,NovaLista),
+    assert(listaEscala(NovaLista)).
+
+
 /*-----------------------------------------------------------------*/
+
 %salva um recebedor na nova lista de recebedores
 salvaRecebedor(Recebedor):-
     retract(listaRecebedores(Lista)),
@@ -633,11 +697,11 @@ carregaImpedimentos():-
     assert(listaImpedimentos(NovaLista)).
 
 
-/*carregaRecebedores():-
+carregaRecebedores():-
     iniciaRecebedores(ListaRecebedores),
     retract(listaRecebedores(Lista)),
     append(Lista,ListaRecebedores,NovaLista),
-    assert(listaEstoque(NovaLista)).*/
+    assert(listaRecebedores(NovaLista)).
 
 
 carregaEstoque():-
@@ -646,22 +710,6 @@ carregaEstoque():-
     append(Lista,ListaEstoque,NovaLista),
     assert(listaEstoque(NovaLista)).
 
-
-%salva um doador na nova lista de doadores
-salvaDoador(Doador):-
-    retract(listaDoadores(Lista)),
-    append(Lista,[Doador],NovaLista),
-    assert(listaDoadores(NovaLista)).
-
-%remove um doador e faz a nova lista sem o doador que foi removido
-removeDoador(Doador):-
-    retract(listaDoadores(Lista)),
-    removerDoador(Lista,Doador,NovaLista),
-    assert(listaDoadores(NovaLista)).
-
-%cria a lista dinamica de doador
-listaDoadores([]).
-:-dynamic listaDoadores/1.
 
 %salva uma nova bolsa na lista de estoque
 salvaEstoque(Bolsa):-
@@ -680,21 +728,75 @@ removeEstoque(TipoSanguineo,Qtd):-
 listaEstoque([]).
 :-dynamic listaEstoque/1.
 
+%-------------------------------------------------------------------------------------
+
 %HistoricoDoEstoque
 historico(Estado):-
     %PegarQuantidadeDeSangue
     verificaEstoque(QtdSangue, Estado). 
 
+
+
+%-------------------------------------------------------------------------------------
+
+
+%salva a Agenda de doações
+salvaAgenda(AgendaDia):-
+    retract(listaAgenda(Lista)),
+    removerAgenda(AgendaDia,Lista,ListaTemp),
+    append(ListaTemp,[AgendaDia],NovaLista),
+    assert(listaAgenda(NovaLista)).
+
+%cria a lista dinamica de Agenda
+listaAgenda([]).
+:-dynamic listaAgenda/1.
+
+%carrega a lista salva com a persistencia de arquivo
+carregaAgenda():-
+    iniciaAgenda(ListaAgenda),
+    retract(listaAgenda(Lista)),
+    append(Lista,ListaAgenda,NovaLista),
+    assert(listaAgenda(NovaLista)).
+
+%-------------------------------------------------------------------------------------
+
 %verifica se o tipo sanguineo eh valido, se nao for, informa o usuario e volta ao menu 
 %TODO ver se nao tem uma forma melhor de fazer isso! 
 validaTipo(Tipo):- (member(Tipo,["O-","O+","A-","A+","B-","B+","AB-","AB+"]) -> true; write("Tipo invalido"), menu(99)).
+
+/*%verifica se o data passada eh valido, se nao for, informa o usuario e volta ao menu 
+%TODO ver se nao tem uma forma melhor de fazer isso! 
+validaData(Data):- (get_time(Stamp), StampTotal is Stamp + (UltimoDia*86400), ())  -> true; write("Data invalida"), menu(99)).
+
+getUltimoDiaImpedido(Impedimento, StampAtual, NovoStamp):- 
+    getDiasImpedidos(Impedimento, UltimoDia),
+    get_time(Stamp),
+    StampTotal is Stamp + (UltimoDia*86400),
+    (StampTotal > StampAtual -> NovoStamp = StampTotal; NovoStamp = StampAtual).
+
+
+dataString(Stamp, Data):-
+    stamp_date_time(Stamp, DataTempo, local),
+    date_time_value(date, DataTempo, DataFinal),
+    Data = DataFinal.
+
+
+
+
+*/
 
 salvarDados():-
     listaEnfermeiros(ListaEnfermeiros),
     listaImpedimentos(ListaImpedimentos),
     listaEstoque(ListaEstoque),
     listaRecebedores(ListaRecebedores),
+    listaDoadores(ListaDoadores),
+    listaEscala(ListaEscala),
+    listaAgenda(ListaAgenda),
     salvaListaImpedimentos(ListaImpedimentos),
     salvaListaEnfermeiros(ListaEnfermeiros),
     salvaListaEstoque(ListaEstoque),
-    salvaListaRecebedores(ListaRecebedores).
+    salvaListaDoadores(ListaDoadores),
+    salvaListaRecebedores(ListaRecebedores),
+    salvaListaEscala(ListaEscala),
+    salvaListaAgenda(ListaAgenda).

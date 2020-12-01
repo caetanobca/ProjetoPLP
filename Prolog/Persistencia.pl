@@ -88,7 +88,6 @@ resgataEstoque([H|T], Lista):-
 salvaListaEnfermeiros(ListaEnfermeiros):-        
     open('dados/Enfermeiros.txt', write, ArquivoEnfermeiros),    
     escreveTodosEnfermeiros(ListaEnfermeiros,String),   
-    write(String),
     write(ArquivoEnfermeiros,String),
     close(ArquivoEnfermeiros). 
 
@@ -127,7 +126,6 @@ resgataEnfermeiro([H|T], Lista):-
 salvaListaDoadores(ListaDoadores):-        
     open('dados/Doadores.txt', write, ArquivoDoadores),    
     escreveTodosDoadores(ListaDoadores,String),   
-    write(String),
     write(ArquivoDoadores,String),
     close(ArquivoDoadores). 
 
@@ -138,12 +136,20 @@ escreveTodosDoadores([H|T],String):-
     string_concat(DoadorString,StringProx,String).
 
 
-escreveDoador(doador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doacoes),String):-
-    string_concat(Nome, ",", Parte1), string_concat(Parte1, Endereco, Parte2),
-    string_concat(Parte2, ",", Parte3),string_concat(Parte3, Idade, Parte4), string_concat(Parte4, ",", Parte5), 
-    string_concat(Parte5, Telefone, Parte6), string_concat(Parte6, ",", Parte7), string_concat(Parte7, TipSanguineo, Parte8), 
-    string_concat(Parte8, ",", Parte9), string_concat(Parte9, ImpedimentoStr, Parte10), string_concat(Parte10, ",", Parte11),
-    string_concat(Parte11, UltimoDiaImpedido, Parte12), string_concat(Parte12, "\n", String).
+escreveDoador(doador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido),String):-
+    string_concat(Nome, ",", Parte1), 
+    string_concat(Parte1, Endereco, Parte2),
+    string_concat(Parte2, ",", Parte3),
+    string_concat(Parte3, Idade, Parte4), 
+    string_concat(Parte4, ",", Parte5), 
+    string_concat(Parte5, Telefone, Parte6), 
+    string_concat(Parte6, ",", Parte7), 
+    string_concat(Parte7, TipSanguineo, Parte8), 
+    string_concat(Parte8, ",", Parte9), 
+    string_concat(Parte9, ImpedimentoStr, Parte10), 
+    string_concat(Parte10, ",", Parte11),
+    string_concat(Parte11, UltimoDiaImpedido, Parte12),
+    string_concat(Parte12, "\n", String).
 
 iniciaDoadores(ListaDoadores) :-
     open('dados/Doadores.txt', read, Stream),
@@ -160,7 +166,7 @@ resgataDoador([H|T], Lista):-
     nth0(4, H, TipSanguineo),
     nth0(5, H, ImpedimentoStr),
     nth0(6, H, UltimoDiaImpedido),
-    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,Doador),
+    constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,Doador),
     resgataDoador(T, ListaNova),
     append([Doador], ListaNova, Lista). 
 
@@ -188,7 +194,7 @@ escreveRecebedor(recebedor(Nome,Idade,Endereco,NumDeBolsas,TipoSanguineo,Hospita
     string_concat(Parte9, Hospital, Parte10), string_concat(Parte10, "\n", Result).
 
 
-iniciaRecebedores(ListaRecebedores) :-
+iniciaRecebedores(ListaRecebedores):-
     open('dados/Recebedores.txt', read, Stream),
     read_file(Stream,ListaRecebedoresStr),    
     resgataRecebedor(ListaRecebedoresStr, ListaRecebedores),     
@@ -206,6 +212,7 @@ resgataRecebedor([H|T], Lista):-
     resgataRecebedor(T, ListaNova),
     append([Recebedor], ListaNova, Lista). 
 
+/*Persistência de estoque*/
 
 %Metodo que inicializa o historico de estoque
 iniciaHistorico(Dia, Mes, QtdMl, QtdMlAnoPassado):-
@@ -235,6 +242,71 @@ resgataHisorico([H|T], Dia, Mes, QtdMl, QtdMlAnoPassado, StreamWrite):-
 escreveHistorico(Dia, Mes, QtdMl, Result):-
     string_concat(Dia,",", Parte1), string_concat(Parte1, Mes, Parte2), string_concat(Parte2, ",", Parte3), 
     string_concat(Parte3, QtdMl, Parte4), string_concat(Parte4, "\n", Result).
+
+salvaListaEscala(ListaEscala):-
+    open('dados/Escala.txt',write,Stream),
+    escreveTodasEscalas(ListaEscala,String),
+    write(Stream,String),
+    close(Stream).
+
+escreveTodasEscalas([],Result):- Result = ''.
+escreveTodasEscalas([Head|Tail],Result):-
+    escreveEscala(Head,String),
+    escreveTodasEscalas(Tail,ResultNovo),    
+    string_concat(String,ResultNovo,Result).
+
+escreveEscala(Escala,String):-
+    nth0(0,Escala,Data),nth0(1,Escala,Enfermeiros),
+    string_concat(Data,",",Parte1), string_concat(Parte1,Enfermeiros,Parte2), 
+    string_concat(Parte2, "\n", String).
+
+iniciaEscala(ListaEscala):-
+    open('dados/Escala.txt',read,Stream),
+    read_file(Stream,ListaEscalaStr),
+    resgataEscala(ListaEscalaStr,ListaEscala),    
+    close(Stream).
+
+resgataEscala([],_).
+resgataEscala([H|T],Lista):-
+    nth0(0,H,Data),
+    nth0(1,H,Enfermeiros),
+    resgataEscala(T,ListaNova),
+    DataEnfermeiros = [Data,Enfermeiros],
+    append([DataEnfermeiros],ListaNova,Lista).
+
+
+salvaListaAgenda(ListaAgenda):-
+    open('dados/AgendaLocal.txt',write,Stream),
+    escreveTodosAgendamentos(ListaAgenda,String),
+    write(Stream,String),
+    close(Stream).
+
+escreveTodosAgendamentos([],Result):- Result = ''.
+escreveTodosAgendamentos([Head|Tail],Result):-
+    escreveAgenda(Head,String),
+    escreveTodosAgendamentos(Tail,ResultNovo),
+    string_concat(String,ResultNovo,Result).
+
+escreveAgenda(Agenda,String):-
+    nth0(0,Agenda,Data),nth0(1,Agenda,Doadores),
+    string_concat(Data,",",Parte1), string_concat(Parte1,Doadores,Parte2), 
+    string_concat(Parte2, "\n", String).
+
+
+iniciaAgenda(ListaAgenda):-
+    open('dados/AgendaLocal.txt',read,Stream),
+    read_file(Stream,ListaAgendaStr),
+    resgataAgenda(ListaAgendaStr,ListaAgenda),
+    close(Stream).
+
+
+resgataAgenda([],_).
+resgataAgenda([H|T],Lista):-
+    nth0(0,H,Data),
+    nth0(1,H,Doadores),
+    resgataAgenda(T,ListaNova),
+    DataDoadores = [Data,Doadores],
+    append([DataDoadores],ListaNova,Lista).
 
     /*leitura*/
    

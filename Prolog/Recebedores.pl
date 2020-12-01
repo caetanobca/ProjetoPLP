@@ -35,3 +35,5 @@ recebedoreString(recebedor(Nome,Idade,Endereco,NumDeBolsas,TipoSanguineo,Hospita
     string_concat(Parte9, "\nHospital onde está internado: ", Parte10), string_concat(Parte10, Hospital, Result).
 
 existeRecebedor(Nome,ListaRecebedor):- buscaRecebedor(Nome,ListaRecebedor,Result), (Result \= "Paciente não encontrado").
+
+removerRecebedor(ListaRecebedor,Nome,Result):- buscaRecebedor(Nome,ListaRecebedor,Recebedor), delete(ListaRecebedor,Recebedor,Result).
