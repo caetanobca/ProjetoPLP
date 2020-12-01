@@ -51,3 +51,5 @@ visualizaAgenda(ListaAgenda,Data):-
 
 listarAgendaData([]):-nl.
 listarAgendaData([Head|Tail]):- write(Head), nl, listarAgendaData(Tail).
+
+

@@ -60,8 +60,9 @@ impedimentoToStringSimples(medicamento(Funcao, Composto, TempoSuspencao), Result
 /*Retorna o tipo date, com as informações do dia gerado pela soma de dias o impedimento com a data de hoje*/
 getUltimoDiaImpedido(Impedimento, StampAtual, NovoStamp):- 
     getDiasImpedidos(Impedimento, UltimoDia),
+    atom_number(UltimoDia, UltimoDiaNumber),    
     get_time(Stamp),
-    StampTotal is Stamp + (UltimoDia*86400),
+    StampTotal is Stamp+(UltimoDiaNumber*86400),       
     (StampTotal > StampAtual -> NovoStamp = StampTotal; NovoStamp = StampAtual).
 
 

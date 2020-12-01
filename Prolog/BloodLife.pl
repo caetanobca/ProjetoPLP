@@ -58,14 +58,15 @@ menuEnfermeiro(4):-
     listaEnfermeiros(ListaEnfermeiros),
     write("Insira a Data: "),
     lerString(Data),
-    write("Insira o nome do Enfermeiro: "),
+    (validaData(Data) ->
+    (write("Insira o nome do Enfermeiro: "),
     lerString(Nome),    
     listaEnfermeiros(ListaEnfermeiros),       
     buscaEnfermeiro(Nome,ListaEnfermeiros,Enfermeiro), 
-    listaEscala(ListaEscala),      
+    listaEscala(ListaEscala),         
     ((Enfermeiro \= "Enfermeiro não encontrado")-> 
     (adicionaEscala(Data,Enfermeiro,ListaEscala,Result), salvaEscala(Result), write("Enfermeiro escalado"))
-    ; write("Enfermeiro não cadastrado")), 
+    ; write("Enfermeiro não cadastrado")));write("Data inserida passada")),
 
     nl, write("Pressione enter para continuar."),
     lerString(_),
@@ -75,7 +76,7 @@ menuEnfermeiro(4):-
 menuEnfermeiro(5):-
     listaEscala(ListaEscala),   
     write("Visualizar escala de Enfermeiros"), nl,
-    write("Insira a data: "), lerString(Data),   
+    write("Insira a data: "), lerString(Data),
     pegaData(Data, ListaEscala, Result),     
     (Result \= -1 -> visualizaEscalaData(ListaEscala,Data); write("Sem escalas para essa data")),
 
@@ -211,7 +212,7 @@ cadastroImpedimento(1, Impedimento):-
     write("Cadastro de Medicamento"), nl,
     write("Função: "), lerString(Funcao), nl,
     write("Composto: "), lerString(Composto), nl,
-    write("tempo de Suspencao (em dias): "), lerNumero(Tempo), nl,
+    write("tempo de Suspencao (em dias): "), lerString(Tempo), nl,
     constroiMedicamento(Funcao, Composto, Tempo, Impedimento).
 
 %Cadastro doenca
@@ -219,7 +220,7 @@ cadastroImpedimento(2, Impedimento):-
     tty_clear,
     write("Cadastro de Doenca"), nl,
     write("Cid: "), lerString(Cid), nl,
-    write("tempo de Suspencao (em dias): "), lerNumero(Tempo), nl,
+    write("tempo de Suspencao (em dias): "), lerString(Tempo), nl,
     constroiDoenca(Cid, Tempo, Impedimento).
 
 cadastroImpedimento(N, Impedimento):-
@@ -257,7 +258,7 @@ menuDoador(1):-
     write("Insira o Tipo Sanguineo do Doador(a): "),
     lerString(TipSanguineo),
     validaTipo(TipSanguineo),
-    getOntem(Ontem), 
+    getOntemString(Ontem), 
     constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo, "", Ontem,Doador),    
     salvaDoador(Doador),
     write("Doador(a) cadastrad(a)"),
@@ -268,7 +269,8 @@ menuDoador(2):-
     write("Insira o nome do(a) Doador(a) que você deseja: "),
     lerString(Nome),
     buscaDoador(Nome,ListaDoadores,Doador),
-    write(Doador),    
+    doadoresToString(Doador, ToStringDoador),
+    write(ToStringDoador),    
     menu(99).
 
 menuDoador(3):-
@@ -280,10 +282,18 @@ menuDoador(3):-
 
 menuDoador(4):-
     listaDoadores(ListaDoadores),
+    listaImpedimentos(ListaImpedimento),
     write("Insira o nome do(a) Doador(a) que você deseja adicionar um impedimento na ficha medica: "),
     lerString(Nome),
-    buscaDoador(Nome,ListaDoadores,Doador),
-    /* falta fazer*/
+    write("Insira o Id do impedimento que você deseja adicionar: "), nl,
+    write("Medicamento -> Id = Composto"), nl,
+    write("Doenca -> Id = Cid"), nl,
+    write("Id: "), lerString(NovoImpedimento), nl,
+    (existeImpedimento(NovoImpedimento, ListaImpedimento) ->
+    (buscaImpedimento(NovoImpedimento, ListaImpedimento, Impedimento), buscaDoador(Nome,ListaDoadores,Doador),
+    ((Doador \= "Doador não encontrado")-> (adicionaImpedimento(Doador,Impedimento,Result), 
+    removeDoador(Nome), salvaDoador(Result), write("Impedimento adicionado"))
+    ; write("Impedimento não adicionado")))), 
     menu(99).
 
 menuDoador(5):-
@@ -333,6 +343,7 @@ menuEstoque(11):-
     constroiBolsa(TipoSanguineoUpper,450,NovaBolsa),
     salvaEstoque(NovaBolsa),
     write("Bolsa cadastrada"),
+    
     menu(99).
 
 %Menu de Estoque para cadastro de nova doação com Doador ja cadastrado
@@ -415,15 +426,24 @@ menuAgenda(1):-
 
     write("Agendar coleta no Hemocentro"),nl,
     write("Insira a data: "), lerString(Data),
-    write("Insira o nome do Doador(a): "), lerString(DoadorNome),
-    write("Insira o nome do Enfermeiro(a): "), lerString(EnfermeiroNome),
-   
-    buscaEnfermeiro(EnfermeiroNome,ListaEnfermeiros,Enfermeiro), 
-    buscaDoador(DoadorNome,ListaDoadores,Doador),
-    ((Enfermeiro \= "Enfermeiro não encontrado")->(
-    (Doador \= "Doador não encontrado")-> (adicionaAgendaHemocentro(Data, Doador, Enfermeiro, ListaAgenda, AgendaNova))
-    ; write("Doador não cadastrado")); write("Enfermeiro não cadastrado")), 
-    salvaAgenda(AgendaNova),
+    (validaData(Data) -> 
+
+        (write("Insira o nome do Doador(a): "), lerString(DoadorNome),
+        buscaDoador(DoadorNome,ListaDoadores,Doador),
+
+        (Doador \= "Doador não encontrado" -> 
+            (estaImpedido(Doador, Data)-> 
+                (write("Doador impedido de doar na data inserida"));
+
+                (write("Insira o nome do Enfermeiro(a): "), lerString(EnfermeiroNome),
+                buscaEnfermeiro(EnfermeiroNome,ListaEnfermeiros,Enfermeiro),
+
+                ((Enfermeiro \= "Enfermeiro não encontrado")->
+                    (adicionaAgendaHemocentro(Data, Doador, Enfermeiro, ListaAgenda, AgendaNova), salvaAgenda(AgendaNova))
+                    ;write("Enfermeiro não cadastrado"))))
+            ;write("Doador não cadastrado")))     
+        ;write("Data inserida passada")
+    ),
     
     nl, write("Pressione enter para continuar."),
     lerString(_),
@@ -436,15 +456,25 @@ menuAgenda(2):-
 
     write("Agendar coleta em domicílio"),nl,
     write("Insira a data: "), lerString(Data),
-    write("Insira o nome do Doador(a): "), lerString(DoadorNome),
-    write("Insira o nome do Enfermeiro(a): "), lerString(EnfermeiroNome),
-   
-    buscaEnfermeiro(EnfermeiroNome,ListaEnfermeiros,Enfermeiro), 
-    buscaDoador(DoadorNome,ListaDoadores,Doador),
-    ((Enfermeiro \= "Enfermeiro não encontrado")->(
-    (Doador \= "Doador não encontrado")-> (adicionaAgendaDomicilio(Data, Doador, Enfermeiro, ListaAgenda, AgendaNova))
-    ; write("Doador não cadastrado")); write("Enfermeiro não cadastrado")), 
-    salvaAgenda(AgendaNova),
+
+    (validaData(Data) -> 
+
+        (write("Insira o nome do Doador(a): "), lerString(DoadorNome),
+        buscaDoador(DoadorNome,ListaDoadores,Doador),
+
+        (Doador \= "Doador não encontrado" -> 
+            (estaImpedido(Doador, Data)-> 
+                (write("Doador impedido de doar na data inserida"));
+
+                (write("Insira o nome do Enfermeiro(a): "), lerString(EnfermeiroNome),
+                buscaEnfermeiro(EnfermeiroNome,ListaEnfermeiros,Enfermeiro),
+
+                ((Enfermeiro \= "Enfermeiro não encontrado")->
+                    (adicionaAgendaDomicilio(Data, Doador, Enfermeiro, ListaAgenda, AgendaNova), salvaAgenda(AgendaNova))
+                    ;write("Enfermeiro não cadastrado"))))
+            ;write("Doador não cadastrado")))     
+        ;write("Data inserida passada")
+    ),
 
     nl, write("Pressione enter para continuar."),
     lerString(_),
@@ -771,26 +801,12 @@ carregaAgenda():-
 %TODO ver se nao tem uma forma melhor de fazer isso! 
 validaTipo(Tipo):- (member(Tipo,["O-","O+","A-","A+","B-","B+","AB-","AB+"]) -> true; write("Tipo invalido"), menu(99)).
 
-/*%verifica se o data passada eh valido, se nao for, informa o usuario e volta ao menu 
-%TODO ver se nao tem uma forma melhor de fazer isso! 
-validaData(Data):- (get_time(Stamp), StampTotal is Stamp + (UltimoDia*86400), ())  -> true; write("Data invalida"), menu(99)).
-
-getUltimoDiaImpedido(Impedimento, StampAtual, NovoStamp):- 
-    getDiasImpedidos(Impedimento, UltimoDia),
-    get_time(Stamp),
-    StampTotal is Stamp + (UltimoDia*86400),
-    (StampTotal > StampAtual -> NovoStamp = StampTotal; NovoStamp = StampAtual).
-
-
-dataString(Stamp, Data):-
-    stamp_date_time(Stamp, DataTempo, local),
-    date_time_value(date, DataTempo, DataFinal),
-    Data = DataFinal.
-
-
-
-
-*/
+%verifica se o data passada eh valido, se nao for, informa o usuario e volta ao menu 
+ 
+validaData(Data):- 
+    stringParaData(Data, StampEntrada),
+    get_time(StampAtual),
+    StampEntrada >= StampAtual.
 
 salvarDados():-
     listaEnfermeiros(ListaEnfermeiros),
