@@ -24,7 +24,6 @@ module DatasCriticas where
         if(estoqueMes /= 0) then do
             let mlAnterior = (read (show estoqueMes) :: Float)
             let mlHoje = (read (show (Estoque.totalSangue estoqueHoje)) ::Float)
-            salvaEstoqueMes
             if ((mlAnterior * 0.50) >= mlHoje) then do
                 putStrLn("ESTOQUE EM ESTADO CRITICO SOLICITAR DOACOES")
             else if ((mlAnterior * 0.90) >= mlHoje)then do
@@ -35,17 +34,24 @@ module DatasCriticas where
                 putStrLn("ESTOQUE ACIMA DA MEDIA")
             else do
                 putStrLn("ESTOQUE EM OTIMAS CONDICOES")
-
         else do
-            let mlAnterior = 0
-            let mlHoje = Estoque.totalSangue estoqueHoje
-            salvaEstoqueMes
-            if(mlAnterior > mlHoje)then do 
             putStrLn ("SEM HISTORICO DE ESTOQUE")
-            else do
-            return ()                   
+                   
+        today <- hoje
+        if((getDia today) == 1) then do
+            salvaEstoqueMes
+        else do
+            return()                
 
-        
+
+    hoje :: IO((Integer, Int, Int))
+    hoje = do
+        today <- toGregorian <$> (utctDay <$> getCurrentTime)    
+        return (today)    
+    
+    getDia :: (a, b, c) -> c
+    getDia (_, _, y) = y
+    
 
     getEstoqueMes :: String -> Map String String -> Int
     getEstoqueMes mes estoqueMes

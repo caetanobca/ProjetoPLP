@@ -32,7 +32,7 @@ module Recebedor where
     -}
     todosOsRecebedores :: [Recebedor] -> String
     todosOsRecebedores [] = ""
-    todosOsRecebedores (h:t) = "Nome " ++ nome h ++ " " ++ "Endereco" ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
+    todosOsRecebedores (h:t) = "Nome: " ++ nome h ++ " " ++ "Endereço: " ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
         ++ "Telefone: " ++ telefone h ++ " " ++ "Quantidade de Bolsas de Sangue Necessárias: " ++ show (numDeBolsas h) ++ " " ++ "Tipo Sanguineo: " ++ tipoSanguineo h ++ " " ++ "Hospital: " ++ hospital h ++ "\n" ++ todosOsRecebedores t
 
     recebedorCadastrado :: String -> [Recebedor] -> Bool
@@ -44,13 +44,13 @@ module Recebedor where
     recebedorFichaMedicaString :: String -> [Recebedor.Recebedor]-> String
     recebedorFichaMedicaString procurado [] = ""
     recebedorFichaMedicaString procurado (h:t)
-        |procurado == nome h = "Ficha médica de " ++ procurado ++ "\n" ++ FichaMedica.imprimeFichaMedica (fichaMedica h)
+        |(toUpperCase procurado) == (toUpperCase (nome h)) = "Ficha médica de " ++ procurado ++ "\n" ++ FichaMedica.imprimeFichaMedica (fichaMedica h)
         |otherwise = recebedorFichaMedicaString procurado t        
 
     recebedorToString :: String -> [Recebedor.Recebedor] -> String
     recebedorToString procurado [] = ""
     recebedorToString procurado (h:t)
-        |procurado == nome h = "Nome: " ++ nome h ++ "\n" ++ "Endereço: " ++  endereco h ++ "\n" ++ "Idade: " ++ show (idade h) ++ "\n" ++ "Telefone: " ++ telefone h ++ "\n" ++ "Número de Bolsas: " ++ (show (numDeBolsas h)) ++ "\n" ++ "Tipo Sanguíneo: " ++  tipoSanguineo h ++ "\n"
+        |(toUpperCase procurado) == (toUpperCase (nome h)) = "Nome: " ++ nome h ++ "\n" ++ "Endereço: " ++  endereco h ++ "\n" ++ "Idade: " ++ show (idade h) ++ "\n" ++ "Telefone: " ++ telefone h ++ "\n" ++ "Número de Bolsas: " ++ (show (numDeBolsas h)) ++ "\n" ++ "Tipo Sanguíneo: " ++  tipoSanguineo h ++ "\n"
         |otherwise = recebedorToString procurado t 
     
     

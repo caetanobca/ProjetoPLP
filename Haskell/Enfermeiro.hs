@@ -4,6 +4,7 @@ module Enfermeiro where
     import Data.Map as Map
     import Data.Char
     import Data.Time
+    import Data.List.Split ( splitOn )
 
 
     data Enfermeiro = Enfermeiro{nome :: String, endereco :: String, idade :: Int, telefone :: String
@@ -12,11 +13,13 @@ module Enfermeiro where
     adicionaEnfermeiro :: String -> String -> Int -> String -> Enfermeiro
     adicionaEnfermeiro nome endereco idade telefone = (Enfermeiro {nome = nome, endereco = endereco,idade = idade, telefone = telefone})
 
-    encontraEnfermeiroString :: String -> [Enfermeiro] -> String
-    encontraEnfermeiroString procurado [] = ""
-    encontraEnfermeiroString procurado (h:t)
-        |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = show h ++ encontraEnfermeiroString procurado t
-        |otherwise = encontraEnfermeiroString procurado t
+    enfermeiroToString :: String -> [Enfermeiro] -> String
+    enfermeiroToString procurado [] = ""
+    enfermeiroToString procurado (h:t)
+        |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = "Nome: " ++ nome h ++ "\n    -Endeço: " ++ endereco h ++
+                                                    "\n    -Idade: " ++ show (idade h) ++ "\n    -Telefone: " ++ telefone h ++ "\n"
+                                                    ++ enfermeiroToString procurado t
+        |otherwise = enfermeiroToString procurado t
 
     encontraEnfermeiroStringNome :: String -> [Enfermeiro] -> String
     encontraEnfermeiroStringNome procurado [] = ""
@@ -34,7 +37,7 @@ module Enfermeiro where
     todosOsEnfermeiros [] = " "
     todosOsEnfermeiros (h:t) = "Nome: " ++ nome h 
         ++ " " ++ "Endereço: " ++ endereco h ++ " " ++ "Idade: " ++ show (idade h) ++ " "
-        ++ "Telefone: " ++ telefone h ++ "\n"++ todosOsEnfermeiros t
+        ++ "Telefone: " ++ telefone h ++ "\n\n"++ todosOsEnfermeiros t
     
     enfermeiroCadastrado :: String -> [Enfermeiro] -> Bool
     enfermeiroCadastrado procurado [] = False
@@ -47,14 +50,15 @@ module Enfermeiro where
         |encontraEnfermeiroStringNome nome enfermeiros /= "" = Map.toList(insertWith (++) diaMes novaEscala escala)
         where novaEscala = encontraEnfermeiroStringNome nome enfermeiros
 
-    visualizaEscala :: Day -> Map Day String -> Maybe String
+    visualizaEscala :: Day -> Map Day String -> String
     visualizaEscala diaMes escala
-        |member diaMes escala == False = Nothing
-        |member diaMes escala == True = Map.lookup diaMes escala
+        |member diaMes escala == False = "Data não encontrada"
+        |member diaMes escala == True = escalaStr
+        where escalaStr = "Enfermeiros escalados" ++ "\n" ++(formataEscala (splitOn "--" (escala ! diaMes)))
 
-    visualizaEnfermeiros :: [Enfermeiro] -> String
-    visualizaEnfermeiros [] = ""
-    visualizaEnfermeiros (h:t) = nome h ++ " " ++ visualizaEnfermeiros t
-
+    formataEscala :: [String] -> String
+    formataEscala  [] = ""
+    formataEscala (h:t) = h ++ "\n" ++ formataEscala t 
+        
     toUpperCase :: String -> String
     toUpperCase entrada = [toUpper x | x <- entrada]

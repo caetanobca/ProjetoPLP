@@ -7,7 +7,7 @@ module Doador where
     import System.IO.Unsafe(unsafeDupablePerformIO)
     import Data.Char
     import Impedimento
-
+    import System.IO.Unsafe(unsafeDupablePerformIO)
 
     data Doador = Doador{nome :: String, endereco :: String, idade :: Int, telefone :: String, tipSanguineo :: String, impedimentoStr :: String, ultimoDiaImpedido :: Day ,doacoes :: String
     } deriving (Show,Eq)
@@ -45,9 +45,17 @@ module Doador where
     encontraDoadorString :: String -> [Doador] -> String
     encontraDoadorString procurado [] = ""
     encontraDoadorString procurado (h:t)
-        |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = show h ++ encontraDoadorString procurado t
+        |((isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True) && (estaImpedido)) = "Nome: " ++ nome h ++ "\n       Endereço " ++ endereco h ++
+                                    "\n       Idade: " ++ (show (idade h)) ++ "\n       Telefone: " ++ telefone h ++ 
+                                    "\n       Tipo Sanguineo: " ++ tipSanguineo h ++ "\n       Impedimentos registrados: " ++ impedimentoStr h ++
+                                    "\n       Doações: " ++ doacoes h ++ "\n       Impedido de doar até " ++ (show (Doador.ultimoDiaImpedido h)) ++ "\n\n" ++ encontraDoadorString procurado t
+        |isInfixOf (toUpperCase procurado) (toUpperCase (nome h)) == True = "Nome: " ++ nome h ++ "\n       Endereço " ++ endereco h ++
+                                    "\n       Idade: " ++ (show (idade h)) ++ "\n       Telefone: " ++ telefone h ++ 
+                                    "\n       Tipo Sanguineo: " ++ tipSanguineo h ++ "\n       Impedimento: " ++ impedimentoStr h ++
+                                    "\n       Doações: " ++ doacoes h ++ "\n       Doador não está impedido de doar " ++ "\n\n" ++ encontraDoadorString procurado t
         |otherwise = encontraDoadorString procurado t
-
+        where estaImpedido = isImpedido h (unsafeDupablePerformIO(Impedimento.getHoje))    
+    
     encontraDoador :: String -> [Doador] ->  Doador
     encontraDoador procurado [] = (Doador "" "" 5 "" "" "" (fromGregorian 1888 12 25) "")
     encontraDoador procurado (h:t)
@@ -72,14 +80,10 @@ module Doador where
         |isInfixOf (toUpperCase procurado)  (toUpperCase (nome h)) == True = endereco h
         |otherwise = getEnderecoDoador procurado t
  
-    visualizaDoadores :: [Doador] -> String
-    visualizaDoadores [] = ""
-    visualizaDoadores (h:t) = nome h ++ " " ++ visualizaDoadores t
-
     toUpperCase :: String -> String
     toUpperCase entrada = [toUpper x | x <- entrada]
 
-    registraImpedimento :: String -> [Doador] -> Impedimento.Impedimento -> [Doador]
+    registraImpedimento :: String -> [Doador] -> Impedimento.Impedimento -> [Doador] 
     registraImpedimento doador [] impedimento = []
     registraImpedimento doador (h:t) impedimento
         |isInfixOf (toUpperCase doador) (toUpperCase (nome h)) == True = ((Doador(nome h) (endereco h) (idade h) (telefone h) (tipSanguineo h) (impedimentoStr h ++ "--" ++ impedimentoAsString) (Impedimento.ultimoDiaImpedido impedimento (Doador.ultimoDiaImpedido h) ) (doacoes h)) : t ) 
