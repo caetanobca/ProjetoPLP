@@ -33,19 +33,19 @@ removerEnfermeiro(ListaEnfermeiro,Nome,Result):- buscaEnfermeiro(Nome,ListaEnfer
 
 adicionaEscala(DiaMes,Enfermeiro,Escala,DataNome):-    
     pegaData(DiaMes,Escala,Result),
-    ((Result \= -1) -> (write("Data existe"), indiceData(Escala, Result, Indice), 
+    ((Result \= -1) -> (indiceData(Escala, Result, Indice), 
     nth0(Indice, Escala, EscalaDiaMes), nth0(1, EscalaDiaMes, EnfermeirosEscalados),
-    getEnfermeiroNome(Enfermeiro, Nome), string_concat(Nome, " -- ", NomeAdd), 
+    getEnfermeiroNome(Enfermeiro, Nome), string_concat(Nome, "//", NomeAdd), 
     string_concat(EnfermeirosEscalados, NomeAdd, EscalaFinal)) 
-    ;write("Data não existe"), getEnfermeiroNome(Enfermeiro, Nome), string_concat(Nome, " -- ", EscalaFinal)),    
+    ;getEnfermeiroNome(Enfermeiro, Nome), string_concat(Nome, "//", EscalaFinal)),    
     DataNome = [DiaMes,EscalaFinal].
 
 pegaData(_,[],Result):- Result = -1.
 pegaData(DiaMes,[Head|Tail],Result):-
-    nth0(0,Head,Data), 
-    (Data = DiaMes -> Result = Data; pegaData(DiaMes,Tail,Result)).
+    nth0(0,Head,Data), string_upper(Data, DataStr), string_upper(DiaMes, DiaMesStr),
+    (DataStr = DiaMesStr -> Result = DataStr; pegaData(DiaMes,Tail,Result)).
 
-indiceData([Head|_], Data, 0):- nth0(0,Head,Data), !.
+indiceData([Head|_], DataStr, 0):- nth0(0,Head,Data), string_upper(Data, DataStr), !.
 indiceData([_|Tail], Data, Indice):-
     indiceData(Tail, Data, Indice1), !,
     Indice is Indice1+1.
@@ -58,9 +58,14 @@ removerEscala(DiaEnfermeiro,ListaEscala,Result):-
 
 pegaEscala(DiaMes,[Head|Tail],Result):-
     nth0(0,Head,Data), 
-    (Data = DiaMes -> Result = Head; pegaData(DiaMes,Tail,Result)).
+    (Data = DiaMes -> Result = Head; pegaEscala(DiaMes,Tail,Result)).
 
-listarEscala([]):-nl.
-listarEscalaData(DiaMes,Escala,Result):- 
-    pegaData(DiaMes,Escala,Result).
+visualizaEscalaData(ListaEscala,Data):-
+    pegaEscala(Data, ListaEscala, EscalaData),   
+    nth0(1,EscalaData,EnfermeirosEscalados),   
+    atomic_list_concat(ListaEnfermeiros,"//", EnfermeirosEscalados),
+    write(Data),write(":"), nl,
+    listarEscalaData(ListaEnfermeiros).
     
+listarEscalaData([]):-nl.
+listarEscalaData([Head|Tail]):- write(Head), nl, listarEscalaData(Tail).
