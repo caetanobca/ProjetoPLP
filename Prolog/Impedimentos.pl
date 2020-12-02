@@ -50,10 +50,10 @@ impedimentoToString(medicamento(Funcao, Composto, TempoSuspencao), Result):-
 
 /*Gera uma representação textual simples e em uma linha*/
 impedimentoToStringSimples(doenca(Cid, TempoSuspencao), Result):- 
-    string_concat("Doença >Cid: ", Cid, Parte1), string_concat(Parte1, " >Tempo de Suspenção: ", Parte2), 
+    string_concat(">Cid: ", Cid, Parte1), string_concat(Parte1, " >Tempo de Suspenção: ", Parte2), 
     string_concat(Parte2, TempoSuspencao, Parte3), string_concat(Parte3, " dia(s)", Result).
 impedimentoToStringSimples(medicamento(Funcao, Composto, TempoSuspencao), Result):- 
-    string_concat("Medicamento: >Função: ", Funcao, Parte1), string_concat(Parte1, " >Composto: ", Parte2),
+    string_concat(">Função: ", Funcao, Parte1), string_concat(Parte1, " >Composto: ", Parte2),
     string_concat(Parte2, Composto, Parte3), string_concat(Parte3, " >Tempo de Suspenção: ", Parte4), 
     string_concat(Parte4, TempoSuspencao, Parte5), string_concat(Parte5, " dia(s)", Result).
 

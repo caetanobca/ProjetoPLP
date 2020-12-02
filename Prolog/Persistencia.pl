@@ -215,31 +215,37 @@ resgataRecebedor([H|T], Lista):-
 /*Persistência de estoque*/
 
 %Metodo que inicializa o historico de estoque
-iniciaHistorico(Dia, Mes, QtdMl, QtdMlAnoPassado):-
-    open('dados/HistoricoEstoque.txt', read, StreamRead),
-    read_file(StreamRead,HistoricoEstoqueStr),  
-    close(StreamRead),
-    open('dados/HistoricoEstoque.txt', write, StreamWrite),
-    resgataHisorico(HistoricoEstoqueStr, Dia, Mes, QtdMl, QtdMlAnoPassado, StreamWrite),
-    close(StreamWrite).
-    
-%Metodo que resgata e atualiza o valor do historico do estoque
-resgataHisorico([], Dia, Mes, QtdMl, _, StreamWrite):- escreveHistorico(Dia, Mes, QtdMl, String), write(StreamWrite, String).
-resgataHisorico([H|T], Dia, Mes, QtdMl, QtdMlAnoPassado, StreamWrite):-    
-    nth0(0, H, DiaAntigo),
-    nth0(1, H, MesAntigo),
-    nth0(2, H, QtdMlAntigo),
-    
-    string_concat(DiaAntigo, MesAntigo, DataAntiga),
-    string_concat(Dia, Mes, Data),
-    
-    (DataAntiga = Data ->(QtdMlAnoPassado = QtdMlAntigo); 
-    (escreveHistorico(DiaAntigo, MesAntigo, QtdMlAntigo, String), write(StreamWrite, String))),
-    resgataHisorico(T, Dia, Mes, QtdMl, QtdMlAnoPassado, StreamWrite),
-    (var(QtdMlAnoPassado) -> QtdMlAnoPassado = -1; QtdMlAnoPassado = QtdMlAnoPassado).
+iniciaHistorico(HistoricoEstoque):-
+    open('dados/HistoricoEstoque.txt', read, StreamRead),    
+    read_file(StreamRead,HistoricoEstoqueStr), !,   
+    resgataHistorico(HistoricoEstoqueStr, HistoricoEstoque), 
+    close(StreamRead).
 
-%Escreve o historico do estoque de uma forma simples para salvar no txt
-escreveHistorico(Dia, Mes, QtdMl, Result):-
+resgataHistorico([],[]).
+resgataHistorico([H|T],Lista):-
+    nth0(0,H,Dia),nth0(1,H,Mes),nth0(2,H,Estoque),
+    resgataHistorico(T,ListaNova),
+    EstoqueData = [Dia,Mes,Estoque],
+    append([EstoqueData],ListaNova,Lista).
+
+salvaHistorico(HistoricoEstoque):-
+    open('dados/HistoricoEstoque.txt', write, StreamWrite),   
+    escreveTodosHistoricos(HistoricoEstoque, String),  
+    write(StreamWrite, String),    
+    close(StreamWrite).
+
+escreveTodosHistoricos([],String):- String = ''.
+escreveTodosHistoricos([H|T],String):-
+    escreveHistorico(H,HistoricoString),
+    escreveTodosHistoricos(T,StringProx),
+    string_concat(HistoricoString,StringProx,String).
+
+
+%constroi a string do historico do estoque de uma forma simples para salvar no txt
+escreveHistorico(Historico, Result):-
+    nth0(0, Historico, Dia),
+    nth0(1, Historico, Mes),
+    nth0(2, Historico, QtdMl),
     string_concat(Dia,",", Parte1), string_concat(Parte1, Mes, Parte2), string_concat(Parte2, ",", Parte3), 
     string_concat(Parte3, QtdMl, Parte4), string_concat(Parte4, "\n", Result).
 
