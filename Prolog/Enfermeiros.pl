@@ -17,6 +17,12 @@ buscaEnfermeiro(NomeEnfermeiro,[Head|Tail], Result):-
     getEnfermeiroNome(Head,Nome), string_upper(Nome, NomeUpper), string_upper(NomeEnfermeiro, NomeEnfermeiroUpper),
     (NomeUpper = NomeEnfermeiroUpper -> Result = Head; buscaEnfermeiro(NomeEnfermeiro,Tail,Result)).
 
+enfermeiroToStringUnico(enfermeiro(Nome,Endereco,Idade,Telefone), Result):- 
+    string_concat("Nome: ", Nome, Parte1), string_concat(Parte1, "\n   > Endereço: ", Parte2),
+    string_concat(Parte2, Endereco, Parte3), string_concat(Parte3, "\n   > Idade: ", Parte4),
+    string_concat(Parte4, Idade, Parte5), string_concat(Parte5, "\n   > Telefone: ", Parte6),
+    string_concat(Parte6, Telefone, Result).
+
 %listar todos os enfermeiros
 listarEnfermeiros([]):-nl.
 listarEnfermeiros([Head|Tail]):- enfermeirosToString(Head,EnfermeirosString), write(EnfermeirosString), nl, listarEnfermeiros(Tail).

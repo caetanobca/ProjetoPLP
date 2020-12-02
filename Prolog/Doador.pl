@@ -27,28 +27,68 @@ buscaDoador(NomeDoador,[Head|Tail], Result):- getDoadorNome(Head,Nome), string_u
 
 %listar todos os doadores
 listarDoadores([]):-nl.
-listarDoadores([Head|Tail]):- doadoresToString(Head,DoadoresString), write(DoadoresString), nl, listarDoadores(Tail).
+listarDoadores([Head|Tail]):- doadoresToStringResumido(Head,DoadoresString), write(DoadoresString), nl, listarDoadores(Tail).
 
 %toString Doadores
 doadoresToString(doador(Nome,Endereco,Idade,Telefone, TipSanguineo, ImpedimentoStr, UltimoDiaImpedido), Result):- 
-    string_concat("Nome: ", Nome, Parte1), string_concat(Parte1, " Endereço: ", Parte2),
-    string_concat(Parte2, Endereco, Parte3),string_concat(Parte3, " - Idade: ", Parte4), string_concat(Parte4, Idade, Parte5), 
-    string_concat(Parte5, " - Telefone: ", Parte6), string_concat(Parte6, Telefone, Parte7), string_concat(Parte7, " - Tipo Sanguineo: ", Parte8),
-    string_concat(Parte8, TipSanguineo, Parte9), string_concat(Parte9, " - Impedimentos: ", Parte10), string_concat(Parte10, ImpedimentoStr, Parte11),
-    string_concat(Parte11, " - Ultimo Dia Impedido: ", Parte12),string_concat(Parte12,UltimoDiaImpedido,Result).
+    string_concat("\nNome: ", Nome, Parte1),
+    string_concat(Parte1, "\nEndereço: ", Parte2),
+    string_concat(Parte2, Endereco, Parte3),
+    string_concat(Parte3, "\nIdade: ", Parte4), 
+    string_concat(Parte4, Idade, Parte5), 
+    string_concat(Parte5, "\nTelefone: ", Parte6), 
+    string_concat(Parte6, Telefone, Parte7), 
+    string_concat(Parte7, "\nTipo Sanguineo: ", Parte8),
+    string_concat(Parte8, TipSanguineo, Parte9), 
+    string_concat(Parte9, "\nImpedimentos: ", Parte10),
+    string_concat(Parte10, ImpedimentoStr, Parte11),
+    string_concat(Parte11, "\nUltimo Dia Impedido: ", Parte12),
+    string_concat(Parte12,UltimoDiaImpedido,Result).
+
+%toString Doadores
+doadoresToStringResumido(doador(Nome,Endereco,Idade,Telefone, TipSanguineo, ImpedimentoStr, UltimoDiaImpedido), Result):- 
+    string_concat("\nNome: ", Nome, Parte1),
+    string_concat(Parte1, " - Idade: ", Parte2),
+    string_concat(Parte2, Idade, Parte3), 
+    string_concat(Parte3, " - Tipo Sanguineo: ", Parte4),
+    string_concat(Parte4, TipSanguineo, Parte5),
+    string_concat(Parte5, " - Ultimo Dia Impedido: ", Parte6),
+    string_concat(Parte6,UltimoDiaImpedido,Result).
+
+%toString Doadores
+doadoresToStringComEspaco(doador(Nome,Endereco,Idade,Telefone, TipSanguineo, ImpedimentoStr, UltimoDiaImpedido), Result):- 
+    string_concat("\nNome: ", Nome, Parte1), 
+    string_concat(Parte1, "\nEndereço: ", Parte2),
+    string_concat(Parte2, Endereco, Parte3),
+    string_concat(Parte3, "\nIdade: ", Parte4),
+    string_concat(Parte4, Idade, Parte5), 
+    string_concat(Parte5, "\nTelefone: ", Parte6),
+    string_concat(Parte6, Telefone, Parte7), 
+    string_concat(Parte7, "\nTipo Sanguineo: ", Parte8),
+    string_concat(Parte8, TipSanguineo, Parte9), 
+    string_concat(Parte9, "\nImpedimentos: ", Parte10), 
+    string_concat(Parte10, ImpedimentoStr, Parte11),
+    string_concat(Parte11, "\nUltimo Dia Impedido: ", Parte12),
+    string_concat(Parte12,UltimoDiaImpedido,Result).
 
 existeDoador(Nome,ListaDoador):- buscaDoador(Nome,ListaDoador,Result), \+(Result = "Doador não encontrado").
 removerDoador(ListaDoador,Nome,Result):- buscaDoador(Nome,ListaDoador,Doador), delete(ListaDoador,Doador,Result).
 
 %Metodo que vai Adiciona o ultimo dia impedido
 adicionaImpedimento(Doador, NovoImpedimento, Result):- 
-    getDoadorImpedimentoStr(Doador, ImpedimentoStr), getDoadorNome(Doador, Nome),
-    getDoadorEndereco(Doador, Endereco), getDoadorIdade(Doador, Idade), getDoadorTelefone(Doador, Telefone),
+    getDoadorImpedimentoStr(Doador, ImpedimentoStr), 
+    getDoadorNome(Doador, Nome),
+    getDoadorEndereco(Doador, Endereco), 
+    getDoadorIdade(Doador, Idade), 
+    getDoadorTelefone(Doador, Telefone),
     getDoadorTipSanguineo(Doador, TipSanguineo), 
-    getDoadorUltimoDiaImpedido(Doador, UltimoDiaImpedido), stringParaData(UltimoDiaImpedido,Stamp),
-    string_concat(ImpedimentoStr, "// ", Parte1), impedimentoToStringSimples(NovoImpedimento,ImpedimentoStrNovo) ,
+    getDoadorUltimoDiaImpedido(Doador, UltimoDiaImpedido), 
+    stringParaData(UltimoDiaImpedido,Stamp),
+    string_concat(ImpedimentoStr, "// ", Parte1), 
+    impedimentoToStringSimples(NovoImpedimento,ImpedimentoStrNovo),
     string_concat(Parte1, ImpedimentoStrNovo, Final), 
-    getUltimoDiaImpedido(NovoImpedimento, Stamp, NovoStamp), dataParaString(NovoStamp, NovaData),
+    getUltimoDiaImpedido(NovoImpedimento, Stamp, NovoStamp), 
+    dataParaString(NovoStamp, NovaData),
     constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,Final,NovaData,Result).
 
 %Metodo que verifica se o doador está impedido de doar

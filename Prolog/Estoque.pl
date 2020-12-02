@@ -17,13 +17,13 @@ listaVisaoGeralEstoque(ListaBolsas, Index):-
                     nl, 
                     succ(Index,NewIndex),
                     listaVisaoGeralEstoque(ListaBolsas, NewIndex).
-
+                    
 %retorna uma representacao visual das bolsas de determinado tipo
 bolsaToString(TipoSanguineo,QtdSangue,Result):- string_concat(TipoSanguineo, ": ", Parte1),
                     string_concat(Parte1,QtdSangue, Parte2), 
                     string_concat(Parte2, " ml", Result).
 
-%busca a quantidade de bolsas por tipo
+%calcula a quantidade de bolsas por tipo (QtdSomada em num de bolsas)
 buscaBolsasPorTipo(_,[],QtdAteEntao,QtdSomada):-QtdSomada is QtdAteEntao.
 buscaBolsasPorTipo(TipoProcurado,[H|T],QtdAteEntao, QtdSomada):- 
                     getBolsaTipo(H,TipoSanguineo), 
@@ -62,8 +62,8 @@ removeBolsa(TipoProcurado, Lista,Qtd, Result):-
                   removeBolsa(TipoProcurado,NewLista,NewQtd,Result).
 
 
-%Busca a primeira bolsa equivalente na lista
-buscaBolsa(TipoProcurado,[], Result):- Result = false.
+%Busca a primeira bolsa equivalente na lista TODO cuidado com esse false Result is False
+buscaBolsa(_,[], _).
 buscaBolsa(TipoProcurado, [Head|Tail], Result):- getBolsaTipo(Head, Tipo), 
                     string_upper(Tipo, TipoSanguineoUpper), 
                     string_upper(TipoProcurado, TipoProcuradoUpper), 
@@ -77,6 +77,35 @@ delete_one(Term, [Head|Tail], [Head|Result]) :-
   delete_one(Term, Tail, Result).
 
 
+%retorna a quantidade total de ml do estoque
+qtdMlTotal(_,8,0).
+qtdMlTotal(ListaBolsas, Index, Total):-
+  tipos(Tipos),
+  nth0(Index,Tipos,Tipo),
+  buscaBolsasPorTipo(Tipo,ListaBolsas,0,QtdSomada),
+  bolsasToMl(QtdSomada,QtdSomadaMl),
+  succ(Index,NewIndex),
+  qtdMlTotal(ListaBolsas, NewIndex, QtdProx),
+  Total is QtdProx + QtdSomadaMl.
 
 
 
+
+mensagemEstoque(_,8):-nl.
+mensagemEstoque(Lista, Index):- 
+  tipos(Tipos),
+  nth0(Index,Tipos,Tipo),
+  buscaBolsasPorTipo(Tipo,Lista,0,QtdSomada),
+  bolsasToMl(QtdSomada,QtdSomadaMl),
+  (QtdSomadaMl > 5000 -> write("Está sobrando sangue do tipo sanguíneo "), 
+  write(Tipo), 
+  write("! Há "), 
+  write(QtdSomadaMl),
+  write(" ml, é uma boa ideia doar para outra instituição que precise!")
+  ; QtdSomadaMl < 1000 -> write("Está faltando sangue do tipo "),
+  write(Tipo),
+  write("! Há somente "), 
+  write(QtdSomadaMl),
+  write(" ml restantes"); true).
+  succ(Index,NewIndex),
+  mensagemEstoque(Lista, NewIndex).
