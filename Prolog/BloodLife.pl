@@ -35,8 +35,8 @@ menuEnfermeiro(1):-
     constroiEnfermeiro(Nome,Endereco,Idade,Telefone,Enfermeiro),
     salvaEnfermeiro(Enfermeiro),
     write("Enfermeiro(a) cadastrad(a)"), nl,       
-    write("Pressione enter para continuar."),
-    lerString(_),
+    write("Pressione Enter para continuar."),
+    
     menu(99).
 
 menuEnfermeiro(2):-
@@ -44,13 +44,16 @@ menuEnfermeiro(2):-
     write("Insira o nome do(a) Enfermeiro(a) que você deseja: "),
     lerString(Nome),
     buscaEnfermeiro(Nome,ListaEnfermeiros,Enfermeiro),
-    write(Enfermeiro),    
+    ((Enfermeiro \= "Enfermeiro não encontrado") -> (enfermeiroToStringUnico(Enfermeiro,EnfermeiroStr),write(EnfermeiroStr));
+    write(Enfermeiro)),    
+    nl, write("Pressione Enter para continuar."),
+    lerString(_),
     menu(99).
 
 menuEnfermeiro(3):-
     listaEnfermeiros(ListaEnfermeiros),
     listarEnfermeiros(ListaEnfermeiros),
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -68,7 +71,7 @@ menuEnfermeiro(4):-
     (adicionaEscala(Data,Enfermeiro,ListaEscala,Result), salvaEscala(Result), write("Enfermeiro escalado"))
     ; write("Enfermeiro não cadastrado")));write("Data inserida passada")),
 
-    nl, write("Pressione enter para continuar."),
+    nl, write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -80,14 +83,14 @@ menuEnfermeiro(5):-
     pegaData(Data, ListaEscala, Result),     
     (Result \= -1 -> visualizaEscalaData(ListaEscala,Data); write("Sem escalas para essa data")),
 
-    nl, write("Pressione enter para continuar."),
+    nl, write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
 menuEnfermeiro(N):-
     tty_clear,    
     write("Opção "), write(N), write(" Inválida"),nl,
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -113,7 +116,7 @@ menuRecebedor(1):-
     constroiRecebedor(Nome, Idade, Endereco, NumDeBolsas, TipoSanguineo, Hospital, Recebedor),
     salvaRecebedor(Recebedor),
     write("Paciente cadastrado(a)."), nl,
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -121,16 +124,16 @@ menuRecebedor(2):-
     listaRecebedores(ListaRecebedores), 
     write("Insira o nome do paciente que você deseja procurar: "), lerString(Nome),
     buscaRecebedor(Nome, ListaRecebedores, Recebedor),
-    (existeRecebedor(Nome, ListaRecebedores) -> (recebedoreString(Recebedor, RecebedorStr),
+    (existeRecebedor(Nome, ListaRecebedores) -> (recebedoresToString(Recebedor, RecebedorStr),
     write(RecebedorStr)); write(Recebedor)),nl,
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),    
     menu(99).
 
 menuRecebedor(3):-
     listaRecebedores(ListaRecebedores),
     listarRecebedores(ListaRecebedores), nl,
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -138,7 +141,7 @@ menuRecebedor(3):-
 menuRecebedor(N):-
     tty_clear,
     write("Opção "), write(N), write(" Inválida"),nl,
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -176,7 +179,7 @@ menuImpedimento(2):-
     write("Id: "), lerString(Id), nl,
     buscaImpedimento(Id, ListaImpedimentos, Impedimento),
     write(Impedimento), nl, nl,
-    write("Pressione enter para continuar"), nl,
+    write("Pressione Enter para continuar"), nl,
     lerString(Wait),    
     menu(99).
 
@@ -185,7 +188,7 @@ menuImpedimento(3):-
     listaImpedimentos(ListaImpedimentos),
     write("Listagem de Impedimentos: "), nl,    
     listarImpedimentos(ListaImpedimentos), nl, nl, 
-    write("Pressione enter para continuar"), nl,
+    write("Pressione Enter para continuar"), nl,
     lerString(_), 
     menu(99).
 
@@ -201,7 +204,7 @@ menuImpedimento(4):-
 menuImpedimento(N):-
     tty_clear,    
     write("Opção "), write(N), write(" Inválida"),nl,
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -226,7 +229,7 @@ cadastroImpedimento(2, Impedimento):-
 cadastroImpedimento(N, Impedimento):-
     tty_clear,    
     write("Opção "), write(N), write(" Inválida"),nl,
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -241,6 +244,7 @@ menuDoador(99):-
     write("4. Cadastrar impedimento em Doador(a)"), nl,
     write("5. Mostrar ficha tecnica do Doador(a)"), nl,
     lerNumero(Numero),
+    tty_clear,
     menuDoador(Numero),
     menu(99).
 
@@ -262,6 +266,9 @@ menuDoador(1):-
     constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo, "", Ontem,Doador),    
     salvaDoador(Doador),
     write("Doador(a) cadastrad(a)"),
+    nl,
+    write("Pressione Enter para continuar."),
+    lerString(_),
     menu(99).
 
 menuDoador(2):-
@@ -269,14 +276,16 @@ menuDoador(2):-
     write("Insira o nome do(a) Doador(a) que você deseja: "),
     lerString(Nome),
     buscaDoador(Nome,ListaDoadores,Doador),
-    doadoresToString(Doador, ToStringDoador),
-    write(ToStringDoador),    
+    ((Doador \= "Doador não encontrado") -> doadoresToString(Doador, ToStringDoador),write(ToStringDoador);
+    write(Doador)), 
+    write("Pressione Enter para continuar."), nl,
+    lerString(_),   
     menu(99).
 
 menuDoador(3):-
     listaDoadores(ListaDoadores),
     listarDoadores(ListaDoadores),
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -294,6 +303,8 @@ menuDoador(4):-
     ((Doador \= "Doador não encontrado")-> (adicionaImpedimento(Doador,Impedimento,Result), 
     removeDoador(Nome), salvaDoador(Result), write("Impedimento adicionado"))
     ; write("Impedimento não adicionado")))), 
+    write("Pressione Enter para continuar."), nl,
+    lerString(_),
     menu(99).
 
 menuDoador(5):-
@@ -304,21 +315,24 @@ menuDoador(5):-
     getDoadorImpedimentoStr(Doador, ImpedimentoStr),
     write(ImpedimentoStr),
 
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
 menuDoador(N):-
     tty_clear,    
     write("Opção "), write(N), write(" Inválida"),nl,
-    write("Pressione enter para continuar."),
+    write("Pressione nter para continuar."),
     lerString(_),
     menu(99).
 
 
 % Menu de Estoque
 menuEstoque(99):-
+    tty_clear,
+    listaEstoque(ListaEstoque),
     write("Menu Estoque"),nl,
+    mensagemEstoque(ListaEstoque,0), nl,
     write("1. Registrar Doacao"), nl,
     write("2. Registrar Retirada"), nl,
     write("3. Listar Estoque"), nl,
@@ -337,17 +351,18 @@ menuEstoque(1):-
 %Menu de Estoque para cadastro de nova doação anonima
 menuEstoque(11):-
     listaEstoque(ListaEstoque),
-    write("Insira o Tipo Sanguineo do Doador: "),
+    write("Insira o Tipo Sanguineo do Doador an: "),
     lerString(TipoSanguineo),
     string_upper(TipoSanguineo, TipoSanguineoUpper),
+    validaTipo(TipoSanguineoUpper),
     constroiBolsa(TipoSanguineoUpper,450,NovaBolsa),
     salvaEstoque(NovaBolsa),
-    write("Bolsa cadastrada"),
-    
+    write("Bolsa cadastrada!"), nl,
+    write("Pressione Enter para continuar."),
+    lerString(_),
     menu(99).
 
 %Menu de Estoque para cadastro de nova doação com Doador ja cadastrado
-%TODO IMPEDIMENTOS! TODO Testar quando Doador tiver pronto!
 menuEstoque(12,NomeDoador):-
     tty_clear,  
     listaEstoque(ListaEstoque),
@@ -357,7 +372,10 @@ menuEstoque(12,NomeDoador):-
     getDoadorTipSanguineo(Doador, TipSanguineo),
     constroiBolsa(TipSanguineo,450,NovaBolsa),
     salvaEstoque(NovaBolsa),
-    write("Bolsa cadastrada"),
+    write("Bolsa cadastrada!"), nl,
+    write("Pressione Enter para continuar."), nl,
+    %TODO Adicionar impedimento de 60 dias em doador
+    lerString(_),
     menu(99).
   
 %Menu de Estoque para cadastro de retirada de bolsa
@@ -366,12 +384,11 @@ menuEstoque(2):-
     write("Qual o nome do recebedor (digite anon para anonimo)? "),
     lerString(NomeRecebedor),
     string_upper(NomeRecebedor, NomeRecebedorUpper),
-    (NomeRecebedorUpper = "ANON" -> menuEstoque(21); write("ainda nao implementado")), %TODO
+    (NomeRecebedorUpper = "ANON" -> menuEstoque(21); menuEstoque(22,NomeRecebedorUpper)),
     menu(99).
 
 %Menu de Estoque para cadastro de retirada de bolsa para anonimo
 menuEstoque(21):-
-    tty_clear,
     listaEstoque(ListaEstoque),
     write("Insira o Tipo Sanguineo do Recebedor anonimo: "),
     lerString(TipoSanguineo),
@@ -382,7 +399,9 @@ menuEstoque(21):-
     verificaQtdBolsas(ListaEstoque,NumBolsas,TipoSanguineoUpper,Result),
     (Result = -1 ->  write("Não há bolsas suficientes disponíveis!"),nl, menu(99); true), 
     removeEstoque(TipoSanguineoUpper,NumBolsas),
-    write("Bolsas Retiradas com sucesso!"),
+    write("Bolsas Retiradas com sucesso!"), nl,
+    write("Pressione Enter para continuar."), nl,
+    lerString(_),
     menu(99).
 
 
@@ -394,11 +413,14 @@ menuEstoque(22,NomeRecebedor):-
     (existeRecebedor(NomeRecebedor, ListaRecebedores) -> true; write("Recebedor nao encontrado"), menu(99)),
     buscaRecebedor(NomeRecebedor,ListaRecebedores,Recebedor),
     getRecebedorTipoSanguineo(Recebedor,TipoSanguineo),
+    validaTipo(TipoSanguineo),
     write("Quantas bolsas serão necessarias? "),
     lerNumero(NumBolsas),
     (Result = -1 ->  write("Não há bolsas suficientes disponíveis!"),nl, menu(99); true), 
     removeEstoque(TipoSanguineoUpper,NumBolsas),
-    write("Bolsas Retiradas com sucesso!"),
+    write("Bolsas Retiradas com sucesso!"),nl,
+    write("Pressione Enter para continuar."), nl,
+    lerString(_),
     menu(99).
 
 %Imprime a visao geral do Estoque disponivel
@@ -406,6 +428,14 @@ menuEstoque(3):-
     tty_clear, 
     listaEstoque(ListaEstoque),
     listaVisaoGeralEstoque(ListaEstoque,0),
+    lerString(_),
+    menu(99).    
+
+menuEstoque(N):-
+    tty_clear,    
+    write("Opção "), write(N), write(" Inválida"),nl,
+    write("Pressione Enter para continuar."),
+    lerString(_),
     menu(99).    
 
 %Se o usuario digitar uma opcao invalida, ele sera informado e voltara para o menu principal
@@ -445,7 +475,7 @@ menuAgenda(1):-
         ;write("Data inserida passada")
     ),
     
-    nl, write("Pressione enter para continuar."),
+    nl, write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -476,7 +506,7 @@ menuAgenda(2):-
         ;write("Data inserida passada")
     ),
 
-    nl, write("Pressione enter para continuar."),
+    nl, write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -495,7 +525,7 @@ menuAgenda(3):-
 menuAgenda(N):-
     tty_clear,    
     write("Opção "), write(N), write(" Inválida"),nl,
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -570,7 +600,7 @@ menu(8):-
     salvarDados(),
     tty_clear,
     write("Dados Salvos!"), nl,
-    write("Pressione enter para continuar."), 
+    write("Pressione Enter para continuar."), 
     lerString(_),
     menu(99).   
 
@@ -604,7 +634,7 @@ menu(99):-
 menu(N):-
     tty_clear,
     write("Opção "), write(N), write(" Inválida"),nl,
-    write("Pressione enter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -798,8 +828,10 @@ carregaAgenda():-
 %-------------------------------------------------------------------------------------
 
 %verifica se o tipo sanguineo eh valido, se nao for, informa o usuario e volta ao menu 
-%TODO ver se nao tem uma forma melhor de fazer isso! 
-validaTipo(Tipo):- (member(Tipo,["O-","O+","A-","A+","B-","B+","AB-","AB+"]) -> true; write("Tipo invalido"), menu(99)).
+validaTipo(Tipo):- (member(Tipo,["O-","O+","A-","A+","B-","B+","AB-","AB+"]) -> true; 
+write("Tipo inválido"), nl ,
+write("Pressione Enter para continuar..."), nl,
+lerString(_),menu(99)).
 
 %verifica se o data passada eh valido, se nao for, informa o usuario e volta ao menu 
  
