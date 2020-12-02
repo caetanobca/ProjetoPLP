@@ -34,8 +34,6 @@ enfermeirosToString(enfermeiro(Nome,Endereco,Idade,Telefone), Result):- string_c
 
 existeEnfermeiro(Nome,ListaEnfermeiro):- buscaEnfermeiro(Nome,ListaEnfermeiro,Result), (Result \= "Enfermeiro não encontrado").
 
-removerEnfermeiro(ListaEnfermeiro,Nome,Result):- buscaEnfermeiro(Nome,ListaEnfermeiro,Enfermeiro), delete(ListaEnfermeiro,Enfermeiro,Result).
-
 
 adicionaEscala(DiaMes,Enfermeiro,Escala,DataNome):-    
     pegaData(DiaMes,Escala,Result),

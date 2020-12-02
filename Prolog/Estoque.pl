@@ -63,7 +63,7 @@ removeBolsa(TipoProcurado, Lista,Qtd, Result):-
 
 
 %Busca a primeira bolsa equivalente na lista TODO cuidado com esse false Result is False
-buscaBolsa(_,[], _).
+buscaBolsa(_,[], Result):- Result is false.
 buscaBolsa(TipoProcurado, [Head|Tail], Result):- getBolsaTipo(Head, Tipo), 
                     string_upper(Tipo, TipoSanguineoUpper), 
                     string_upper(TipoProcurado, TipoProcuradoUpper), 
@@ -90,22 +90,22 @@ qtdMlTotal(ListaBolsas, Index, Total):-
 
 
 
-
-mensagemEstoque(_,8):-nl.
+% Imprime mensagens em relação ao estoque atual
+mensagemEstoque(_,8).
 mensagemEstoque(Lista, Index):- 
   tipos(Tipos),
   nth0(Index,Tipos,Tipo),
   buscaBolsasPorTipo(Tipo,Lista,0,QtdSomada),
   bolsasToMl(QtdSomada,QtdSomadaMl),
-  (QtdSomadaMl > 5000 -> write("Está sobrando sangue do tipo sanguíneo "), 
+  (QtdSomadaMl = 0 -> write("!> Atenção! Não há bolsas do tipo "), write(Tipo), write(" disponíveis!"),nl; 
+  (QtdSomadaMl > 10000 -> write("!> Está sobrando sangue do tipo "), 
   write(Tipo), 
   write("! Há "), 
-  write(QtdSomadaMl),
-  write(" ml, é uma boa ideia doar para outra instituição que precise!")
-  ; QtdSomadaMl < 1000 -> write("Está faltando sangue do tipo "),
+  write(QtdSomadaMl),write(" ml, é uma boa ideia doar para outra instituição que precise!"),nl
+  ;QtdSomadaMl < 1000 -> write("!> Está faltando sangue do tipo "),
   write(Tipo),
   write("! Há somente "), 
   write(QtdSomadaMl),
-  write(" ml restantes"); true).
+  write(" ml restantes"),nl; true)),
   succ(Index,NewIndex),
   mensagemEstoque(Lista, NewIndex).
