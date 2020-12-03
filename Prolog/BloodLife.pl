@@ -371,14 +371,21 @@ menuEstoque(11):-
 
 %Menu de Estoque para cadastro de nova doação com Doador ja cadastrado
 menuEstoque(12,NomeDoador):-
-    listaEstoque(ListaEstoque),
+    listaEstoque(ListaEstoque), 
     listaDoadores(ListaDoadores),
-    (existeDoador(NomeDoador, ListaDoadores) -> true; write("Doador não encontrado"), menu(99)),
     buscaDoador(NomeDoador,ListaDoadores,Doador),
+        ((Doador \= "Doador não encontrado") -> true;
+        write("Doador não encontrado"),nl,
+        write("Pressione Enter para continuar."), nl,
+        lerString(_),
+        menu(99)),
     get_time(Stamp),
     dataParaString(Stamp,StringData),
-    (estaImpedido(Doador,StringData) -> write("Doador Impedido"),nl,write("Pressione Enter para continuar."),lerString(_),
-    menu(99);true),
+        (estaImpedido(Doador,StringData) -> write("Doador Impedido"),nl,
+        write("Pressione Enter para continuar."),
+        lerString(_),
+        menu(99);
+        true),
     getDoadorTipSanguineo(Doador, TipSanguineo),
     constroiBolsa(TipSanguineo,450,NovaBolsa),
     salvaEstoque(NovaBolsa),
@@ -424,8 +431,12 @@ menuEstoque(21):-
 menuEstoque(22,NomeRecebedor):-
     listaEstoque(ListaEstoque),
     listaRecebedores(ListaRecebedores),
-    (existeRecebedor(NomeRecebedor, ListaRecebedores) -> true; write("Recebedor não encontrado"), menu(99)),
     buscaRecebedor(NomeRecebedor,ListaRecebedores,Recebedor),
+    ((Recebedor \= "Paciente não encontrado") -> true;
+        write("Paciente não encontrado"),nl,
+        write("Pressione Enter para continuar."), nl,
+        lerString(_),
+        menu(99)),
     getRecebedorTipoSanguineo(Recebedor,TipoSanguineo),
     string_upper(TipoSanguineo,TipoSanguineoUpper),
     validaTipo(TipoSanguineoUpper),
