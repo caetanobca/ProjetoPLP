@@ -3,7 +3,7 @@
 * Download do [Haskell](https://www.haskell.org/platform/)
 * Download do [Stack](https://docs.haskellstack.org/en/stable/README/)
 
-**Para importar as bibliotecas Data.List.Split e System.IO.Strict com o stack, rode o seguinte no PowerShell dentro do diretório do projeto:**
+**Para importar bibliotecas como Data.List.Split e System.IO.Strict com o stack, rode o seguinte no Terminal dentro do diretório do projeto:**
 
 	stack setup
 	
