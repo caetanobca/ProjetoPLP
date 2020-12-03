@@ -19,9 +19,9 @@ menuEnfermeiro(99):-
     write("2. Buscar Enfermeiros"), nl,
     write("3. Listagem de Enfermeiros"), nl,
     write("4. Adicionar escala de Enfermeiros"), nl,
-    write("5. Visualizar escala de Enfermeiros"), nl,
-    tty_clear, 
+    write("5. Visualizar escala de Enfermeiros"), nl,   
     lerNumero(Numero),
+    tty_clear,
     menuEnfermeiro(Numero),
     menu(99).
 
@@ -39,7 +39,7 @@ menuEnfermeiro(1):-
     salvaEnfermeiro(Enfermeiro),
     write("Enfermeiro(a) cadastrad(a)"), nl,       
     write("Pressione enter para continuar."),
-    
+    lerString(_),    
     menu(99).
 
 menuEnfermeiro(2):-
@@ -106,7 +106,7 @@ menuRecebedor(99):-
     write("2. Buscar Recebedores"), nl,
     write("3. Listar Recebedores"), nl,
     lerNumero(Numero),
-    tty_clear, 
+    tty_clear,
     menuRecebedor(Numero),
     menu(99).
 
@@ -173,6 +173,9 @@ menuImpedimento(1):-
     lerNumero(Opcao),
     cadastroImpedimento(Opcao, Impedimento),
     salvaImpedimento(Impedimento),
+    write("Impedimento salvo"), nl,
+    write("Pressione Enter para continuar."),
+    lerString(_),
     menu(99).
 
 %Menu de impedimento para buscar impedimento
@@ -183,7 +186,8 @@ menuImpedimento(2):-
     write("Doenca -> Id = Cid"), nl,
     write("Id: "), lerString(Id), nl,
     buscaImpedimento(Id, ListaImpedimentos, Impedimento),
-    write(Impedimento), nl, nl,
+    (Impedimento \= "Não encontrado"-> impedimentoToString(Impedimento, ImpedimentoStr); ImpedimentoStr = "Impedimento não encontrado."),
+    write(ImpedimentoStr), nl,
     write("Pressione Enter para continuar"), nl,
     lerString(_),    
     menu(99).
@@ -204,6 +208,9 @@ menuImpedimento(4):-
     write("Doenca -> Id = Cid"), nl,
     write("Id: "), lerString(Id), nl,
     removeImpedimento(Id),
+    write("Impedimento removido"),
+    write("Pressione Enter para continuar"), nl,
+    lerString(_), 
     menu(99).
 
 menuImpedimento(N):-
@@ -307,7 +314,7 @@ menuDoador(4):-
     (buscaImpedimento(NovoImpedimento, ListaImpedimento, Impedimento), buscaDoador(Nome,ListaDoadores,Doador),
     ((Doador \= "Doador não encontrado")-> (adicionaImpedimento(Doador,Impedimento,Result), 
     removeDoador(Nome), salvaDoador(Result), write("Impedimento adicionado"))
-    ; write("Impedimento não adicionado")))), 
+    ; write("Impedimento não adicionado")))), nl,
     write("Pressione Enter para continuar."), nl,
     lerString(_),
     menu(99).
@@ -327,7 +334,7 @@ menuDoador(5):-
 menuDoador(N):-
     tty_clear,    
     write("Opção "), write(N), write(" Inválida"),nl,
-    write("Pressione nter para continuar."),
+    write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
 
@@ -410,7 +417,7 @@ menuEstoque(21):-
     write("Quantas bolsas serao necessarias? "),
     lerNumero(NumBolsas),
     verificaQtdBolsas(ListaEstoque,NumBolsas,TipoSanguineoUpper,Result),
-    (Result = -1 ->  write("Não há bolsas suficientes disponíveis!"),nl, menu(99); true), 
+    (Result = -1 ->  write("Não há bolsas suficientes disponíveis!"),nl, write("Pressione Enter para continuar."), nl, lerString(_), menu(99); true), 
     removeEstoque(TipoSanguineoUpper,NumBolsas),
     write(NumBolsas), write(" bolsa(s) do tipo "),
     write(TipoSanguineoUpper),
@@ -432,7 +439,7 @@ menuEstoque(22,NomeRecebedor):-
     write("Quantas bolsas serão necessarias? "),
     lerNumero(NumBolsas),
     verificaQtdBolsas(ListaEstoque,NumBolsas,TipoSanguineoUpper,Result),
-    (Result = -1 ->  write("Não há bolsas suficientes disponíveis!"),nl, menu(99); true), 
+    (Result = -1 ->  write("Não há bolsas suficientes disponíveis!"),nl, write("Pressione Enter para continuar."), nl, lerString(_), menu(99); true), 
     removeEstoque(TipoSanguineoUpper,NumBolsas),
     write(NumBolsas), write(" bolsa(s) do tipo "),
     write(TipoSanguineoUpper),
@@ -489,13 +496,13 @@ menuAgenda(1):-
                 buscaEnfermeiro(EnfermeiroNome,ListaEnfermeiros,Enfermeiro),
 
                 ((Enfermeiro \= "Enfermeiro não encontrado")->
-                    (adicionaAgendaHemocentro(Data, Doador, Enfermeiro, ListaAgenda, AgendaNova), salvaAgenda(AgendaNova))
+                    (adicionaAgendaHemocentro(Data, Doador, Enfermeiro, ListaAgenda, AgendaNova), salvaAgenda(AgendaNova),write("Agendamento concluido com sucesso"))
                     ;write("Enfermeiro não cadastrado"))))
             ;write("Doador não cadastrado")))     
         ;write("Data inserida passada")
     ),
     
-    nl, write("Pressione Enter para continuar."),
+    nl, write("Pressione Enter para continuar."), nl,
     lerString(_),
     menu(99).
 
@@ -520,13 +527,13 @@ menuAgenda(2):-
                 buscaEnfermeiro(EnfermeiroNome,ListaEnfermeiros,Enfermeiro),
 
                 ((Enfermeiro \= "Enfermeiro não encontrado")->
-                    (adicionaAgendaDomicilio(Data, Doador, Enfermeiro, ListaAgenda, AgendaNova), salvaAgenda(AgendaNova))
+                    (adicionaAgendaDomicilio(Data, Doador, Enfermeiro, ListaAgenda, AgendaNova), salvaAgenda(AgendaNova),write("Agendamento concluido com sucesso"))
                     ;write("Enfermeiro não cadastrado"))))
             ;write("Doador não cadastrado")))     
         ;write("Data inserida passada")
     ),
-
-    nl, write("Pressione Enter para continuar."),
+    
+    nl, write("Pressione Enter para continuar."),nl,
     lerString(_),
     menu(99).
 
@@ -907,7 +914,9 @@ lerString(_),menu(99)).
 validaData(Data):- 
     stringParaData(Data, StampEntrada),
     get_time(StampAtual),
-    StampEntrada >= StampAtual.
+    StampCompara is StampEntrada + 86399,
+    dataParaString(StampCompara, Str),
+    StampCompara >= StampAtual.
 
 salvarDados():-
     listaEnfermeiros(ListaEnfermeiros),
