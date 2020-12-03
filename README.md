@@ -1,5 +1,4 @@
 # **Projeto de PLP - 2020.3**
----
 <p  align="center">
      <img  src="./img/038-transfusion.svg"  heigth="80"  width="180"/>
      <img  src="./img/005-blood-donation.svg"  heigth="80"  width="180"/>
