@@ -1,3 +1,6 @@
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+
 constroiRecebedor(Nome,Idade,Endereco,NumDeBolsas,TipoSanguineo,Hospital, recebedor(Nome,Idade,Endereco,NumDeBolsas,TipoSanguineo,Hospital)).
 salvaRecebedor(Recebedor,Lista,Result):- append(Lista,[Recebedor], Result).
 

@@ -1,3 +1,6 @@
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+
 constroiEnfermeiro(Nome,Endereco,Idade,Telefone,enfermeiro(Nome,Endereco,Idade,Telefone)).
 
 
@@ -64,12 +67,13 @@ pegaEscala(DiaMes,[Head|Tail],Result):-
     nth0(0,Head,Data), string_upper(Data, DataStr), string_upper(DiaMes, DiaMesStr),
     (DataStr = DiaMesStr -> Result = Head; pegaEscala(DiaMes,Tail,Result)).
 
-visualizaEscalaData(ListaEscala,Data):-
+visualizaEscalaData(ListaEscala,Data,Result):-
     pegaEscala(Data, ListaEscala, EscalaData),   
     nth0(1,EscalaData,EnfermeirosEscalados),   
-    atomic_list_concat(ListaEnfermeiros,"//", EnfermeirosEscalados),
-    write(Data),write(":"), nl,
-    listarEscalaData(ListaEnfermeiros).
+    atomic_list_concat(ListaEnfermeiros,"//", EnfermeirosEscalados),   
+    listarEscalaData(ListaEnfermeiros,Result).
     
-listarEscalaData([]):-nl.
-listarEscalaData([Head|Tail]):- write(Head), nl, listarEscalaData(Tail).
+listarEscalaData([], String):- String = "".
+listarEscalaData([Head|Tail],String):- listarEscalaData(Tail,StringNovo),string_concat(Head, "\n", Parte1),
+    string_concat(Parte1, StringNovo, String). 
+

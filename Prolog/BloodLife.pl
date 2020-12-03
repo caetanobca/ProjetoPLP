@@ -6,9 +6,10 @@
 :- include('Persistencia.pl').
 :- include('HistoricoDoEstoque.pl').
 :- include('Agenda.pl').
-:- style_check(-discontiguous).
-:- style_check(-singleton).
+:- include('Dashboard.pl').
 :- initialization(main).
+:- style_check(-singleton).
+:- style_check(-discontiguous).
 
 
 menuEnfermeiro(99):-    
@@ -24,7 +25,6 @@ menuEnfermeiro(99):-
     menu(99).
 
 menuEnfermeiro(1):-
-    listaEnfermeiros(ListaEnfermeiros),    
     write("Você irá cadastrar um Enfermeiro(a): "),nl,
     write("Insira o nome do Enfermeiro(a): "),
     lerString(Nome),
@@ -83,7 +83,8 @@ menuEnfermeiro(5):-
     write("Visualizar escala de Enfermeiros"), nl,
     write("Insira a data: "), lerString(Data),
     pegaData(Data, ListaEscala, Result),     
-    (Result \= -1 -> visualizaEscalaData(ListaEscala,Data); write("Sem escalas para essa data")),
+    (Result \= -1 -> nl,write(Data),write(":"),visualizaEscalaData(ListaEscala,Data,String),nl,write(String);
+    write("Sem escalas para essa data")),
 
     nl, write("Pressione enter para continuar."),
     lerString(_),
@@ -182,7 +183,7 @@ menuImpedimento(2):-
     buscaImpedimento(Id, ListaImpedimentos, Impedimento),
     write(Impedimento), nl, nl,
     write("Pressione Enter para continuar"), nl,
-    lerString(Wait),    
+    lerString(_),    
     menu(99).
 
 %Menu de impedimento para listar os impedimentos
@@ -228,7 +229,7 @@ cadastroImpedimento(2, Impedimento):-
     write("tempo de Suspencao (em dias): "), lerString(Tempo), nl,
     constroiDoenca(Cid, Tempo, Impedimento).
 
-cadastroImpedimento(N, Impedimento):-
+cadastroImpedimento(N, _):-
     tty_clear,    
     write("Opção "), write(N), write(" Inválida"),nl,
     write("Pressione Enter para continuar."),
@@ -352,14 +353,13 @@ menuEstoque(1):-
 
 %Menu de Estoque para cadastro de nova doação anonima
 menuEstoque(11):-
-    listaEstoque(ListaEstoque),
     write("Insira o Tipo Sanguineo do Doador anônimo: "),
     lerString(TipoSanguineo),
     string_upper(TipoSanguineo, TipoSanguineoUpper),
     validaTipo(TipoSanguineoUpper),
     constroiBolsa(TipoSanguineoUpper,450,NovaBolsa),
     salvaEstoque(NovaBolsa),
-    write("Uma bolsa de 450 ml do tipo "), write(TipSanguineoUpper), (" cadastrada com sucesso!"), nl,
+    write("Uma bolsa de 450 ml do tipo "), write(TipoSanguineoUpper), (" cadastrada com sucesso!"), nl,
     write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
@@ -531,7 +531,7 @@ menuAgenda(3):-
     write("Visualizar agenda de doação"),nl,
     write("Insira a data: "), lerString(Data),    
     pegaData(Data, ListaAgenda, Result),
-    (Result \= -1 -> visualizaAgenda(ListaAgenda,Data); write("Sem agendamentos para essa data")),
+    (Result \= -1 -> write(Data),write(":"), nl,visualizaAgenda(ListaAgenda,Data,Agenda),write(Agenda); write("Sem agendamentos para essa data")),
 
     nl, write("Pressione enter para continuar."),
     lerString(_),
@@ -547,6 +547,7 @@ menuAgenda(N):-
 
 %Main
 main:-
+    
     carregaEnfermeiros(), 
     carregaImpedimentos(), 
     carregaEstoque(),
@@ -554,7 +555,7 @@ main:-
     carregaRecebedores(),
     carregaEscala(),
     carregaAgenda(),
-    historico(),
+    historico(),   
     letreiroInicial,
     lerString(_),
     menu(99),
@@ -605,10 +606,38 @@ menu(6):-
 
 %Menu(7) Invoca o Dashboard
 menu(7):-
-    tty_clear,
-    write("Dashboard"),    
-    lerString(A),
-    nl,
+    tty_clear,   
+
+    listaEscala(ListaEscala),
+    listaAgenda(ListaAgenda),
+    get_time(Stamp), 
+    dataParaString(Stamp, Hoje),
+    pegaData(Hoje, ListaEscala, ResultEscala),
+    (ResultEscala \= -1-> visualizaEscalaData(ListaEscala, Hoje, EscalaHoje); EscalaHoje = "Sem escalas para hoje."),
+    pegaData(Hoje, ListaAgenda, ResultAgenda),
+    (ResultAgenda \= -1-> visualizaAgenda(ListaAgenda, Hoje, AgendaHoje); AgendaHoje = "Sem doações agendadas para hoje."),
+    
+
+    listaEstoque(ListaEstoque),
+    buscaBolsasPorTipo("A+",ListaEstoque,0,AM), !,
+    buscaBolsasPorTipo("A-",ListaEstoque,0,A), !,
+    buscaBolsasPorTipo("B+",ListaEstoque,0,BM), !,
+    buscaBolsasPorTipo("B-",ListaEstoque,0,B), !,
+    buscaBolsasPorTipo("AB+",ListaEstoque,0,ABM), !,
+    buscaBolsasPorTipo("AB-",ListaEstoque,0,AB), !,
+    buscaBolsasPorTipo("O+",ListaEstoque,0,OM), !,
+    buscaBolsasPorTipo("O-",ListaEstoque,0,O), !,
+    AMMl is AM*450, AMl is A*450, BMMl is BM*450, BMl is B*450,
+    ABMMl is ABM*450, ABMl is AB*450, OMMl is OM*450, OMl is O*450,   
+    estoqueAnoPassado(AnoPassado),
+    
+    listaImpedimentos(ListaImpedimento), length(ListaImpedimento, QtdImpedimentos),
+    listaEnfermeiros(ListaEnfermeiros), length(ListaEnfermeiros, QtdEnfermeiros),
+    listaRecebedores(ListaRecebedores), length(ListaRecebedores, QtdRecebedores),
+    listaDoadores(ListaDoadores), length(ListaDoadores, QtdDoadores),
+
+    dashboardIni(AMl,AMMl,BMl,BMMl,ABMl,ABMMl,OMl,OMMl,AnoPassado,AgendaHoje,EscalaHoje,QtdEnfermeiros,QtdImpedimentos,QtdDoadores,QtdRecebedores), 
+    lerString(_),
     menu(99).
 
 %Menu(8) Salva os dados 
@@ -820,8 +849,14 @@ historico():-
     listaEstoque(Estoque),
     qtdMlTotal(Estoque, 0, QtdSangueHoje),
     retract(historicoDoEstoque(Historico)),
-    verificaEstoque(QtdSangueHoje, Estado),
+    retract(estoqueAnoPassado(Passado)),
+    verificaEstoque(QtdSangueHoje, Estado,AnoPassado),
+    assert(estoqueAnoPassado(AnoPassado)),
     assert(historicoDoEstoque(Estado)). 
+
+
+estoqueAnoPassado("").
+:-dynamic estoqueAnoPassado/1.
 
 historicoDoEstoque("").
 :-dynamic historicoDoEstoque/1.
@@ -856,14 +891,6 @@ write("Tipo inválido"), nl ,
 write("Pressione Enter para continuar..."), nl,
 lerString(_),menu(99)).
 
-estadoDoEstoque():-
-    qtdMlTotal(ListaEstoque, 0, QtdSangueHoje),
-    retract(estadoEstoque(Estado)),
-    verificaEstoque(QtdSangueHoje, Estado),
-    assert(estadoEstoque(Estado)).
-
-estadoEstoque("").
-:-dynamic estadoEstoque/1.
 
 %verifica se o data passada eh valido, se nao for, informa o usuario e volta ao menu 
 validaData(Data):- 

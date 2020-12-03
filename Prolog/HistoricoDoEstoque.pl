@@ -1,13 +1,17 @@
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+
 :- include('Persistencia.pl').
 
 %Predicado que deve ser chamado no BloodLife que recebe a qtd de sangue atual do estoque e encontra o estado do estoque
-verificaEstoque(QtdSangueHoje, Estado):-
+verificaEstoque(QtdSangueHoje, Estado, AnoPassado):-
     get_time(Stamp),
     stamp_date_time(Stamp, DateTime, local),
     date_time_value(day, DateTime, Dia),
     date_time_value(month, DateTime, Mes),
     iniciaHistorico(ListaHistorico),  
     pegarHistorico(ListaHistorico, Dia, Mes, QtdMlAnoPassado),
+    AnoPassado = QtdMlAnoPassado,
     (QtdMlAnoPassado = -1 -> Estado = "SEM HISTORICO DE ESTOQUE"
     ;getEstado(QtdMlAnoPassado, QtdSangueHoje, Estado)),
     HistoricoDia = [Dia, Mes, QtdSangueHoje],

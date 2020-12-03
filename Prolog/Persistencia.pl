@@ -1,3 +1,6 @@
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+
 :- include("Enfermeiros.pl").
 :- include("Impedimentos.pl").
 :- include("Doador.pl").
