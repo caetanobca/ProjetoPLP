@@ -1,3 +1,6 @@
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+
 :- include('Impedimentos.pl').
 
 constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido,doador(Nome,Endereco,Idade,Telefone,TipSanguineo,ImpedimentoStr,UltimoDiaImpedido)).
@@ -102,7 +105,7 @@ estaImpedido(Doador, DiaDoacao) :-
 
 
 dataParaString(Stamp,StringData):-
-    stamp_date_time(Stamp, DataString, 'UTC'), 
+    stamp_date_time(Stamp, DataString, local), 
     date_time_value(year, DataString, Value3), 
     date_time_value(month, DataString, Value2), 
     date_time_value(day, DataString, Value1),

@@ -1,3 +1,6 @@
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+
 constroiBolsa(TipoSanguineo,QtdSangue,bolsa(TipoSanguineo,QtdSangue)).
 
 %retorna os dados da bolsa

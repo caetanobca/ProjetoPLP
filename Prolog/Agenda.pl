@@ -1,3 +1,6 @@
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+
 :- include("Enfermeiros.pl").
 :- include("Doador.pl").
 
@@ -42,14 +45,16 @@ pegaAgenda(DiaMes,[Head|Tail],Result):-
     (DataStr = DiaMesStr -> Result = Head; pegaAgenda(DiaMes, Tail, Result)).
 
 
-visualizaAgenda(ListaAgenda,Data):-
+visualizaAgenda(ListaAgenda,Data,Result):-
     pegaAgenda(Data, ListaAgenda, DoacoesAgendadas),   
     nth0(1,DoacoesAgendadas,DoadoresAgendados),       
-    atomic_list_concat(ListaDoadores,"//", DoadoresAgendados),
-    write(Data),write(":"), nl,
-    listarAgendaData(ListaDoadores).
+    atomic_list_concat(ListaDoadores,"//", DoadoresAgendados),    
+    listarAgendaData(ListaDoadores,Result).
 
-listarAgendaData([]):-nl.
-listarAgendaData([Head|Tail]):- write(Head), nl, listarAgendaData(Tail).
+listarAgendaData([], String):- String = "".
+listarAgendaData([Head|Tail],String):-  listarAgendaData(Tail,StringNovo),string_concat(Head, "\n", Parte1),
+    string_concat(Parte1, StringNovo, String). 
+
+
 
 

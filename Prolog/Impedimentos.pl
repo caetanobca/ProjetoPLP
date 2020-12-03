@@ -1,3 +1,6 @@
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+
 %Cria um termo composto do tipo doenca ou medicamento, que representa um impedimento
 constroiDoenca(Cid, TempoSuspencao, doenca(Cid, TempoSuspencao)).
 constroiMedicamento(Funcao, Composto, TempoSuspencao, medicamento(Funcao, Composto, TempoSuspencao)).
