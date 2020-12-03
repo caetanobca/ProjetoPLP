@@ -20,6 +20,7 @@ menuEnfermeiro(99):-
     write("3. Listagem de Enfermeiros"), nl,
     write("4. Adicionar escala de Enfermeiros"), nl,
     write("5. Visualizar escala de Enfermeiros"), nl,
+    tty_clear, 
     lerNumero(Numero),
     menuEnfermeiro(Numero),
     menu(99).
@@ -105,6 +106,7 @@ menuRecebedor(99):-
     write("2. Buscar Recebedores"), nl,
     write("3. Listar Recebedores"), nl,
     lerNumero(Numero),
+    tty_clear, 
     menuRecebedor(Numero),
     menu(99).
 
@@ -269,7 +271,7 @@ menuDoador(1):-
     getOntemString(Ontem), 
     constroiDoador(Nome,Endereco,Idade,Telefone,TipSanguineoUpper, "", Ontem,Doador),    
     salvaDoador(Doador),
-    write("Doador(a) cadastrad(a)"),
+    write("Doador(a) cadastrado (a)"),nl,
     write("Pressione Enter para continuar."), nl,
     lerString(_),   
     menu(99). 
@@ -280,7 +282,7 @@ menuDoador(2):-
     lerString(Nome),
     buscaDoador(Nome,ListaDoadores,Doador),
     ((Doador \= "Doador não encontrado") -> doadoresToString(Doador, ToStringDoador),write(ToStringDoador);
-    write(Doador)), 
+    write(Doador)), nl,
     write("Pressione Enter para continuar."), nl,
     lerString(_),   
     menu(99).
@@ -340,6 +342,7 @@ menuEstoque(99):-
     write("2. Registrar Retirada"), nl,
     write("3. Listar Estoque"), nl,
     lerNumero(Numero),
+    tty_clear, 
     menuEstoque(Numero),
     menu(99).
 
@@ -349,17 +352,19 @@ menuEstoque(1):-
     write("Qual o nome do doador (digite anon para anônimo)? "),
     lerString(NomeDoador),
     string_upper(NomeDoador, NomeDoadorUpper),
+    tty_clear,
     (NomeDoadorUpper = "ANON" -> menuEstoque(11); menuEstoque(12,NomeDoadorUpper)).
 
 %Menu de Estoque para cadastro de nova doação anonima
-menuEstoque(11):-
-    write("Insira o Tipo Sanguineo do Doador anônimo: "),
+menuEstoque(11):- 
+    write("Você irá registrar uma Doação Anônima:"),nl,
+    write("Insira o Tipo Sanguineo do Doador: "),
     lerString(TipoSanguineo),
     string_upper(TipoSanguineo, TipoSanguineoUpper),
     validaTipo(TipoSanguineoUpper),
     constroiBolsa(TipoSanguineoUpper,450,NovaBolsa),
     salvaEstoque(NovaBolsa),
-    write("Uma bolsa de 450 ml do tipo "), write(TipoSanguineoUpper), (" cadastrada com sucesso!"), nl,
+    write("Bolsa de 450 ml do tipo "), write(TipoSanguineoUpper), write(" cadastrada com sucesso!"), nl,
     write("Pressione Enter para continuar."),
     lerString(_),
     menu(99).
@@ -368,9 +373,8 @@ menuEstoque(11):-
 menuEstoque(12,NomeDoador):-
     listaEstoque(ListaEstoque),
     listaDoadores(ListaDoadores),
-    string_upper(NomeDoador,NomeDoadorUpper),
-    (existeDoador(NomeDoadorUpper, ListaDoadores) -> true; write("Doador não encontrado"), menu(99)),
-    buscaDoador(NomeDoadorUpper,ListaDoadores,Doador),
+    (existeDoador(NomeDoador, ListaDoadores) -> true; write("Doador não encontrado"), menu(99)),
+    buscaDoador(NomeDoador,ListaDoadores,Doador),
     get_time(Stamp),
     dataParaString(Stamp,StringData),
     (estaImpedido(Doador,StringData) -> write("Doador Impedido"),nl,write("Pressione Enter para continuar."),lerString(_),
@@ -378,11 +382,12 @@ menuEstoque(12,NomeDoador):-
     getDoadorTipSanguineo(Doador, TipSanguineo),
     constroiBolsa(TipSanguineo,450,NovaBolsa),
     salvaEstoque(NovaBolsa),
+    write("Doador econtrado!"),nl,
     write("Uma bolsa de 450 ml do tipo "), write(TipSanguineo), write(" cadastrada com sucesso!"), nl,
     atom_number(Atom,60),
     constroiDoenca("Doação recente",Atom,ImpedimentoDoacao),
     adicionaImpedimento(Doador, ImpedimentoDoacao,Result), 
-    removeDoador(NomeDoadorUpper), salvaDoador(Result), 
+    removeDoador(NomeDoador), salvaDoador(Result), 
     write("Pressione Enter para continuar."), nl,
     lerString(_),
     menu(99).
@@ -652,6 +657,18 @@ menu(8):-
 %Menu(9) Encerra o programa
 menu(9):-
     tty_clear,
+    write("
+    ---------------------------------------------------------------------------
+    |            Obrigado Por Usar o BloodLife!                               |
+    |                                                                         |
+    |      Autores:                                                           |
+    |            * Artur Brito         (https://github.com/arturbs)           |
+    |            * Caetano Albuquerque (https://github.com/caetanobca)        |
+    |            * Caio Davi           (https://github.com/caiodavic)         | 
+    |            * Fernando Lisboa     (https://github.com/fernandollisboa)   |
+    |                                                                         |
+    |      UFCG (2020)                                                        |
+    ---------------------------------------------------------------------------"),nl,
     salvarDados(),
     write("Encerrando."),
     halt.
@@ -659,7 +676,7 @@ menu(9):-
 
 %Menu(99) Menu Inicial
 menu(99):-    
-    %tty_clear,    
+    tty_clear,    
     ttyflush,
     historicoDoEstoque(Estado),
     nl, write(Estado),nl,
@@ -750,13 +767,7 @@ salvaRecebedor(Recebedor):-
     append(Lista,[Recebedor],NovaLista),
     assert(listaRecebedores(NovaLista)).
 
-%remove um recebedor e faz a nova lista sem o recebedor que foi removido
-/* TODO remover a funcao se nao for usar
-removeRecebedor(Recebedor):-
-    retract(listaRecebedores(Lista)),
-    removerRecebedor(Lista,Recebedor,NovaLista),
-    assert(listaRecebedores(NovaLista)).
-*/
+
 
 
 %cria a lista dinamica de recebedor
