@@ -1,7 +1,7 @@
 :- include('Enfermeiros.pl').
 :- include('Recebedores.pl').
 :- include('Impedimentos.pl').
-:- include('Estoque.pl').
+:- include('Estoque.pl'). 
 :- include('Doador.pl').
 :- include('Persistencia.pl').
 :- include('HistoricoDoEstoque.pl').
