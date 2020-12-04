@@ -21,4 +21,4 @@
 ---
 # [Especificação](https://docs.google.com/document/d/1JNRNlHbjwj-HJhO-UjUqoyT4cKTxpHdYI1Cs2WvYIXQ/edit?usp=sharing)
 # [Vídeo Explicativo Haskell](https://youtu.be/hwUGltLfQto)
-# [Vídeo Explicativo Prolog](youtube.com)
+# [Vídeo Explicativo Prolog](https://youtu.be/4xhLa-4fITE)
